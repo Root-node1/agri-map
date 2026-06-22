@@ -1,0 +1,22 @@
+# Root ignore rules
+
+# Global environment file
+global.env
+
+# Node.js dependencies
+client-agri-map/node_modules/
+node-agri-map-server/node_modules/
+
+# Build artifacts
+client-agri-map/dist/
+client-agri-map/build/
+
+# Python virtualenv and caches
+server-agri-map-django/venv/
+server-agri-map-django/.venv/
+**/__pycache__/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+*.log

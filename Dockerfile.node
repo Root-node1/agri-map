@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY node-agri-map-server/package.json node-agri-map-server/package-lock.json ./
+COPY node-agri-map-server/src ./src
+COPY node-agri-map-server/.env ./
+RUN npm ci
+EXPOSE 3001
+CMD ["npm", "run", "start"]

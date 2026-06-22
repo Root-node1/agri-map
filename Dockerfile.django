@@ -1,0 +1,9 @@
+# Placeholder Django service
+# Add your Django application files and requirements.txt before using.
+FROM python:3.12-slim
+WORKDIR /app
+COPY server-agri-map-django/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY server-agri-map-django/ .
+EXPOSE 8002
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]

@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "4173:4173"
+    environment:
+      - NODE_ENV=development
+
+  node-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - client
+
+  django-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.django
+    ports:
+      - "8002:8002"
+    environment:
+      - DJANGO_SETTINGS_MODULE=server_agri_map_django.settings
+    depends_on:
+      - node-backend
