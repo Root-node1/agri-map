@@ -1,9 +1,21 @@
-# Placeholder Django service
-# Add your Django application files and requirements.txt before using.
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    DJANGO_SETTINGS_MODULE=server_agri_map_django.settings.production \
+    SECRET_KEY=dummy-build-only
+
+RUN apt-get update && apt-get install -y \
+    libgdal-dev \
+    libpq-dev \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY server-agri-map-django/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=180 -r requirements.txt
 COPY server-agri-map-django/ .
+RUN python manage.py collectstatic --noinput
+RUN chmod +x startup.sh
 EXPOSE 8002
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
+CMD ["./startup.sh"]

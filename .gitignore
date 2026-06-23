@@ -16,6 +16,9 @@ server-agri-map-django/venv/
 server-agri-map-django/.venv/
 **/__pycache__/
 
+# Django local env with secrets
+server-agri-map-django/.env
+
 # OS artifacts
 .DS_Store
 Thumbs.db

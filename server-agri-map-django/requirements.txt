@@ -1,0 +1,17 @@
+python-decouple
+dj-database-url
+django>=4.2
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+django-filter
+drf-spectacular
+gunicorn
+whitenoise
+psycopg2-binary
+scikit-learn
+joblib
+numpy
+pandas
+rasterio
+shapely
