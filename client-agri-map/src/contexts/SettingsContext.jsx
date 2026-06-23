@@ -10,7 +10,8 @@ const FONT_STEPS = [
   { id: "sm", px: 14, label: "A" },
   { id: "md", px: 16, label: "A" },
   { id: "lg", px: 18, label: "A" },
-  { id: "xl", px: 21, label: "A" },
+  { id: "xl", px: 20, label: "A" },
+  { id: "xxl", px: 24, label: "A" },
 ];
 
 const STORAGE_KEY = "agrimap.settings.v1";

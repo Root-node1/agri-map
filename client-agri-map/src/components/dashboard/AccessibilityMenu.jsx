@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Type, Minus, Plus, Globe } from "lucide-react";
-import { useSettings } from "../context/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
 export default function AccessibilityMenu() {
   const [open, setOpen] = useState(false);

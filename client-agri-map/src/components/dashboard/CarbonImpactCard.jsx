@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useSettings } from "../context/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
 export default function CarbonImpactCard({ carbonTons }) {
   const { t } = useSettings();
@@ -22,7 +22,7 @@ export default function CarbonImpactCard({ carbonTons }) {
         <p className="text-sm text-ink-600">{t("carbonSubtitle")}</p>
 
         <p className="mt-3 text-3xl font-extrabold text-brand-700">
-          {carbonTons.toLocaleString()}{" "}
+          {Number(carbonTons || 0).toFixed(2)}{" "}
           <span className="text-lg font-semibold text-brand-600">
             {t("carbonUnit")}
           </span>
