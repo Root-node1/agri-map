@@ -7,6 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "ai-test": "node test-ai.js",
+    "test": "npm run ai-test",
     "train": "python3 ai_scripts/train_models.py"
   },
   "dependencies": {
