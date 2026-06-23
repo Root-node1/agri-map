@@ -11,12 +11,17 @@ ALLOWED_HOSTS = config(
     default='agrimap-django.onrender.com',
     cast=Csv(),
 )
+ALLOWED_HOSTS += ['.onrender.com']
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default='https://agrimap-django.onrender.com,https://agrimap-node.onrender.com',
     cast=Csv(),
 )
+CORS_ALLOWED_ORIGINS = [
+    o if o.startswith('http://') or o.startswith('https://') else f'https://{o}'
+    for o in CORS_ALLOWED_ORIGINS
+]
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
