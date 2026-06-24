@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from fields.models import Field
-from ml.services import predict_crop
+from ml.services import predict_crop, predict_crop_area, predict_soil
 
 from .models import BoundaryDetection, LandDegradation, VegetationIndex
 from .serializers import (
@@ -14,6 +14,8 @@ from .serializers import (
     CropTypeInputSerializer,
     CropTypeResponseSerializer,
     DegradationResponseSerializer,
+    MLInputSerializer,
+    MLResponseSerializer,
     VegetationIndexResponseSerializer,
     VegetationTrendsResponseSerializer,
 )
@@ -69,12 +71,77 @@ class CropTypeView(APIView):
 
         logger.info(
             'CropTypeView — field=%s crop=%s confidence=%.4f',
-            field_id, result['crop_type'], result['confidence'],
+            field_id, result.get('crop_type'), result.get('confidence'),
         )
 
         return Response({
             'field_id': field.id,
-            'crop_type': result['crop_type'],
+            'crop_type': result.get('crop_type', result.get('prediction')),
+            'confidence': result['confidence'],
+            'reliability_level': result['reliability_level'],
+            'message': result['message'],
+        })
+
+
+@extend_schema(
+    summary='Predict soil composition',
+    description='Predicts soil type (Clayey, Loamy, Sandy) for a field',
+    tags=['Analysis'],
+    request=MLInputSerializer,
+    responses={200: MLResponseSerializer},
+)
+class SoilCompositionView(APIView):
+    serializer_class = MLInputSerializer
+    def post(self, request, field_id=None):
+        try:
+            field = Field.objects.get(pk=field_id, user=request.user)
+        except Field.DoesNotExist:
+            return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MLInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = predict_soil(field_id=field.id, user=request.user, **serializer.validated_data)
+
+        return Response({
+            'field_id': field.id,
+            'prediction': result.get('prediction'),
+            'confidence': result['confidence'],
+            'reliability_level': result['reliability_level'],
+            'message': result.get('note', result['message']),
+        })
+
+
+@extend_schema(
+    summary='Identify crop in field',
+    description='Identifies the crop type currently growing in a field using ML',
+    tags=['Analysis'],
+    request=MLInputSerializer,
+    responses={200: MLResponseSerializer},
+)
+class CropAreaView(APIView):
+    serializer_class = MLInputSerializer
+    def post(self, request, field_id=None):
+        try:
+            field = Field.objects.get(pk=field_id, user=request.user)
+        except Field.DoesNotExist:
+            return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MLInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = predict_crop_area(field_id=field.id, user=request.user, **serializer.validated_data)
+
+        logger.info(
+            'CropAreaView — field=%s crop=%s confidence=%.4f',
+            field_id, result.get('crop_type'), result.get('confidence'),
+        )
+
+        return Response({
+            'field_id': field.id,
+            'prediction': result.get('crop_type', result.get('prediction')),
             'confidence': result['confidence'],
             'reliability_level': result['reliability_level'],
             'message': result['message'],

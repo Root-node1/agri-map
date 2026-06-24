@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from analysis.models import (BoundaryDetection, CropPrediction,
-                             LandDegradation, VegetationIndex)
+from analysis.models import (BoundaryDetection, CropAreaPrediction,
+                             CropPrediction, LandDegradation,
+                             SoilPrediction, VegetationIndex)
 from carbon.models import CarbonSequestration
 from farmers.models import Cooperative, Farmer
 from fields.models import Field
@@ -93,6 +94,12 @@ class Command(BaseCommand):
             if not LandDegradation.objects.filter(field=field).exists():
                 LandDegradation.objects.create(field=field, severity='low', score=0.22)
                 self.stdout.write(f'  Created degradation record for field: {field.id}')
+            if not SoilPrediction.objects.filter(field=field).exists():
+                SoilPrediction.objects.create(field=field, soil_type='Loamy', confidence=0.72)
+                self.stdout.write(f'  Created soil prediction for field: {field.id}')
+            if not CropAreaPrediction.objects.filter(field=field).exists():
+                CropAreaPrediction.objects.create(field=field, crop_type='Maize', confidence=0.81)
+                self.stdout.write(f'  Created crop area prediction for field: {field.id}')
             if not SoilHealthRecord.objects.filter(field=field).exists():
                 SoilHealthRecord.objects.create(field=field, nitrogen_proxy=0.62, moisture_index=0.48, degradation_risk='moderate')
                 self.stdout.write(f'  Created soil health record for field: {field.id}')
