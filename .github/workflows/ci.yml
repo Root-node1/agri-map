@@ -80,15 +80,12 @@ jobs:
       - name: Run Django tests
         env:
           SECRET_KEY: 'django-insecure-ci-test-key-never-use-this-in-production'
-          DB_HOST: '127.0.0.1'
-          DB_PORT: '5432'
-          DB_NAME: 'agri_map_db'
-          DB_USER: 'postgres'
-          DB_PASSWORD: 'password'
+          # We format it as: postgres://username:password@host:port/database_name
+          DATABASE_URL: 'postgres://postgres:password@127.0.0.1:5432/agri_map_db'
         run: |
           cd server-agri-map-django
           if [ -f manage.py ]; then python manage.py test; else echo "No Django app detected, skipping Django test step."; fi
-
+          
   build-docker:
     name: build-docker
     runs-on: ubuntu-latest
