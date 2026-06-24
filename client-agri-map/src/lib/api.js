@@ -21,6 +21,9 @@ async function getJSON(path) {
 }
 
 export const agrimapApi = {
+  // GET /farmers/me -- logged-in farmer's profile (used for the greeting)
+  getFarmerProfile: () => getJSON("/farmers/me"),
+
   // GET /fields -- list of fields for the logged-in cooperative/farmer
   getFields: () => getJSON("/fields"),
 
