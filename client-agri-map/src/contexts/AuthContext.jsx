@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
+      const response = await axios.get(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setUser(response.data)
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/login`, {
         email,
         password
       })
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/signup`, userData)
+      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/signup`, userData)
       const { token, user } = response.data
       localStorage.setItem('token', token)
       setToken(token)
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = async (credentialResponse) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/google`, {
+      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/google`, {
         credential: credentialResponse.credential
       })
       const { token, user } = response.data

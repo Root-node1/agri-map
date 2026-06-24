@@ -68,6 +68,18 @@ export const dictionaries = {
     applyForFinancing: "Apply for financing",
     viewDetails: "View details",
     acrossFields: "Across {count} fields",
+
+
+    "farm.title: "My Fields",
+    "farm.addField": "Add Field",
+    "farm.viewField": "View",
+    "farm.editField": "Edit",
+    "farm.deleteField": "Delete",
+    "farm.location": "Location",
+    "farm.size": "Size",
+    "farm.cropType": "Crop Type",
+    "farm.soilHealth": "Soil Health",
+    "farm.fieldName": "Field Name",
   },
   sw: {
     appName: "AgriMap",
@@ -135,6 +147,17 @@ export const dictionaries = {
     applyForFinancing: "Omba Ufadhili",
     viewDetails: "Angalia Maelezo Zaidi",
     acrossFields: "Katika mashamba {count}",
+
+    "farm.title": "Mashamba Yangu",
+    "farm.addField": "Ongeza Shamba",
+    "farm.viewField": "Angalia",
+    "farm.editField": "Hariri",
+    "farm.deleteField": "Futa",
+    "farm.location": "Mahali",
+    "farm.size": "Ukubwa",
+    "farm.cropType": "Aina ya Mazao",
+    "farm.soilHealth": "Afya ya Udongo",
+    "farm.fieldName": "Jina la Shamba",
   },
 };
 
