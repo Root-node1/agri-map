@@ -15,7 +15,7 @@ ALLOWED_HOSTS += ['.onrender.com']
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='https://agrimap-django.onrender.com,https://agrimap-node.onrender.com',
+    default='https://agrimap-django.onrender.com,https://agrimap-node.onrender.com,https://client-agri-map.pages.dev',
     cast=Csv(),
 )
 CORS_ALLOWED_ORIGINS = [

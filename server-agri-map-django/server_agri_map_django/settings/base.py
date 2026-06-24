@@ -99,7 +99,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:4173,http://localhost:3001,http://localhost:8002',
+    default='http://localhost:4173,http://localhost:3001,http://localhost:8002,http://localhost:3000',
     cast=Csv(),
 )
 
@@ -127,8 +127,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-ML_MODELS_DIR = BASE_DIR / 'ml' / 'models'
-ML_PREPROCESSORS_DIR = BASE_DIR / 'ml' / 'preprocessors'
+ML_ASSETS_DIR = BASE_DIR / 'ml' / 'model_assets'
 
 LOGGING = {
     'version': 1,
