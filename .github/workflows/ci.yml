@@ -52,12 +52,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Django dependencies
+        env:
+          SECRET_KEY: 'django-insecure-ci-test-key-never-use-this-in-production'
         run: |
           cd server-agri-map-django
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found, skipping Django dependency install."; fi
 
       - name: Run Django tests
+        env:
+          SECRET_KEY: 'django-insecure-ci-test-key-never-use-this-in-production'
         run: |
           cd server-agri-map-django
           if [ -f manage.py ]; then python manage.py test; else echo "No Django app detected, skipping Django test step."; fi
