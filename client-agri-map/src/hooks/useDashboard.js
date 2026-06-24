@@ -68,14 +68,14 @@ export function useDashboard() {
   }, [t]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  load();
+}, [load]);
 
   return { ...state, reload: load };
 }
 
 function aggregate(enrichedFields, farmerName, t) {
-  const count = enrichedFields.length || 1;
 
   const fields = enrichedFields.map((f) => {
     const soil = f.report?.soil ?? {};

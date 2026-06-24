@@ -31,6 +31,23 @@ jobs:
     strategy:
       matrix:
         python-version: [3.12]
+    
+    # 1. Spin up the PostgreSQL background service container
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: agri_map_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -52,16 +69,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Django dependencies
+        env:
+          SECRET_KEY: 'django-insecure-ci-test-key-never-use-this-in-production'
         run: |
           cd server-agri-map-django
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found, skipping Django dependency install."; fi
 
+      # 2. Inject matching environment variables so Django points to the service container
       - name: Run Django tests
+        env:
+          SECRET_KEY: 'django-insecure-ci-test-key-never-use-this-in-production'
+          # We format it as: postgres://username:password@host:port/database_name
+          DATABASE_URL: 'postgres://postgres:password@127.0.0.1:5432/agri_map_db'
         run: |
           cd server-agri-map-django
           if [ -f manage.py ]; then python manage.py test; else echo "No Django app detected, skipping Django test step."; fi
-
+          
   build-docker:
     name: build-docker
     runs-on: ubuntu-latest
