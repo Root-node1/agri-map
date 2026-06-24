@@ -69,7 +69,7 @@ const Fields = () => {
   return (
     <div className="fields-page">
       <div className="page-header glass">
-        <h1>{t('farm.title') || 'My Fields'}</h1>
+        <h1>{t('fields.title') || 'My Fields'}</h1>
         <div className="header-actions">
           <div className="search-bar">
             <FaSearch className="search-icon" />
@@ -81,7 +81,7 @@ const Fields = () => {
             />
           </div>
           <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-            <FaPlus /> {t('farm.addField') || 'Add Field'}
+            <FaPlus /> {t('fields.addField') || 'Add Field'}
           </button>
         </div>
       </div>
@@ -100,15 +100,15 @@ const Fields = () => {
               <div className="field-header">
                 <h3>{field.name}</h3>
                 <div className="field-actions">
-                  <button className="icon-btn" title={t('farm.viewField') || 'View'}>
+                  <button className="icon-btn" title={t('fields.viewField') || 'View'}>
                     <FaEye />
                   </button>
-                  <button className="icon-btn" title={t('farm.editField') || 'Edit'}>
+                  <button className="icon-btn" title={t('fields.editField') || 'Edit'}>
                     <FaEdit />
                   </button>
                   <button 
                     className="icon-btn danger" 
-                    title={t('farm.deleteField') || 'Delete'}
+                    title={t('fields.deleteField') || 'Delete'}
                     onClick={() => handleDeleteField(field.id)}
                   >
                     <FaTrash />
@@ -116,10 +116,10 @@ const Fields = () => {
                 </div>
               </div>
               <div className="field-details">
-                <p><strong>{t('farm.location') || 'Location'}:</strong> {field.location || 'N/A'}</p>
-                <p><strong>{t('farm.size') || 'Size'}:</strong> {field.size || 0} ha</p>
-                <p><strong>{t('farm.cropType') || 'Crop Type'}:</strong> {field.cropType || 'N/A'}</p>
-                <p><strong>{t('farm.soilHealth') || 'Soil Health'}:</strong> {field.soilHealth || 'Unknown'}</p>
+                <p><strong>{t('fields.location') || 'Location'}:</strong> {field.location || 'N/A'}</p>
+                <p><strong>{t('fields.size') || 'Size'}:</strong> {field.size || 0} ha</p>
+                <p><strong>{t('fields.cropType') || 'Crop Type'}:</strong> {field.cropType || 'N/A'}</p>
+                <p><strong>{t('fields.soilHealth') || 'Soil Health'}:</strong> {field.soilHealth || 'Unknown'}</p>
               </div>
             </motion.div>
           ))
@@ -134,10 +134,10 @@ const Fields = () => {
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
-            <h2>{t('farm.addField') || 'Add Field'}</h2>
+            <h2>{t('fields.addField') || 'Add Field'}</h2>
             <form onSubmit={handleAddField}>
               <div className="form-group">
-                <label>{t('farm.fieldName') || 'Field Name'}</label>
+                <label>{t('fields.fieldName') || 'Field Name'}</label>
                 <input
                   type="text"
                   value={newField.name}
@@ -147,7 +147,7 @@ const Fields = () => {
                 />
               </div>
               <div className="form-group">
-                <label>{t('farm.location') || 'Location'}</label>
+                <label>{t('fields.location') || 'Location'}</label>
                 <input
                   type="text"
                   value={newField.location}
@@ -156,7 +156,7 @@ const Fields = () => {
                 />
               </div>
               <div className="form-group">
-                <label>{t('farm.size') || 'Size (hectares)'}</label>
+                <label>{t('fields.size') || 'Size (hectares)'}</label>
                 <input
                   type="number"
                   value={newField.size}
@@ -166,7 +166,7 @@ const Fields = () => {
                 />
               </div>
               <div className="form-group">
-                <label>{t('farm.cropType') || 'Crop Type'}</label>
+                <label>{t('fields.cropType') || 'Crop Type'}</label>
                 <input
                   type="text"
                   value={newField.cropType}
