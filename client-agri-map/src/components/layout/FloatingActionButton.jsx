@@ -1,33 +1,19 @@
-import { MapPinned } from "lucide-react";
+import { Plus } from "lucide-react";
 
-export default function FloatingActionButton({
-  onClick,
-}) {
+/**
+ * Props:
+ *  - onClick: () => void  -- typically opens the "map a new field" flow
+ *  - label: accessible label, defaults to a sensible English/Swahili-neutral string
+ */
+export default function FloatingActionButton({ onClick, label = "Add field" }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="
-        fixed
-        bottom-20
-        right-5
-        z-50
-        flex
-        items-center
-        gap-2
-        rounded-full
-        bg-brand-600
-        px-5
-        py-3
-        text-sm
-        font-semibold
-        text-white
-        shadow-lg
-        hover:bg-brand-700
-      "
+      aria-label={label}
+      className="fixed bottom-20 right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-600/30 transition-transform hover:scale-105 hover:bg-brand-700 active:scale-95"
     >
-      <MapPinned size={18} />
-      Map Field
+      <Plus size={24} />
     </button>
   );
 }

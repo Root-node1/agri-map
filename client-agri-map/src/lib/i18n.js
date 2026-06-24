@@ -34,6 +34,40 @@ export const dictionaries = {
     navSoil: "Soil",
     navFinance: "Finance",
     navProfile: "Profile",
+
+    // Vegetation / NDVI
+    vegetationHealth: "Vegetation Health",
+    ndviLabel: "NDVI",
+    eviLabel: "EVI",
+    trendUp: "Improving since last scan",
+    trendDown: "Declining since last scan",
+    trendFlat: "Stable since last scan",
+
+    // Soil
+    soilHealth: "Soil Health",
+    nitrogenProxy: "Nitrogen",
+    moistureIndex: "Moisture",
+    degradationRisk: "Degradation risk",
+    riskLow: "Low",
+    riskModerate: "Moderate",
+    riskHigh: "High",
+
+    // Carbon confidence
+    carbonConfidence: "Carbon Confidence",
+    confidenceScore: "Confidence score",
+    methodology: "Methodology",
+
+    // Finance readiness
+    financeReadiness: "Finance Readiness",
+    statusReady: "Ready to apply",
+    statusNeedsData: "Needs more data",
+    statusNotReady: "Not yet ready",
+    checkCarbonVerified: "Carbon data verified",
+    checkSoilRiskOk: "Soil risk acceptable",
+    checkReportsComplete: "Field reports complete",
+    applyForFinancing: "Apply for financing",
+    viewDetails: "View details",
+    acrossFields: "Across {count} fields",
   },
   sw: {
     appName: "AgriMap",
@@ -67,6 +101,40 @@ export const dictionaries = {
     navSoil: "Udongo",
     navFinance: "Fedha",
     navProfile: "Wasifu",
+
+    // Vegetation / NDVI
+    vegetationHealth: "Afya ya Mimea",
+    ndviLabel: "NDVI",
+    eviLabel: "EVI",
+    trendUp: "Inaboresha tangu uchunguzi wa mwisho",
+    trendDown: "Inashuka tangu uchunguzi wa mwisho",
+    trendFlat: "Imetulia tangu uchunguzi wa mwisho",
+
+    // Soil
+    soilHealth: "Afya ya Udongo",
+    nitrogenProxy: "Nitrojeni",
+    moistureIndex: "Unyevu",
+    degradationRisk: "Hatari ya uharibifu",
+    riskLow: "Chini",
+    riskModerate: "Wastani",
+    riskHigh: "Juu",
+
+    // Carbon confidence
+    carbonConfidence: "Uthibitisho wa Kaboni",
+    confidenceScore: "Alama ya uthibitisho",
+    methodology: "Mbinu",
+
+    // Finance readiness
+    financeReadiness: "Utayari wa Ufadhili",
+    statusReady: "Tayari kuomba",
+    statusNeedsData: "Inahitaji data zaidi",
+    statusNotReady: "Bado haijafikia kiwango",
+    checkCarbonVerified: "Data ya kaboni imethibitishwa",
+    checkSoilRiskOk: "Hatari ya udongo inakubalika",
+    checkReportsComplete: "Ripoti za mashamba zimekamilika",
+    applyForFinancing: "Omba Ufadhili",
+    viewDetails: "Angalia Maelezo Zaidi",
+    acrossFields: "Katika mashamba {count}",
   },
 };
 
