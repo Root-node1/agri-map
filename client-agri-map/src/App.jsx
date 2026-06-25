@@ -14,11 +14,12 @@ import AdminDashboard from './pages/dashboard/AdminDashboard'
 import Fields from './pages/farm/Fields'
 import SatelliteAnalysis from './pages/farm/SatelliteAnalysis'
 import Finance from './pages/finance/Finance'
-import ProtectedRoute from './components/auth/ProtectedRoute'
 
 function App() {
-  const { user, loading } = useAuth()
+  const { user } = useAuth()
 
+  // 🔓 AUTH REMOVED: Bypassing auth loading blocker entirely to jump right to the UI
+  /*
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -26,9 +27,12 @@ function App() {
       </div>
     )
   }
+  */
 
   const getDashboard = () => {
-    if (!user) return <Navigate to="/login" />
+    // 🔓 AUTH REMOVED: If no backend user exists yet, automatically default to the main Farmer view
+    if (!user) return <FarmerDashboard />
+    
     switch(user.role) {
       case 'admin': return <AdminDashboard />
       case 'cooperative': return <CooperativeDashboard />
@@ -39,16 +43,21 @@ function App() {
   return (
     <Layout>
       <Routes>
+        {/* Public Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsConditions />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<ProtectedRoute>{getDashboard()}</ProtectedRoute>} />
-        <Route path="/fields" element={<ProtectedRoute><Fields /></ProtectedRoute>} />
-        <Route path="/satellite" element={<ProtectedRoute><SatelliteAnalysis /></ProtectedRoute>} />
-        <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+        
+        {/* 🔓 Internal Pages (Protected Wrappers Removed) */}
+        <Route path="/dashboard" element={getDashboard()} />
+        <Route path="/fields" element={<Fields />} />
+        <Route path="/satellite" element={<SatelliteAnalysis />} />
+        <Route path="/finance" element={<Finance />} />
+        
+        {/* Catch-all Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
