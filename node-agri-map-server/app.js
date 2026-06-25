@@ -16,8 +16,15 @@ const paymentRoutes = require('./src/routes/paymentRoutes');
 const webhookRoutes = require('./src/routes/webhookRoutes');
 const aiRoutes = require('./src/routes/aiRoutes');
 const chatbotRoutes = require('./src/routes/chatbotRoutes');
-const testRoutes = require('./src/routes/testRoutes');
 const subscriptionRoutes = require('./src/routes/subscriptionRoutes');
+
+// Django-style routes (for compatibility)
+const farmersRoutes = require('./src/routes/farmersRoutes');
+const cooperativesRoutes = require('./src/routes/cooperativesRoutes');
+const satelliteRoutes = require('./src/routes/satelliteRoutes');
+const analysisRoutes = require('./src/routes/analysisRoutes');
+const carbonRoutes = require('./src/routes/carbonRoutes');
+const reportsRoutes = require('./src/routes/reportsRoutes');
 
 const app = express();
 
@@ -38,7 +45,7 @@ app.use(compression());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: { success: false, message: 'Too many requests from this IP, please try again later.' }
+  message: { success: false, message: 'Too many requests' }
 });
 app.use('/api', limiter);
 
@@ -66,7 +73,8 @@ app.get('/health', (req, res) => {
     stripe: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not configured',
     blockchain: process.env.ETHEREUM_RPC_URL ? 'configured' : 'not configured',
     ai: 'enabled',
-    chatbot: 'enabled'
+    chatbot: 'enabled',
+    subscription: 'enabled'
   });
 });
 
@@ -78,14 +86,69 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/test', testRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+
+// Django-style routes (for compatibility with frontend)
+app.use('/api/farmers', farmersRoutes);
+app.use('/api/cooperatives', cooperativesRoutes);
+app.use('/api/satellite', satelliteRoutes);
+app.use('/api/analysis', analysisRoutes);
+app.use('/api/carbon', carbonRoutes);
+app.use('/api/reports', reportsRoutes);
+
+// API Root
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: 'AgriMap API v2.0',
+    version: '2.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      farmers: '/api/farmers',
+      cooperatives: '/api/cooperatives',
+      loans: '/api/loans',
+      carbon: '/api/carbon',
+      carbonCredits: '/api/carbon-credits',
+      satellite: '/api/satellite',
+      analysis: '/api/analysis',
+      reports: '/api/reports',
+      wallet: '/api/wallet',
+      payments: '/api/payments',
+      ai: '/api/ai',
+      chatbot: '/api/chatbot',
+      subscriptions: '/api/subscriptions',
+      webhooks: '/api/webhooks'
+    },
+    docs: 'Import the Postman collection for detailed API documentation',
+    live: 'https://agrimap-node-api.onrender.com'
+  });
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
     path: req.path,
+    availableRoutes: [
+      '/api',
+      '/api/auth',
+      '/api/farmers',
+      '/api/cooperatives',
+      '/api/loans',
+      '/api/carbon',
+      '/api/carbon-credits',
+      '/api/satellite',
+      '/api/analysis',
+      '/api/reports',
+      '/api/wallet',
+      '/api/payments',
+      '/api/ai',
+      '/api/chatbot',
+      '/api/subscriptions',
+      '/api/webhooks',
+      '/health'
+    ]
   });
 });
 
