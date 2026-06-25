@@ -1,13 +1,45 @@
 {
   "info": {
-    "name": "AgriMap API Collection",
-    "description": "Complete API collection for AgriMap - AI-powered agricultural mapping and finance platform",
+    "name": "AgriMap Complete API",
+    "description": "Complete API collection for AgriMap - Agriculture Intelligence Platform\n\nBase URL: https://agrimap-node-api.onrender.com\nLocal URL: http://localhost:3000\n\nFeatures:\n- 🔐 Authentication (Email + Firebase OAuth)\n- 🤖 AI Services (Crop, Soil, Carbon, Yield)\n- 💬 Chatbot Assistant\n- 💰 Loans & Financing\n- 🌿 Carbon Credits\n- 💳 Payments & Wallet\n- 📋 Subscriptions & API Keys",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.0.0"
+    "version": "3.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agrimap-node-api.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
   },
   "item": [
     {
-      "name": "Health & Status",
+      "name": "🏠 Health & Status",
       "item": [
         {
           "name": "Health Check",
@@ -18,6 +50,19 @@
               "raw": "{{base_url}}/health",
               "host": ["{{base_url}}"],
               "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api",
+              "host": ["{{base_url}}"],
+              "path": ["api"]
             }
           },
           "response": []
@@ -38,10 +83,10 @@
       ]
     },
     {
-      "name": "Authentication",
+      "name": "🔐 Authentication",
       "item": [
         {
-          "name": "Register User",
+          "name": "Register (Email)",
           "request": {
             "method": "POST",
             "header": [
@@ -63,7 +108,7 @@
           "response": []
         },
         {
-          "name": "Login User",
+          "name": "Login (Email)",
           "request": {
             "method": "POST",
             "header": [
@@ -80,6 +125,50 @@
               "raw": "{{base_url}}/api/auth/login",
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firebaseToken\": \"YOUR_FIREBASE_ID_TOKEN\",\n  \"role\": \"farmer\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"phone\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firebaseToken\": \"YOUR_FIREBASE_ID_TOKEN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "login"]
             }
           },
           "response": []
@@ -145,7 +234,7 @@
       ]
     },
     {
-      "name": "AI Services",
+      "name": "🤖 AI Services",
       "item": [
         {
           "name": "Detect Crop",
@@ -153,12 +242,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -179,12 +268,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -205,12 +294,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -231,17 +320,17 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilQuality\": 0.7,\n  \"weatherData\": {\n    \"rainfall\": 800,\n    \"temperature\": 25\n  }\n}"
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilQuality\": 0.7\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/predict-yield",
@@ -257,17 +346,17 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55,\n    \"chlorophyll\": 45.2\n  },\n  \"options\": {}\n}"
+              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55,\n    \"chlorophyll\": 45.2\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/analyze-vegetation",
@@ -283,12 +372,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -309,12 +398,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -350,7 +439,118 @@
       ]
     },
     {
-      "name": "Loans",
+      "name": "💬 Chatbot",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {\n    \"fieldId\": \"field_123\",\n    \"region\": \"East Africa\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/message",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "message"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Conversation History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "history"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Farm Recommendations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmData\": {\n    \"soil\": {\n      \"nitrogen\": 0.3,\n      \"moisture\": 0.25,\n      \"ph\": 5.2\n    },\n    \"crop\": {\n      \"type\": \"maize\",\n      \"healthScore\": 0.45\n    },\n    \"carbon\": {\n      \"tons\": 2.5\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "recommendations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Chat Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/analytics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "analytics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clear History",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "history"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💰 Loans",
       "item": [
         {
           "name": "Apply for Loan",
@@ -358,12 +558,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -434,17 +634,17 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved based on good credit score\",\n  \"rejectionReason\": null\n}"
+              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved based on good credit score\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/loans/{{loan_id}}/approve",
@@ -460,12 +660,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -483,10 +683,10 @@
       ]
     },
     {
-      "name": "Carbon Credits",
+      "name": "🌿 Carbon Credits",
       "item": [
         {
-          "name": "Get All Carbon Credits",
+          "name": "Get All Credits",
           "request": {
             "method": "GET",
             "header": [
@@ -496,15 +696,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/carbon-credits?status=available",
+              "raw": "{{base_url}}/api/carbon-credits",
               "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "available"
-                }
-              ]
+              "path": ["api", "carbon-credits"]
             }
           },
           "response": []
@@ -546,7 +740,7 @@
           "response": []
         },
         {
-          "name": "Get Carbon Credit Details",
+          "name": "Get Credit Details",
           "request": {
             "method": "GET",
             "header": [
@@ -564,17 +758,17 @@
           "response": []
         },
         {
-          "name": "Create Carbon Credit (Admin)",
+          "name": "Create Credit (Admin)",
           "request": {
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -590,17 +784,17 @@
           "response": []
         },
         {
-          "name": "Tokenize Carbon Credit",
+          "name": "Tokenize Credit",
           "request": {
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -616,17 +810,17 @@
           "response": []
         },
         {
-          "name": "Sell Carbon Credit",
+          "name": "Sell Credit",
           "request": {
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -644,7 +838,7 @@
       ]
     },
     {
-      "name": "Wallet & Payments",
+      "name": "💳 Wallet & Payments",
       "item": [
         {
           "name": "Get Wallet Balance",
@@ -698,12 +892,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -724,12 +918,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -750,12 +944,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -776,12 +970,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -830,12 +1024,12 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
@@ -853,7 +1047,314 @@
       ]
     },
     {
-      "name": "Webhooks",
+      "name": "📋 Subscriptions & API Keys",
+      "item": [
+        {
+          "name": "Get Available Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/plans",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "plans"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\",\n  \"paymentMethod\": \"stripe\",\n  \"metadata\": {\n    \"organization\": \"FarmCo Ltd\",\n    \"industry\": \"agriculture\",\n    \"teamSize\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "create"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/my-subscription",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "my-subscription"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Production API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/generate-api-key",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "generate-api-key"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List API Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "api-keys"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/api-keys/{{api_key_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "api-keys", "{{api_key_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Usage Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/usage",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "usage"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Too expensive\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "cancel"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🌾 Django-style Routes (Compatibility)",
+      "item": [
+        {
+          "name": "Farmers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cooperatives",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cooperatives",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cooperatives"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Satellite - Fetch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_id\": \"field_123\",\n  \"date_range\": [\"2026-01-01\", \"2026-03-01\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/satellite/fetch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "fetch"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analysis - Vegetation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/vegetation/{{field_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "vegetation", "{{field_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analysis - Soil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/soil/{{field_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "soil", "{{field_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Carbon - Calculate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/{{field_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon", "{{field_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reports - Field Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/field/{{field_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "field", "{{field_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔗 Webhooks",
       "item": [
         {
           "name": "Stripe Webhook",
@@ -893,7 +1394,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"loanId\": \"loan_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"status\": \"approved\",\n  \"timestamp\": \"2026-06-24T10:00:00.000Z\"\n}"
+              "raw": "{\n  \"loanId\": \"loan_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"status\": \"approved\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/webhooks/loan-approved",
@@ -940,52 +1441,5 @@
         }
       ]
     }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:3000",
-      "type": "string"
-    },
-    {
-      "key": "auth_token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "refresh_token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "loan_id",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "credit_id",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "payment_id",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "wallet_id",
-      "value": "",
-      "type": "string"
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{auth_token}}",
-        "type": "string"
-      }
-    ]
-  }
+  ]
 }
