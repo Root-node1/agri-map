@@ -41,7 +41,7 @@ run_npm_service() {
 }
 
 run_npm_service "$CLIENT_DIR" "React client" "npm run dev"
-run_npm_service "$NODE_DIR" "Node backend" "npm run start || node src/server.js"
+run_npm_service "$NODE_DIR" "Node backend" "npm run start || node server.js"
 
 if [ -f "$DJANGO_DIR/manage.py" ]; then
   log "Starting Django backend"
