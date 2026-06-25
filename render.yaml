@@ -1,4 +1,42 @@
 services:
+  # Node.js Backend API
+  - type: web
+    name: agrimap-node-api
+    runtime: node
+    plan: free
+    buildCommand: cd node-agri-map-server && npm install --legacy-peer-deps
+    startCommand: cd node-agri-map-server && npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: DJANGO_API_URL
+        sync: false
+      - key: DJANGO_API_KEY
+        sync: false
+      - key: WEBHOOK_BASE_URL
+        value: https://agrimap-node-api.onrender.com/api/webhooks
+      - key: CORS_ORIGIN
+        value: https://agrimap-client.onrender.com,https://agrimap-django-api.onrender.com,http://localhost:3000
+      - key: LOG_LEVEL
+        value: info
+
+  # Django Backend API
   - type: web
     name: agrimap-node-api
     runtime: node

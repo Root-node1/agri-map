@@ -1,0 +1,535 @@
+{
+  "info": {
+    "name": "AgriMap API",
+    "description": "AI-powered agricultural mapping and soil intelligence platform.\n\n## Authentication\n1. Call `POST /api/auth/login/` or `POST /api/auth/register/` to get tokens\n2. Postman will auto-set `{{token}}` from the login/register response via the Test script\n3. All authenticated endpoints use `Authorization: Bearer {{token}}`\n\n## Base URL\n- Local: `http://localhost:8000`\n- Production: Update `base_url` variable accordingly",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "field_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "coop_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Health check endpoint. No authentication required.\n\n**Response 200:**\n```json\n{\n  \"status\": \"ok\",\n  \"version\": \"1.0.0\",\n  \"database\": \"connected\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Health check and monitoring endpoints"
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"demo\",\n  \"email\": \"demo@example.com\",\n  \"password\": \"demo12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. Returns JWT access + refresh tokens.\n\n**Required fields:** username, password\n**Optional:** email (password min 8 chars)\n\n**Response 201:**\n```json\n{\n  \"user\": { \"id\": 1, \"username\": \"demo\", \"email\": \"demo@example.com\", \"date_joined\": \"2026-06-24T...\" },\n  \"access\": \"eyJ...\",\n  \"refresh\": \"eyJ...\"\n}\n```"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.access);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"demo\",\n  \"password\": \"demo12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with username + password. Returns JWT access + refresh tokens.\n\n**Response 200:**\n```json\n{\n  \"access\": \"eyJ...\",\n  \"refresh\": \"eyJ...\"\n}\n```"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.access);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"eyJ...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh"]
+            },
+            "description": "Refresh an expired access token using the refresh token.\n\n**Response 200:**\n```json\n{\n  \"access\": \"eyJ...\"\n}\n```"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.access);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get the authenticated user's profile.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"username\": \"demo\",\n  \"email\": \"demo@example.com\",\n  \"date_joined\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Authentication endpoints — register, login, refresh tokens, and get current user"
+    },
+    {
+      "name": "Farmers",
+      "item": [
+        {
+          "name": "Register Farmer Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+254712345678\",\n  \"location\": \"Central Region, Kenya\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/farmers/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "register"]
+            },
+            "description": "Register a farmer profile for the authenticated user.\n`username` and `email` are read-only (auto-populated from JWT user).\n\n**Response 201:**\n```json\n{\n  \"id\": 1,\n  \"username\": \"demo\",\n  \"email\": \"demo@example.com\",\n  \"phone\": \"+254712345678\",\n  \"location\": \"Central Region, Kenya\",\n  \"created_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get / Update My Farmer Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers/me/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "me"]
+            },
+            "description": "GET to retrieve your farmer profile (auto-creates if missing).\nPATCH / PUT with body to update phone/location.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"username\": \"demo\",\n  \"email\": \"demo@example.com\",\n  \"phone\": \"+254712345678\",\n  \"location\": \"Central Region, Kenya\",\n  \"created_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "List / Create Cooperatives",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives"]
+            },
+            "description": "GET to list all cooperatives.\nPOST to create a new cooperative:\n```json\n{\n  \"name\": \"Green Valley Coop\",\n  \"description\": \"Sustainable farming collective\",\n  \"location\": \"Central Region\"\n}\n```\n\n**GET Response 200:** paginated list of cooperatives.\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"Green Valley Coop\",\n  \"description\": \"Sustainable farming collective\",\n  \"location\": \"Central Region\",\n  \"created_by\": 1,\n  \"member_count\": 0,\n  \"created_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Cooperative Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/{{coop_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives", "{{coop_id}}"]
+            },
+            "description": "Get details for a specific cooperative by ID."
+          }
+        }
+      ],
+      "description": "Farmer profiles and cooperative management"
+    },
+    {
+      "name": "Fields",
+      "item": [
+        {
+          "name": "List / Create Fields",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fields/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fields"]
+            },
+            "description": "GET to list all fields for the authenticated user (paginated).\nPOST to create a new field:\n\n```json\n{\n  \"name\": \"My Field\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]\n  },\n  \"area_ha\": 10.5\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Field Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fields/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fields", "{{field_id}}"]
+            },
+            "description": "Get details for a specific field. Only returns fields owned by the authenticated user.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", ...},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Field CRUD — geometry is GeoJSON Polygon/MultiPolygon"
+    },
+    {
+      "name": "Analysis",
+      "item": [
+        {
+          "name": "Vegetation Indices",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/vegetation/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "vegetation", "{{field_id}}"]
+            },
+            "description": "Returns the last 10 NDVI/EVI vegetation index records for a field.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"indices\": [\n    {\"ndvi\": 0.72, \"evi\": 0.54, \"date\": \"2026-06-01\"},\n    {\"ndvi\": 0.68, \"evi\": 0.51, \"date\": \"2026-05-15\"}\n  ]\n}\n```\n\n**Response 404:** `{\"error\": \"Field not found\"}`"
+          }
+        },
+        {
+          "name": "Predict Crop Type (Recommendation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 3.1,\n  \"lat\": 43.1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analysis/crop-type/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "crop-type", "{{field_id}}"]
+            },
+            "description": "Predicts the most suitable crop to plant using ML.\nAll input fields are optional with sensible defaults.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"crop_type\": \"apple\",\n  \"confidence\": 0.41,\n  \"reliability_level\": \"Low\",\n  \"message\": \"Conditions variable; consult local soil tests before planting.\"\n}\n```\n\n**Reliability thresholds:**\n- High: confidence > 0.85\n- Medium: confidence >= 0.60\n- Low: confidence < 0.60\n\n**Note:** Current model predicts from: apple, banana, blackgram (3 crops)."
+          }
+        },
+        {
+          "name": "Predict Soil Composition",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 3.1,\n  \"lat\": 43.1,\n  \"soil_type\": \"Unknown\",\n  \"region\": \"Unknown\",\n  \"country\": \"Unknown\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analysis/soil-composition/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "soil-composition", "{{field_id}}"]
+            },
+            "description": "Predicts soil type (Clayey / Loamy / Sandy) for a field.\n\n**Note:** Soil model not yet trained — currently returns an estimated stub.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"prediction\": \"Loamy\",\n  \"confidence\": 0.6,\n  \"reliability_level\": \"Medium\",\n  \"message\": \"Soil model not yet trained — returning estimate\"\n}\n```"
+          }
+        },
+        {
+          "name": "Identify Crop in Field (Crop Area)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 3.1,\n  \"lat\": 43.1,\n  \"soil_type\": \"Loamy\",\n  \"region\": \"Unknown\",\n  \"country\": \"Unknown\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analysis/crop-area/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "crop-area", "{{field_id}}"]
+            },
+            "description": "Identifies the crop type currently growing in a field using ML.\nPredicts from: Barley, Maize, Rice, Wheat.\nOptional categorical fields (soil_type, region, country) improve accuracy.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"prediction\": \"Rice\",\n  \"confidence\": 0.31,\n  \"reliability_level\": \"Low\",\n  \"message\": \"Conditions variable; consult local soil tests before planting.\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Field Boundaries",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/boundaries/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "boundaries", "{{field_id}}"]
+            },
+            "description": "Returns the detected GeoJSON boundary for a field.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"boundary\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"detected_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Soil Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/soil/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "soil", "{{field_id}}"]
+            },
+            "description": "Returns soil health metrics (nitrogen proxy, moisture index, degradation risk).\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"nitrogen_proxy\": 0.62,\n  \"moisture_index\": 0.48,\n  \"degradation_risk\": \"moderate\",\n  \"recorded_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Vegetation Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/trends/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "trends", "{{field_id}}"]
+            },
+            "description": "Returns NDVI/EVI time-series trend data for a field.\nTrend is `declining` if the latest NDVI < earliest NDVI, otherwise `stable`.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"trend\": \"stable\",\n  \"data_points\": [\n    {\"date\": \"2026-05-15\", \"ndvi\": 0.68, \"evi\": 0.51},\n    {\"date\": \"2026-06-01\", \"ndvi\": 0.72, \"evi\": 0.54}\n  ]\n}\n```"
+          }
+        },
+        {
+          "name": "Get Land Degradation",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/degradation/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analysis", "degradation", "{{field_id}}"]
+            },
+            "description": "Returns land degradation severity assessment for a field.\nSeverity can be: none, low, moderate, severe.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"severity\": \"low\",\n  \"score\": 0.22,\n  \"detected_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Analysis and ML prediction endpoints — vegetation, crop prediction, soil, boundaries, trends, degradation"
+    },
+    {
+      "name": "Satellite",
+      "item": [
+        {
+          "name": "Fetch Satellite Imagery",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_id\": 1,\n  \"date_range\": [\"2026-01-01\", \"2026-06-01\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/satellite/fetch/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "fetch"]
+            },
+            "description": "Fetch satellite imagery for a field. Optionally specify a date range.\n\n**Response 201:**\n```json\n{\n  \"field_id\": 1,\n  \"image_id\": 1,\n  \"date\": \"2026-06-01\",\n  \"source_url\": \"https://scihub.copernicus.eu/...\",\n  \"cloud_cover\": 12.5,\n  \"bands\": {\"B02\": 0.15, \"B03\": 0.22, \"B04\": 0.31, \"B08\": 0.68},\n  \"date_range\": {\"start\": \"2026-01-01\", \"end\": \"2026-06-01\"}\n}\n```"
+          }
+        },
+        {
+          "name": "Process Satellite Imagery",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/satellite/process/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "process"]
+            },
+            "description": "Process satellite imagery for a field (cloud masking, NDVI/EVI calculation).\n\n**Response 200:**\n```json\n{\n  \"job_id\": 1,\n  \"status\": \"completed\",\n  \"result\": {\n    \"cloud_masking\": \"applied\",\n    \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n    \"ndvi_calculated\": 0.72,\n    \"evi_calculated\": 0.54,\n    \"images_processed\": 1\n  }\n}\n```"
+          }
+        }
+      ],
+      "description": "Satellite imagery fetch and processing endpoints"
+    },
+    {
+      "name": "Carbon",
+      "item": [
+        {
+          "name": "Get Carbon Sequestration",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon", "{{field_id}}"]
+            },
+            "description": "Returns carbon sequestration data for a field.\nMethodology options: ndvi_based, soil_organic_carbon, biomass_estimation.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"carbon_tons\": 2.3,\n  \"confidence_score\": 0.87,\n  \"methodology\": \"ndvi_based\",\n  \"calculated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Carbon sequestration data endpoints"
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get Field Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/field/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "field", "{{field_id}}"]
+            },
+            "description": "Returns a consolidated field report aggregating crop predictions, soil health, carbon, and vegetation data.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"field_name\": \"My Field\",\n  \"crop\": {\n    \"type\": \"Maize\",\n    \"confidence\": 0.92\n  },\n  \"soil\": {\n    \"nitrogen_proxy\": 0.62,\n    \"moisture_index\": 0.48,\n    \"degradation_risk\": \"moderate\"\n  },\n  \"carbon\": {\n    \"carbon_tons\": 2.3,\n    \"confidence_score\": 0.87,\n    \"methodology\": \"ndvi_based\"\n  },\n  \"vegetation\": {\n    \"ndvi\": 0.72,\n    \"evi\": 0.54\n  }\n}\n```"
+          }
+        }
+      ],
+      "description": "Consolidated field report endpoints"
+    },
+    {
+      "name": "Schema & Docs",
+      "item": [
+        {
+          "name": "OpenAPI Schema (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schema/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schema"]
+            },
+            "description": "Returns the full OpenAPI 3.0 JSON schema for the API.\nNo authentication required."
+          }
+        },
+        {
+          "name": "Swagger UI Docs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/docs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "docs"]
+            },
+            "description": "Interactive Swagger UI documentation for the API.\nNo authentication required."
+          }
+        }
+      ],
+      "description": "API schema and documentation endpoints"
+    }
+  ]
+}

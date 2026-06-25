@@ -1,8 +1,21 @@
 FROM node:20-alpine
+
 WORKDIR /app
-COPY node-agri-map-server/package.json node-agri-map-server/package-lock.json ./
-COPY node-agri-map-server/src ./src
-COPY node-agri-map-server/.env ./
-RUN npm ci
-EXPOSE 3001
-CMD ["npm", "run", "start"]
+
+# Copy package files
+COPY node-agri-map-server/package*.json ./
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy application code
+COPY node-agri-map-server/ .
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]

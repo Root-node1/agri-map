@@ -37,6 +37,32 @@ class BoundaryDetection(models.Model):
         return f'Boundary {self.field_id} @ {self.detected_at}'
 
 
+class SoilPrediction(models.Model):
+    field = models.ForeignKey('fields.Field', on_delete=models.CASCADE, related_name='soil_predictions')
+    soil_type = models.CharField(max_length=100)
+    confidence = models.FloatField()
+    predicted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-predicted_at',)
+
+    def __str__(self):
+        return f'{self.soil_type} ({self.confidence})'
+
+
+class CropAreaPrediction(models.Model):
+    field = models.ForeignKey('fields.Field', on_delete=models.CASCADE, related_name='crop_area_predictions')
+    crop_type = models.CharField(max_length=100)
+    confidence = models.FloatField()
+    predicted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-predicted_at',)
+
+    def __str__(self):
+        return f'{self.crop_type} ({self.confidence})'
+
+
 class LandDegradation(models.Model):
     SEVERITY_CHOICES = [
         ('none', 'No Degradation'),

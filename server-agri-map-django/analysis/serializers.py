@@ -55,3 +55,26 @@ class DegradationResponseSerializer(serializers.Serializer):
     severity = serializers.CharField()
     score = serializers.FloatField(allow_null=True)
     detected_at = serializers.DateTimeField()
+
+
+class MLInputSerializer(serializers.Serializer):
+    nitrogen = serializers.FloatField(min_value=0, max_value=300, default=80)
+    phosphorus = serializers.FloatField(min_value=0, max_value=300, default=40)
+    potassium = serializers.FloatField(min_value=0, max_value=300, default=40)
+    temperature = serializers.FloatField(min_value=-10, max_value=55, default=25.0)
+    humidity = serializers.FloatField(min_value=0, max_value=100, default=70.0)
+    rainfall = serializers.FloatField(min_value=0, max_value=5000, default=200.0)
+    moisture = serializers.FloatField(min_value=0, max_value=100, default=40.0)
+    lon = serializers.FloatField(min_value=-180, max_value=180, default=3.1)
+    lat = serializers.FloatField(min_value=-90, max_value=90, default=43.1)
+    soil_type = serializers.CharField(required=False, default='Unknown')
+    region = serializers.CharField(required=False, default='Unknown')
+    country = serializers.CharField(required=False, default='Unknown')
+
+
+class MLResponseSerializer(serializers.Serializer):
+    field_id = serializers.IntegerField(allow_null=True)
+    prediction = serializers.CharField()
+    confidence = serializers.FloatField()
+    reliability_level = serializers.CharField()
+    message = serializers.CharField()
