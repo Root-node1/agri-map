@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   userId: { 
     type: String, 
-    unique: true 
+    unique: true,
+    // Make it optional in schema so it can be auto-generated
+    required: false
   },
   email: { 
     type: String, 
@@ -27,7 +29,8 @@ const userSchema = new mongoose.Schema({
   role: { 
     type: String, 
     enum: ['farmer', 'cooperative_admin', 'investor', 'admin', 'developer'], 
-    required: true 
+    required: true,
+    default: 'farmer'
   },
   firstName: { 
     type: String, 
@@ -64,17 +67,26 @@ const userSchema = new mongoose.Schema({
     type: String, 
     enum: ['email', 'firebase', 'google', 'facebook', 'apple'], 
     default: 'email' 
+  },
+  settings: {
+    language: { type: String, default: 'en' },
+    notifications: {
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: true }
+    }
   }
 }, { timestamps: true });
 
 // Auto-generate userId BEFORE saving
 userSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    // Generate userId if not provided
-    if (!this.userId) {
+  if (this.isNew && !this.userId) {
+    try {
       const lastUser = await this.constructor.findOne().sort({ createdAt: -1 });
-      const lastId = lastUser ? parseInt(lastUser.userId?.split('_')[1] || 0) : 0;
+      const lastId = lastUser && lastUser.userId ? parseInt(lastUser.userId.split('_')[1]) : 0;
       this.userId = `usr_${String(lastId + 1).padStart(4, '0')}`;
+    } catch (error) {
+      // Fallback if there's an error
+      this.userId = `usr_${Date.now().toString().slice(-6)}`;
     }
   }
   next();
@@ -83,9 +95,13 @@ userSchema.pre('save', async function (next) {
 // Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Compare password method
