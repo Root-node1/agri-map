@@ -17,6 +17,7 @@ const webhookRoutes = require('./src/routes/webhookRoutes');
 const aiRoutes = require('./src/routes/aiRoutes');
 const chatbotRoutes = require('./src/routes/chatbotRoutes');
 const testRoutes = require('./src/routes/testRoutes');
+const subscriptionRoutes = require('./src/routes/subscriptionRoutes');
 
 const app = express();
 
@@ -78,7 +79,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/test', testRoutes);
-
+app.use('/api/subscriptions', subscriptionRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
