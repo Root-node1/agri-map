@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "dashboard": "Tableau de Bord",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "title": "Bienvenue sur AgriMap",
+    "subtitle": "Révolutionner l'agriculture avec une technologie intelligente",
+    "getStarted": "Commencer",
+    "learnMore": "En Savoir Plus",
+    "whyChoose": "Pourquoi choisir AgriMap?",
+    "features": {
+      "smartFarming": "Agriculture Intelligente",
+      "smartFarmingDesc": "Insights agricoles alimentés par l'IA",
+      "equipment": "Gestion d'Équipement",
+      "equipmentDesc": "Suivez et gérez votre flotte",
+      "analytics": "Analytique",
+      "analyticsDesc": "Données et prévisions en temps réel"
+    }
+  },
+  "about": {
+    "title": "À Propos d'AgriMap",
+    "subtitle": "Autonomiser les agriculteurs avec une technologie de pointe",
+    "mission": "Notre Mission",
+    "missionDesc": "Chez AgriMap, nous nous engageons à révolutionner l'agriculture grâce à des solutions technologiques innovantes. Nous croyons en des pratiques agricoles durables qui augmentent la productivité tout en protégeant notre environnement.",
+    "vision": "Notre Vision",
+    "visionDesc": "Créer un monde où chaque agriculteur a accès aux outils et aux connaissances nécessaires pour cultiver des aliments de manière durable et efficace.",
+    "team": "Notre Équipe",
+    "teamDesc": "Nous sommes une équipe diversifiée d'experts agricoles, d'ingénieurs logiciels et de scientifiques des données travaillant ensemble pour construire l'avenir de l'agriculture."
+  }
+}

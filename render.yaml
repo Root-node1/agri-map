@@ -4,8 +4,8 @@ services:
     name: agrimap-node-api
     runtime: node
     plan: free
-    buildCommand: npm install --legacy-peer-deps
-    startCommand: npm start
+    buildCommand: cd node-agri-map-server && npm install --legacy-peer-deps
+    startCommand: cd node-agri-map-server && npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -41,21 +41,23 @@ services:
     name: agrimap-django-api
     runtime: python
     plan: free
-    buildCommand: pip install -r server-agri-map-django/requirements.txt || pip install Django==4.2.0 djangorestframework==3.14.0 django-cors-headers
-    startCommand: cd server-agri-map-django && python manage.py runserver 0.0.0.0:8000
+    buildCommand: cd server-agri-map-django && pip install -r requirements.txt || pip install Django==4.2.0 djangorestframework==3.14.0 django-cors-headers
+    startCommand: cd server-agri-map-django && gunicorn server_agri_map_django.wsgi:application
     healthCheckPath: /api/health/
     autoDeploy: true
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: server_agri_map_django.settings.local
+        value: server_agri_map_django.settings.production
       - key: SECRET_KEY
         sync: false
       - key: DEBUG
-        value: True
+        value: "False"
       - key: DATABASE_URL
         sync: false
       - key: CORS_ALLOWED_ORIGINS
-        value: https://agrimap-client.onrender.com,https://agrimap-node-api.onrender.com
+        value: https://agrimap-client.onrender.com,https://agrimap-node-api.onrender.com,https://agri-map-ekyx.onrender.com
+      - key: GUNICORN_WORKERS
+        value: "4"
 
   # Frontend Client
   - type: web
@@ -69,3 +71,10 @@ services:
         value: https://agrimap-node-api.onrender.com/api
       - key: VITE_DJANGO_API_URL
         value: https://agrimap-django-api.onrender.com/api
+
+databases:
+  - name: agrimap-db
+    databaseName: agrimap
+    user: agrimap
+    plan: starter
+    postgresMajorVersion: 16
