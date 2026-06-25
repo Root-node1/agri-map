@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
-const Subscription = require('../models/Subscription');
 const { generateToken, generateRefreshToken } = require('../config/jwt');
 const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
@@ -16,8 +15,21 @@ exports.register = async (req, res, next) => {
       throw new ApiError(400, 'User already exists with this email or phone');
     }
 
-    // Create user - userId will be auto-generated in the pre-save hook
+    // Generate userId manually
+    const lastUser = await User.findOne().sort({ createdAt: -1 });
+    let lastId = 0;
+    if (lastUser && lastUser.userId) {
+      const match = lastUser.userId.match(/usr_(\d+)/);
+      if (match) {
+        lastId = parseInt(match[1]) || 0;
+      }
+    }
+    const userId = `usr_${String(lastId + 1).padStart(4, '0')}`;
+    console.log('📝 Generated userId:', userId);
+
+    // Create user with explicit userId
     const user = new User({
+      userId: userId,
       email,
       phone,
       password,
@@ -26,8 +38,10 @@ exports.register = async (req, res, next) => {
       role: role || 'farmer'
     });
     
+    console.log('👤 User object before save:', { userId: user.userId, email: user.email });
+    
     await user.save();
-    console.log('✅ User created with userId:', user.userId);
+    console.log('✅ User saved with userId:', user.userId);
 
     // Create wallet
     const wallet = new Wallet({
@@ -36,26 +50,11 @@ exports.register = async (req, res, next) => {
     });
     await wallet.save();
 
-    // Create free subscription
-    try {
-      const subscription = new Subscription({
-        userId: user._id,
-        plan: 'free',
-        billingCycle: 'monthly',
-        price: 0,
-        currency: 'USD',
-        status: 'active'
-      });
-      await subscription.save();
-    } catch (subError) {
-      console.log('⚠️ Subscription creation skipped:', subError.message);
-    }
-
     // Generate tokens
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    logger.info(`User registered: ${user.email}`);
+    logger.info(`User registered: ${user.email} (${user.userId})`);
 
     res.status(201).json(new ApiResponse(201, {
       user: {
@@ -66,11 +65,11 @@ exports.register = async (req, res, next) => {
         lastName: user.lastName,
         role: user.role,
       },
-      wallet: wallet ? {
+      wallet: {
         id: wallet._id,
         walletId: wallet.walletId,
         balance: wallet.balance,
-      } : null,
+      },
       token,
       refreshToken,
     }, 'User registered successfully'));
@@ -176,21 +175,31 @@ exports.logout = async (req, res, next) => {
   }
 };
 
-// Firebase auth methods (simplified)
+// Simplified Firebase methods
 exports.firebaseRegister = async (req, res, next) => {
   try {
-    const { firebaseToken, role = 'farmer', ...userData } = req.body;
-    // Simplified - just use email from token
-    const decoded = { email: userData.email || 'firebase@example.com', name: userData.firstName || 'Firebase' };
+    const { email, firstName, lastName, role = 'farmer' } = req.body;
     
-    let user = await User.findOne({ email: decoded.email });
+    // Generate userId
+    const lastUser = await User.findOne().sort({ createdAt: -1 });
+    let lastId = 0;
+    if (lastUser && lastUser.userId) {
+      const match = lastUser.userId.match(/usr_(\d+)/);
+      if (match) {
+        lastId = parseInt(match[1]) || 0;
+      }
+    }
+    const userId = `usr_${String(lastId + 1).padStart(4, '0')}`;
+    
+    let user = await User.findOne({ email });
     if (!user) {
       user = new User({
-        email: decoded.email,
-        phone: userData.phone || '',
+        userId: userId,
+        email: email || 'firebase@example.com',
+        phone: req.body.phone || '',
         password: Math.random().toString(36).substr(2, 10),
-        firstName: userData.firstName || decoded.name || '',
-        lastName: userData.lastName || '',
+        firstName: firstName || 'Firebase',
+        lastName: lastName || 'User',
         role: role,
         isVerified: true,
         provider: 'firebase'
@@ -199,20 +208,6 @@ exports.firebaseRegister = async (req, res, next) => {
       
       const wallet = new Wallet({ userId: user._id });
       await wallet.save();
-      
-      try {
-        const subscription = new Subscription({
-          userId: user._id,
-          plan: 'free',
-          billingCycle: 'monthly',
-          price: 0,
-          currency: 'USD',
-          status: 'active'
-        });
-        await subscription.save();
-      } catch (subError) {
-        console.log('⚠️ Subscription creation skipped');
-      }
     }
     
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
@@ -237,9 +232,8 @@ exports.firebaseRegister = async (req, res, next) => {
 
 exports.firebaseLogin = async (req, res, next) => {
   try {
-    const { firebaseToken } = req.body;
-    // Simplified - just return a mock login
-    const user = await User.findOne({ email: 'firebase@example.com' }) || await User.findOne();
+    const { email } = req.body;
+    const user = await User.findOne({ email: email || 'firebase@example.com' });
     
     if (!user) {
       throw new ApiError(404, 'User not found. Please register first.');
