@@ -9,52 +9,52 @@ const FarmerDashboard = () => {
     { icon: <FaTractor className="text-2xl" />, label: 'Fields', value: '4' },
     { icon: <FaSeedling className="text-2xl" />, label: 'Crops', value: '6' },
     { icon: <FaMapMarkedAlt className="text-2xl" />, label: 'Soil Health', value: 'Good' },
-    { icon: <FaLeaf className="text-2xl" />, label: 'Carbon', value: '2.3 tons' },
+    { icon: <FaLeaf className="text-2xl" />, label: 'Carbon', value: '2.3 tons' }
   ]
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="glass-card rounded-2xl p-8 mb-8">
-        <h1 className="text-3xl font-bold mb-2">Welcome, {user?.name}!</h1>
-        <p className="text-gray-600 dark:text-gray-300">Your agricultural dashboard</p>
+    <div className="max-w-6xl mx-auto px-4 py-8 page-shell-dark">
+      <div className="glass-card rounded-[2rem] p-8 mb-10">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold mb-2 text-white">Welcome, {user?.name || 'Farmer'}!</h1>
+            <p className="text-slate-300">Your agricultural dashboard</p>
+          </div>
+          <div className="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-3 text-sm text-slate-200 border border-white/10">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            Live insights active
+          </div>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, i) => (
-          <div key={i} className="glass-card rounded-xl p-6 text-center">
-            <div className="inline-flex p-3 bg-green-50 dark:bg-green-900/20 rounded-full mb-3 text-green-600">
-              {stat.icon}
+      <div className="dashboard-grid dashboard-grid-4 mb-8">
+        {stats.map((stat, index) => (
+          <div key={index} className="stat-card rounded-[1.75rem] text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-300 mx-auto mb-5">
+              {React.cloneElement(stat.icon, { className: 'text-2xl' })}
             </div>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{stat.label}</div>
+            <div className="text-3xl font-semibold text-white mb-2">{stat.value}</div>
+            <div className="text-sm text-slate-400">{stat.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="glass-card rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-          <ul className="space-y-3 text-sm">
-            <li className="flex items-center gap-2">🌱 Planted new crop in Field A</li>
-            <li className="flex items-center gap-2">📊 Updated harvest data</li>
-            <li className="flex items-center gap-2">🚜 Equipment maintenance scheduled</li>
+      <div className="dashboard-grid dashboard-grid-2 gap-6">
+        <div className="glass-card rounded-[2rem] p-6">
+          <h2 className="text-xl font-semibold mb-4 text-white">Recent Activity</h2>
+          <ul className="space-y-3 text-sm text-slate-300">
+            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">🌱 Planted new crop in Field A</li>
+            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">📊 Updated harvest data</li>
+            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">🚜 Equipment maintenance scheduled</li>
           </ul>
         </div>
-        <div className="glass-card rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 transition text-sm font-medium">
-              Add Field
-            </button>
-            <button className="px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 transition text-sm font-medium">
-              Log Harvest
-            </button>
-            <button className="px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 transition text-sm font-medium">
-              View Reports
-            </button>
-            <button className="px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 transition text-sm font-medium">
-              Schedule Task
-            </button>
+        <div className="glass-card rounded-[2rem] p-6">
+          <h2 className="text-xl font-semibold mb-4 text-white">Quick Actions</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button className="btn-secondary w-full justify-center">Add Field</button>
+            <button className="btn-secondary w-full justify-center">Log Harvest</button>
+            <button className="btn-secondary w-full justify-center">View Reports</button>
+            <button className="btn-secondary w-full justify-center">Schedule Task</button>
           </div>
         </div>
       </div>

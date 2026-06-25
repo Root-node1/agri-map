@@ -6,8 +6,8 @@ const Footer = () => {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="mx-4 mb-4 mt-8 glass rounded-2xl px-6 py-8">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+    <footer className="mx-4 mb-4 mt-8 glass rounded-3xl px-6 py-8 backdrop-blur-xl border border-white/10">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8 text-slate-300">
         <div>
           <h3 className="font-bold text-lg mb-3">AgriMap</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">

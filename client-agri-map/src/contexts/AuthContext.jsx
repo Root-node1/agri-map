@@ -20,10 +20,11 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/me`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      setUser(response.data)
+      // Node API wraps payload in { success, statusCode, message, data }
+      setUser(response.data.data.user)
     } catch (error) {
       localStorage.removeItem('token')
       setToken(null)
@@ -35,14 +36,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/login`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         email,
         password
       })
-      const { token, user } = response.data
-      localStorage.setItem('token', token)
-      setToken(token)
-      setUser(user)
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
+      setUser(userResp)
       navigate('/dashboard')
       return { success: true }
     } catch (error) {
@@ -52,11 +55,13 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/signup`, userData)
-      const { token, user } = response.data
-      localStorage.setItem('token', token)
-      setToken(token)
-      setUser(user)
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, userData)
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
+      setUser(userResp)
       navigate('/dashboard')
       return { success: true }
     } catch (error) {
@@ -66,13 +71,15 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = async (credentialResponse) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_AGRIMAP_DJANGO_URL}/auth/google`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
         credential: credentialResponse.credential
       })
-      const { token, user } = response.data
-      localStorage.setItem('token', token)
-      setToken(token)
-      setUser(user)
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
+      setUser(userResp)
       navigate('/dashboard')
       return { success: true }
     } catch (error) {

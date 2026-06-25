@@ -13,7 +13,7 @@ import CooperativeDashboard from './pages/dashboard/CooperativeDashboard'
 import AdminDashboard from './pages/dashboard/AdminDashboard'
 import Fields from './pages/farm/Fields'
 import SatelliteAnalysis from './pages/farm/SatelliteAnalysis'
-import Finance from './pages/finance/Finance'
+// Finance page removed (not present) — route omitted
 
 function App() {
   const { user } = useAuth()
@@ -55,7 +55,7 @@ function App() {
         <Route path="/dashboard" element={getDashboard()} />
         <Route path="/fields" element={<Fields />} />
         <Route path="/satellite" element={<SatelliteAnalysis />} />
-        <Route path="/finance" element={<Finance />} />
+        {/* finance route removed (no component present) */}
         
         {/* Catch-all Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

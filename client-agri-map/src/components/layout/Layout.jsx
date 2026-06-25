@@ -5,7 +5,7 @@ import Chatbot from '../ui/Chatbot'
 
 const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell page-shell-dark flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-1">
         {children}
