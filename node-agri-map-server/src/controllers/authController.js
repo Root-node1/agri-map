@@ -15,21 +15,8 @@ exports.register = async (req, res, next) => {
       throw new ApiError(400, 'User already exists with this email or phone');
     }
 
-    // Generate userId manually
-    const lastUser = await User.findOne().sort({ createdAt: -1 });
-    let lastId = 0;
-    if (lastUser && lastUser.userId) {
-      const match = lastUser.userId.match(/usr_(\d+)/);
-      if (match) {
-        lastId = parseInt(match[1]) || 0;
-      }
-    }
-    const userId = `usr_${String(lastId + 1).padStart(4, '0')}`;
-    console.log('📝 Generated userId:', userId);
-
-    // Create user with explicit userId
+    // Create user - let MongoDB generate _id
     const user = new User({
-      userId: userId,
       email,
       phone,
       password,
@@ -38,10 +25,8 @@ exports.register = async (req, res, next) => {
       role: role || 'farmer'
     });
     
-    console.log('👤 User object before save:', { userId: user.userId, email: user.email });
-    
     await user.save();
-    console.log('✅ User saved with userId:', user.userId);
+    console.log('✅ User created with _id:', user._id);
 
     // Create wallet
     const wallet = new Wallet({
@@ -54,12 +39,11 @@ exports.register = async (req, res, next) => {
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    logger.info(`User registered: ${user.email} (${user.userId})`);
+    logger.info(`User registered: ${user.email}`);
 
     res.status(201).json(new ApiResponse(201, {
       user: {
         id: user._id,
-        userId: user.userId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -102,7 +86,6 @@ exports.login = async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, {
       user: {
         id: user._id,
-        userId: user.userId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -129,7 +112,6 @@ exports.getProfile = async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, {
       user: {
         id: user._id,
-        userId: user.userId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -175,26 +157,14 @@ exports.logout = async (req, res, next) => {
   }
 };
 
-// Simplified Firebase methods
+// Firebase methods (simplified)
 exports.firebaseRegister = async (req, res, next) => {
   try {
     const { email, firstName, lastName, role = 'farmer' } = req.body;
     
-    // Generate userId
-    const lastUser = await User.findOne().sort({ createdAt: -1 });
-    let lastId = 0;
-    if (lastUser && lastUser.userId) {
-      const match = lastUser.userId.match(/usr_(\d+)/);
-      if (match) {
-        lastId = parseInt(match[1]) || 0;
-      }
-    }
-    const userId = `usr_${String(lastId + 1).padStart(4, '0')}`;
-    
     let user = await User.findOne({ email });
     if (!user) {
       user = new User({
-        userId: userId,
         email: email || 'firebase@example.com',
         phone: req.body.phone || '',
         password: Math.random().toString(36).substr(2, 10),
@@ -216,7 +186,6 @@ exports.firebaseRegister = async (req, res, next) => {
     res.status(201).json(new ApiResponse(201, {
       user: {
         id: user._id,
-        userId: user.userId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -248,7 +217,6 @@ exports.firebaseLogin = async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, {
       user: {
         id: user._id,
-        userId: user.userId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
