@@ -25,6 +25,9 @@ class CooperativeSerializer(serializers.ModelSerializer):
 
 
 class CooperativeMemberSerializer(serializers.ModelSerializer):
+    farmer_username = serializers.CharField(source='farmer.user.username', read_only=True)
+
     class Meta:
         model = CooperativeMember
-        fields = ('id', 'cooperative', 'farmer', 'role', 'joined_at')
+        fields = ('id', 'cooperative', 'farmer', 'farmer_username', 'role', 'joined_at')
+        read_only_fields = ('cooperative', 'farmer', 'joined_at')

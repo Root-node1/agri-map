@@ -24,6 +24,11 @@
       "key": "coop_id",
       "value": "1",
       "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "1",
+      "type": "string"
     }
   ],
   "item": [
@@ -230,6 +235,41 @@
             },
             "description": "Get details for a specific cooperative by ID."
           }
+        },
+        {
+          "name": "List / Add Cooperative Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/{{coop_id}}/members/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives", "{{coop_id}}", "members"]
+            },
+            "description": "GET to list all members of a cooperative (paginated).\nPOST to add a member (only cooperative admins):\n```json\n{\n  \"user_id\": 2,\n  \"role\": \"member\"\n}\n```\n`role` can be `member` (default) or `admin`.\n\n**GET Response 200:**\n```json\n{\n  \"count\": 2,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"cooperative\": 1,\n      \"farmer\": 1,\n      \"farmer_username\": \"admin\",\n      \"role\": \"admin\",\n      \"joined_at\": \"2026-06-24T00:00:00Z\"\n    },\n    {\n      \"id\": 2,\n      \"cooperative\": 1,\n      \"farmer\": 2,\n      \"farmer_username\": \"demo\",\n      \"role\": \"member\",\n      \"joined_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 2,\n  \"cooperative\": 1,\n  \"farmer\": 2,\n  \"farmer_username\": \"demo\",\n  \"role\": \"member\",\n  \"joined_at\": \"2026-06-24T00:00:00Z\"\n}\n```\n\n**Error 400 (no farmer profile):** `{\"user_id\": [\"User does not have a farmer profile.\"]}`\n**Error 403:** Only cooperative admins can manage members."
+          }
+        },
+        {
+          "name": "Update / Remove Cooperative Member",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/{{coop_id}}/members/{{member_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives", "{{coop_id}}", "members", "{{member_id}}"]
+            },
+            "description": "PATCH to update a member's role (only cooperative admins).\nDELETE to remove a member from the cooperative.\n\n**PATCH Response 200:** returns the updated member.\n**DELETE Response 204:** no content."
+          }
         }
       ],
       "description": "Farmer profiles and cooperative management"
@@ -247,9 +287,31 @@
             "url": {
               "raw": "{{base_url}}/api/fields/",
               "host": ["{{base_url}}"],
-              "path": ["api", "fields"]
+              "path": ["api", "fields"],
+              "query": [
+                {
+                  "key": "bbox",
+                  "value": "west,south,east,north",
+                  "description": "Optional. Filter fields by bounding box (comma-separated: min_lng,min_lat,max_lng,max_lat)"
+                }
+              ]
             },
-            "description": "GET to list all fields for the authenticated user (paginated).\nPOST to create a new field:\n\n```json\n{\n  \"name\": \"My Field\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]\n  },\n  \"area_ha\": 10.5\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+            "description": "GET to list all fields visible to the authenticated user (paginated).\nIncludes own fields + fields from cooperative members.\nSupports `?bbox=west,south,east,north` to filter by map viewport.\n\nPOST to create a new field:\n```json\n{\n  \"name\": \"My Field\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]\n  },\n  \"area_ha\": 10.5\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"area_ha\": 10.5,\n  \"centroid_lat\": 0.5,\n  \"centroid_lng\": 0.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Fields GeoJSON",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fields/geojson/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fields", "geojson"]
+            },
+            "description": "Returns all visible fields as a GeoJSON FeatureCollection — ideal for rendering on a map.\nIncludes own fields + cooperative members' fields. No pagination.\n\n**Response 200:**\n```json\n{\n  \"type\": \"FeatureCollection\",\n  \"features\": [\n    {\n      \"type\": \"Feature\",\n      \"id\": 1,\n      \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n      \"properties\": {\n        \"id\": 1,\n        \"name\": \"My Field\",\n        \"area_ha\": 10.5,\n        \"centroid_lat\": 0.5,\n        \"centroid_lng\": 0.5,\n        \"created_at\": \"2026-06-24T00:00:00Z\",\n        \"updated_at\": \"2026-06-24T00:00:00Z\"\n      }\n    }\n  ]\n}\n```"
           }
         },
         {
@@ -264,11 +326,11 @@
               "host": ["{{base_url}}"],
               "path": ["api", "fields", "{{field_id}}"]
             },
-            "description": "Get details for a specific field. Only returns fields owned by the authenticated user.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", ...},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+            "description": "Get details for a specific field. Returns own fields and cooperative members' fields.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", ...},\n  \"area_ha\": 10.5,\n  \"centroid_lat\": 0.5,\n  \"centroid_lng\": 0.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
           }
         }
       ],
-      "description": "Field CRUD — geometry is GeoJSON Polygon/MultiPolygon"
+      "description": "Field CRUD — geometry is GeoJSON Polygon/MultiPolygon. Bbox filter, GeoJSON FeatureCollection endpoint, and cooperative field sharing available."
     },
     {
       "name": "Analysis",
