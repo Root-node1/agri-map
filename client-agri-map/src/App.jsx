@@ -16,7 +16,6 @@ import CooperativeDashboard from './pages/dashboard/CooperativeDashboard'
 import AdminDashboard from './pages/dashboard/AdminDashboard'
 
 import Fields from './pages/farm/Fields'
-import FieldDetail from './pages/farm/FieldDetail'
 import HeatmapView from './pages/farm/HeatmapView'
 import SatelliteAnalysis from './pages/farm/SatelliteAnalysis'
 import FieldDetails from './pages/farm/FieldDetails'
@@ -64,6 +63,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsConditions />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/signup" element={<Signup />} />
 

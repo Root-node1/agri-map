@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { authAPI } from '../services/api'
 import { farmerAPI } from '../services/djangoApi'
 
 export const AuthContext = createContext()
@@ -132,12 +134,26 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = async () => {
-    try { await authAPI.logout() } catch { /* ignore */ }
+    try {
+      await authAPI.logout()
+    } catch {
+      // ignore logout failures
+    }
+
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
     setToken(null)
     setUser(null)
     navigate('/login')
+  }
+
+  const forgotPassword = async (email) => {
+    try {
+      await authAPI.forgotPassword(email)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message || 'Unable to send password reset email.' }
+    }
   }
 
   const completeFarmerProfile = async (profileData) => {
@@ -160,19 +176,16 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     googleLogin,
+    forgotPassword,
     logout,
     completeFarmerProfile,
     needsFarmerProfile,
-    isAuthenticated: !!user,
+    isAuthenticated: !!token || !!user,
     isAdmin: user?.role === 'admin'
   }
 
   return (
-    <AuthContext.Provider value={{
-      user, loading, login, signup, googleLogin, forgotPassword, logout,
-      isAuthenticated: !!token || !!user,
-      isAdmin: user?.role === 'admin',
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )
