@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "AgriMap",
+    "subtitle": "AI-Powered Agricultural Intelligence & Green Financing Platform",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "whyChoose": "Why AgriMap?",
+    "features": {
+      "smartFarming": "Satellite Intelligence",
+      "smartFarmingDesc": "Real-time crop monitoring & field analysis",
+      "equipment": "Carbon Sequestration",
+      "equipmentDesc": "Track & monetize your carbon credits",
+      "analytics": "Green Financing",
+      "analyticsDesc": "Access loans & funding for your farm"
+    }
+  },
+  "dashboard": {
+    "farmer": {
+      "title": "Farmer Dashboard",
+      "welcome": "Welcome",
+      "fields": "Fields",
+      "crops": "Crops",
+      "soilHealth": "Soil Health",
+      "carbon": "Carbon Credits",
+      "recentActivity": "Recent Activity",
+      "quickActions": "Quick Actions",
+      "addField": "Add Field",
+      "viewMaps": "View Maps",
+      "checkSoil": "Check Soil",
+      "viewReports": "View Reports"
+    },
+    "cooperative": {
+      "title": "Cooperative Dashboard",
+      "welcome": "Welcome",
+      "totalFarmers": "Total Farmers",
+      "totalFields": "Total Fields",
+      "loans": "Loans",
+      "carbonCredits": "Carbon Credits"
+    }
+  },
+  "satellite": {
+    "title": "Satellite Intelligence",
+    "fetchData": "Process Satellite Data",
+    "processing": "Processing...",
+    "ndvi": "NDVI Index",
+    "evi": "EVI Index",
+    "soilMoisture": "Soil Moisture",
+    "cropDetection": "Crop Detection",
+    "boundaryDetection": "Boundary Detection",
+    "noData": "No satellite data available",
+    "soilHealth": "Soil Health Analysis",
+    "carbonSequestration": "Carbon Sequestration"
+  },
+  "finance": {
+    "title": "Green Financing",
+    "loans": "Loans",
+    "applyLoan": "Apply for Loan",
+    "loanAmount": "Loan Amount",
+    "purpose": "Purpose",
+    "status": "Status",
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "carbonCredits": "Carbon Credits",
+    "carbonCreditsDesc": "Monetize your carbon sequestration",
+    "tokenize": "Tokenize Credits",
+    "sell": "Sell Credits",
+    "wallet": "Wallet",
+    "balance": "Balance",
+    "transactions": "Transactions"
+  },
+  "fields": {
+    "title": "My Fields",
+    "addField": "Add Field",
+    "fieldName": "Field Name",
+    "location": "Location",
+    "size": "Size (Hectares)",
+    "cropType": "Crop Type",
+    "soilHealth": "Soil Health",
+    "viewField": "View Field",
+    "editField": "Edit Field",
+    "deleteField": "Delete Field"
+  },
+  "about": {
+    "title": "About AgriMap",
+    "subtitle": "Empowering farmers with geospatial intelligence & green finance",
+    "mission": "Our Mission",
+    "missionDesc": "To revolutionize agriculture through AI-powered satellite intelligence, enabling smallholder farmers to access green financing and build climate-resilient farms.",
+    "vision": "Our Vision",
+    "visionDesc": "A world where every farmer has access to the tools, insights, and financing needed to grow food sustainably and profitably.",
+    "team": "Our Team",
+    "teamDesc": "We're a diverse team of agricultural experts, geospatial data scientists, software engineers, and fintech specialists."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Login to your AgriMap account",
+      "email": "Email Address",
+      "password": "Password",
+      "button": "Login",
+      "loading": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign Up",
+      "orContinue": "or continue with"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Join the agricultural intelligence revolution",
+      "name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "button": "Sign Up",
+      "loading": "Creating Account...",
+      "hasAccount": "Already have an account?",
+      "login": "Login",
+      "orContinue": "or continue with"
+    }
+  },
+  "chatbot": {
+    "title": "AgriMap Assistant",
+    "placeholder": "Ask me about farming, financing, or satellite data...",
+    "welcome": "Hello! I'm your AgriMap assistant. I can help you with:",
+    "features": "• Satellite imagery analysis\n• Crop health monitoring\n• Carbon credit calculations\n• Loan applications\n• Soil health insights"
+  }
+}

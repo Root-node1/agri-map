@@ -1,0 +1,122 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "dashboard": "Tablero",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "title": "Bienvenido a AgriMap",
+    "subtitle": "Revolucionando la agricultura con tecnología inteligente",
+    "getStarted": "Comenzar",
+    "learnMore": "Más Información",
+    "whyChoose": "¿Por qué elegir AgriMap?",
+    "features": {
+      "smartFarming": "Agricultura Inteligente",
+      "smartFarmingDesc": "Insights agrícolas con IA",
+      "equipment": "Gestión de Equipos",
+      "equipmentDesc": "Rastrea y administra tu flota",
+      "analytics": "Análisis",
+      "analyticsDesc": "Datos y predicciones en tiempo real"
+    }
+  },
+  "about": {
+    "title": "Acerca de AgriMap",
+    "subtitle": "Empoderando a los agricultores con tecnología de vanguardia",
+    "mission": "Nuestra Misión",
+    "missionDesc": "En AgriMap, estamos comprometidos a revolucionar la agricultura a través de soluciones tecnológicas innovadoras. Creemos en prácticas agrícolas sostenibles que aumentan la productividad mientras protegen nuestro medio ambiente.",
+    "vision": "Nuestra Visión",
+    "visionDesc": "Crear un mundo donde cada agricultor tenga acceso a las herramientas y conocimientos necesarios para cultivar alimentos de manera sostenible y eficiente.",
+    "team": "Nuestro Equipo",
+    "teamDesc": "Somos un equipo diverso de expertos agrícolas, ingenieros de software y científicos de datos que trabajan juntos para construir el futuro de la agricultura."
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de Nuevo",
+      "subtitle": "Inicia sesión en tu cuenta AgriMap",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "button": "Iniciar Sesión",
+      "loading": "Iniciando sesión...",
+      "noAccount": "¿No tienes una cuenta?",
+      "signup": "Registrarse",
+      "orContinue": "o continúa con"
+    },
+    "signup": {
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a AgriMap hoy",
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "button": "Registrarse",
+      "loading": "Creando cuenta...",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "login": "Iniciar Sesión",
+      "orContinue": "o continúa con"
+    }
+  },
+  "dashboard": {
+    "admin": {
+      "title": "Tablero de Administrador",
+      "welcome": "Bienvenido de nuevo",
+      "totalUsers": "Usuarios Totales",
+      "activeUsers": "Usuarios Activos",
+      "newUsers": "Nuevos Esta Semana",
+      "userManagement": "Gestión de Usuarios",
+      "search": "Buscar usuarios...",
+      "loading": "Cargando usuarios..."
+    },
+    "user": {
+      "title": "Bienvenido",
+      "subtitle": "Tu tablero agrícola",
+      "profile": "Perfil",
+      "projects": "Proyectos",
+      "fields": "Campos",
+      "crops": "Cultivos",
+      "recentActivity": "Actividad Reciente",
+      "quickActions": "Acciones Rápidas",
+      "addField": "Agregar Campo",
+      "logHarvest": "Registrar Cosecha",
+      "viewReports": "Ver Informes",
+      "scheduleTask": "Programar Tarea"
+    }
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: Enero 2024",
+    "infoCollect": "Información que Recopilamos",
+    "infoCollectDesc": "Recopilamos información que proporcionas directamente, como cuando creas una cuenta, actualizas tu perfil o utilizas nuestros servicios. Esto puede incluir tu nombre, dirección de correo electrónico, número de teléfono y datos de ubicación.",
+    "howUse": "Cómo Usamos Tu Información",
+    "howUseDesc": "Utilizamos la información que recopilamos para proporcionar, mantener y mejorar nuestros servicios, comunicarnos contigo y proteger la seguridad de nuestra plataforma.",
+    "dataSecurity": "Seguridad de Datos",
+    "dataSecurityDesc": "Implementamos medidas técnicas y organizativas apropiadas para proteger tu información personal contra acceso no autorizado, alteración o destrucción.",
+    "contact": "Contáctanos",
+    "contactDesc": "Si tienes preguntas sobre esta Política de Privacidad, contáctanos en privacy@agrimap.com"
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "lastUpdated": "Última actualización: Enero 2024",
+    "acceptance": "Aceptación de Términos",
+    "acceptanceDesc": "Al usar AgriMap, aceptas estos términos y condiciones. Si no estás de acuerdo, por favor no utilices nuestros servicios.",
+    "accounts": "Cuentas de Usuario",
+    "accountsDesc": "Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta. Aceptas notificarnos inmediatamente sobre cualquier uso no autorizado de tu cuenta.",
+    "conduct": "Conducta del Usuario",
+    "conductDesc": "Aceptas usar AgriMap en cumplimiento con todas las leyes y regulaciones aplicables. No debes hacer mal uso de nuestros servicios ni interferir con la experiencia de otros usuarios.",
+    "intellectual": "Propiedad Intelectual",
+    "intellectualDesc": "Todo el contenido en AgriMap está protegido por derechos de propiedad intelectual. No puedes reproducir, distribuir o crear trabajos derivados sin nuestro permiso.",
+    "contact": "Contáctanos",
+    "contactDesc": "Para preguntas sobre estos términos, contáctanos en legal@agrimap.com"
+  },
+  "accessibility": {
+    "title": "Accesibilidad",
+    "increaseFont": "Aumentar Fuente",
+    "decreaseFont": "Disminuir Fuente",
+    "highContrast": "Alto Contraste",
+    "language": "Idioma"
+  }
+}

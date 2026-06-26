@@ -1,31 +1,69 @@
 services:
+  # Node.js Backend API
   - type: web
-    name: agrimap-django
-    env: docker
-    dockerfilePath: ./Dockerfile.django
-    dockerContext: .
-    healthCheckPath: /api/health/
+    name: agrimap-node-api
+    runtime: node
+    plan: free
+    buildCommand: cd node-agri-map-server && npm install --legacy-peer-deps
+    startCommand: cd node-agri-map-server && npm start
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: server_agri_map_django.settings.production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: agrimap-db
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ALLOWED_HOSTS
-        value: agri-map-ekyx.onrender.com,localhost,127.0.0.1
-      - key: CORS_ALLOWED_ORIGINS
-        value: https://agri-map-ekyx.onrender.com,https://client-agri-map.pages.dev,http://localhost:3000
-      - key: DEBUG
-        value: "False"
-      - key: GUNICORN_WORKERS
-        value: "4"
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: DJANGO_API_URL
+        sync: false
+      - key: DJANGO_API_KEY
+        sync: false
+      - key: WEBHOOK_BASE_URL
+        value: https://agrimap-node-api.onrender.com/api/webhooks
+      - key: CORS_ORIGIN
+        value: https://agrimap-client.onrender.com,https://agrimap-django-api.onrender.com,http://localhost:3000
+      - key: LOG_LEVEL
+        value: info
 
-databases:
-  - name: agrimap-db
-    databaseName: agrimap
-    user: agrimap
-    plan: starter
-    postgresMajorVersion: 16
+  # Django Backend API
+  - type: web
+    name: agrimap-node-api
+    runtime: node
+    plan: free
+    buildCommand: |
+      echo "📦 Installing dependencies..."
+      cd node-agri-map-server
+      npm install --legacy-peer-deps
+      echo "✅ Dependencies installed"
+    startCommand: |
+      echo "🚀 Starting server..."
+      cd node-agri-map-server
+      node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: LOG_LEVEL
+        value: info

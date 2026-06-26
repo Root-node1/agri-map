@@ -1,0 +1,1165 @@
+{
+  "info": {
+    "name": "AgriMap Complete API",
+    "description": "Complete API collection for AgriMap - Agriculture Intelligence Platform\n\nBase URL: https://agri-map-v81v.onrender.com\nLocal URL: http://localhost:3000\n\nFeatures:\n- 🔐 Authentication (Email + Firebase OAuth)\n- 🤖 AI Services (Crop, Soil, Carbon, Yield)\n- 💬 Chatbot Assistant\n- 💰 Loans & Financing\n- 🌿 Carbon Credits\n- 💳 Payments & Wallet\n- 📋 Subscriptions & API Keys\n\n🚀 Live API: https://agri-map-v81v.onrender.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "3.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agri-map-v81v.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🏠 Health & Status",
+      "item": [
+        {
+          "name": "Root API",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Root",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api",
+              "host": ["{{base_url}}"],
+              "path": ["api"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"phone\": \"1234567890\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Register with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"firebase@example.com\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"firebase@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI Services",
+      "item": [
+        {
+          "name": "Detect Crop",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageData\": \"base64_encoded_image_data_here\",\n  \"options\": {\n    \"confidenceThreshold\": 0.7\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/detect-crop",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "detect-crop"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Soil",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4,\n    \"temperature\": 25,\n    \"organicMatter\": 2.3\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/analyze-soil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "analyze-soil"]
+            }
+          }
+        },
+        {
+          "name": "Predict Carbon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/predict-carbon",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "predict-carbon"]
+            }
+          }
+        },
+        {
+          "name": "Predict Yield",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/predict-yield",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "predict-yield"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Vegetation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/analyze-vegetation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "analyze-vegetation"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilData\": {\"ph\": 6.5, \"moisture\": 0.4}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/analyze-field",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "analyze-field"]
+            }
+          }
+        },
+        {
+          "name": "Get AI Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ai/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "models"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💬 Chatbot",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/message",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "message"]
+            }
+          }
+        },
+        {
+          "name": "Get History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "history"]
+            }
+          }
+        },
+        {
+          "name": "Get Recommendations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmData\": {\n    \"soil\": {\"nitrogen\": 0.3, \"moisture\": 0.25},\n    \"crop\": {\"type\": \"maize\", \"healthScore\": 0.45}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "recommendations"]
+            }
+          }
+        },
+        {
+          "name": "Get Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/analytics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "analytics"]
+            }
+          }
+        },
+        {
+          "name": "Clear History",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chatbot/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chatbot", "history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Loans",
+      "item": [
+        {
+          "name": "Apply for Loan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"purpose\": \"irrigation_upgrade\",\n  \"tenureMonths\": 12\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/loans/apply",
+              "host": ["{{base_url}}"],
+              "path": ["api", "loans", "apply"]
+            }
+          }
+        },
+        {
+          "name": "Get All Loans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/loans?status=pending&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "loans"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Loan Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/loans/{{loan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "loans", "{{loan_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Approve Loan (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/loans/{{loan_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "loans", "{{loan_id}}", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Disburse Loan (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletId\": \"{{wallet_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/loans/{{loan_id}}/disburse",
+              "host": ["{{base_url}}"],
+              "path": ["api", "loans", "{{loan_id}}", "disburse"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🌿 Carbon Credits",
+      "item": [
+        {
+          "name": "Get All Credits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Credits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits/available",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits", "available"]
+            }
+          }
+        },
+        {
+          "name": "Get Credit Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Create Credit (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"fieldId\": \"field_123\",\n  \"amountInTons\": 2.5,\n  \"pricePerTon\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits"]
+            }
+          }
+        },
+        {
+          "name": "Tokenize Credit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 2.5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits/{{credit_id}}/tokenize",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits", "{{credit_id}}", "tokenize"]
+            }
+          }
+        },
+        {
+          "name": "Sell Credit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buyerId\": \"user_456\",\n  \"amount\": 2.5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/carbon-credits/{{credit_id}}/sell",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon-credits", "{{credit_id}}", "sell"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Wallet & Payments",
+      "item": [
+        {
+          "name": "Get Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet"]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/transactions?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/deposit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "deposit"]
+            }
+          }
+        },
+        {
+          "name": "Withdraw",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"bank_transfer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/withdraw",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "withdraw"]
+            }
+          }
+        },
+        {
+          "name": "Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientUserId\": \"user_456\",\n  \"amount\": 200,\n  \"description\": \"Payment for services\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/transfer",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "transfer"]
+            }
+          }
+        },
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"card\",\n  \"paymentType\": \"loan_repayment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/initiate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "initiate"]
+            }
+          }
+        },
+        {
+          "name": "Get Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "Refund Payment (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer request\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}/refund",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}", "refund"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Subscriptions & API Keys",
+      "item": [
+        {
+          "name": "Get Plans",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/plans",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "plans"]
+            }
+          }
+        },
+        {
+          "name": "Create Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get My Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/my-subscription",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "my-subscription"]
+            }
+          }
+        },
+        {
+          "name": "Generate API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/generate-api-key",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "generate-api-key"]
+            }
+          }
+        },
+        {
+          "name": "List API Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "api-keys"]
+            }
+          }
+        },
+        {
+          "name": "Revoke API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/api-keys/{{api_key_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "api-keys", "{{api_key_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Usage Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/usage",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "usage"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Too expensive\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔗 Webhooks",
+      "item": [
+        {
+          "name": "Webhook Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "status"]
+            }
+          }
+        },
+        {
+          "name": "Stripe Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "whsec_mock"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_mock_123\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_mock_123\",\n      \"amount\": 50000,\n      \"currency\": \"usd\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/stripe",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "stripe"]
+            }
+          }
+        },
+        {
+          "name": "Loan Approved Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanId\": \"loan_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/loan-approved",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "loan-approved"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
