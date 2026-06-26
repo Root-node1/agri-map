@@ -40,3 +40,29 @@ class CarbonTest(TestCase):
     def test_unauthenticated(self):
         resp = self.client.get(f'/api/carbon/{self.field.id}/')
         self.assertEqual(resp.status_code, 401)
+
+    def test_create_carbon_record(self):
+        resp = self.client.post(f'/api/carbon/{self.field.id}/create/', {
+            'carbon_tons': 5.0,
+            'confidence_score': 0.9,
+            'methodology': 'soil_organic_carbon',
+        }, **self.headers, content_type='application/json')
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(CarbonSequestration.objects.count(), 2)
+        self.assertAlmostEqual(resp.json()['carbon_tons'], 5.0)
+
+    def test_create_carbon_not_own_field(self):
+        resp = self.client.post(f'/api/carbon/{self.other_field.id}/create/', {
+            'carbon_tons': 5.0,
+            'confidence_score': 0.9,
+            'methodology': 'soil_organic_carbon',
+        }, **self.headers, content_type='application/json')
+        self.assertEqual(resp.status_code, 404)
+
+    def test_create_carbon_invalid_data(self):
+        resp = self.client.post(f'/api/carbon/{self.field.id}/create/', {
+            'carbon_tons': 'not-a-number',
+            'confidence_score': 0.9,
+            'methodology': 'invalid_methodology',
+        }, **self.headers, content_type='application/json')
+        self.assertEqual(resp.status_code, 400)

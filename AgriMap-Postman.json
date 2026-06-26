@@ -24,6 +24,21 @@
       "key": "coop_id",
       "value": "1",
       "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "image_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "1",
+      "type": "string"
     }
   ],
   "item": [
@@ -230,6 +245,41 @@
             },
             "description": "Get details for a specific cooperative by ID."
           }
+        },
+        {
+          "name": "List / Add Cooperative Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/{{coop_id}}/members/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives", "{{coop_id}}", "members"]
+            },
+            "description": "GET to list all members of a cooperative (paginated).\nPOST to add a member (only cooperative admins):\n```json\n{\n  \"user_id\": 2,\n  \"role\": \"member\"\n}\n```\n`role` can be `member` (default) or `admin`.\n\n**GET Response 200:**\n```json\n{\n  \"count\": 2,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"cooperative\": 1,\n      \"farmer\": 1,\n      \"farmer_username\": \"admin\",\n      \"role\": \"admin\",\n      \"joined_at\": \"2026-06-24T00:00:00Z\"\n    },\n    {\n      \"id\": 2,\n      \"cooperative\": 1,\n      \"farmer\": 2,\n      \"farmer_username\": \"demo\",\n      \"role\": \"member\",\n      \"joined_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 2,\n  \"cooperative\": 1,\n  \"farmer\": 2,\n  \"farmer_username\": \"demo\",\n  \"role\": \"member\",\n  \"joined_at\": \"2026-06-24T00:00:00Z\"\n}\n```\n\n**Error 400 (no farmer profile):** `{\"user_id\": [\"User does not have a farmer profile.\"]}`\n**Error 403:** Only cooperative admins can manage members."
+          }
+        },
+        {
+          "name": "Update / Remove Cooperative Member",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/farmers/cooperatives/{{coop_id}}/members/{{member_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "farmers", "cooperatives", "{{coop_id}}", "members", "{{member_id}}"]
+            },
+            "description": "PATCH to update a member's role (only cooperative admins).\nDELETE to remove a member from the cooperative.\n\n**PATCH Response 200:** returns the updated member.\n**DELETE Response 204:** no content."
+          }
         }
       ],
       "description": "Farmer profiles and cooperative management"
@@ -247,9 +297,31 @@
             "url": {
               "raw": "{{base_url}}/api/fields/",
               "host": ["{{base_url}}"],
-              "path": ["api", "fields"]
+              "path": ["api", "fields"],
+              "query": [
+                {
+                  "key": "bbox",
+                  "value": "west,south,east,north",
+                  "description": "Optional. Filter fields by bounding box (comma-separated: min_lng,min_lat,max_lng,max_lat)"
+                }
+              ]
             },
-            "description": "GET to list all fields for the authenticated user (paginated).\nPOST to create a new field:\n\n```json\n{\n  \"name\": \"My Field\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]\n  },\n  \"area_ha\": 10.5\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+            "description": "GET to list all fields visible to the authenticated user (paginated).\nIncludes own fields + fields from cooperative members.\nSupports `?bbox=west,south,east,north` to filter by map viewport.\n\nPOST to create a new field:\n```json\n{\n  \"name\": \"My Field\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]\n  },\n  \"area_ha\": 10.5\n}\n```\n\n**POST Response 201:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n  \"area_ha\": 10.5,\n  \"centroid_lat\": 0.5,\n  \"centroid_lng\": 0.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Fields GeoJSON",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fields/geojson/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fields", "geojson"]
+            },
+            "description": "Returns all visible fields as a GeoJSON FeatureCollection — ideal for rendering on a map.\nIncludes own fields + cooperative members' fields. No pagination.\n\n**Response 200:**\n```json\n{\n  \"type\": \"FeatureCollection\",\n  \"features\": [\n    {\n      \"type\": \"Feature\",\n      \"id\": 1,\n      \"geometry\": {\"type\": \"Polygon\", \"coordinates\": [...]},\n      \"properties\": {\n        \"id\": 1,\n        \"name\": \"My Field\",\n        \"area_ha\": 10.5,\n        \"centroid_lat\": 0.5,\n        \"centroid_lng\": 0.5,\n        \"created_at\": \"2026-06-24T00:00:00Z\",\n        \"updated_at\": \"2026-06-24T00:00:00Z\"\n      }\n    }\n  ]\n}\n```"
           }
         },
         {
@@ -264,11 +336,11 @@
               "host": ["{{base_url}}"],
               "path": ["api", "fields", "{{field_id}}"]
             },
-            "description": "Get details for a specific field. Only returns fields owned by the authenticated user.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", ...},\n  \"area_ha\": 10.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+            "description": "Get details for a specific field. Returns own fields and cooperative members' fields.\n\n**Response 200:**\n```json\n{\n  \"id\": 1,\n  \"name\": \"My Field\",\n  \"geometry\": {\"type\": \"Polygon\", ...},\n  \"area_ha\": 10.5,\n  \"centroid_lat\": 0.5,\n  \"centroid_lng\": 0.5,\n  \"created_at\": \"2026-06-24T00:00:00Z\",\n  \"updated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
           }
         }
       ],
-      "description": "Field CRUD — geometry is GeoJSON Polygon/MultiPolygon"
+      "description": "Field CRUD — geometry is GeoJSON Polygon/MultiPolygon. Bbox filter, GeoJSON FeatureCollection endpoint, and cooperative field sharing available."
     },
     {
       "name": "Analysis",
@@ -451,11 +523,71 @@
               "host": ["{{base_url}}"],
               "path": ["api", "satellite", "process"]
             },
-            "description": "Process satellite imagery for a field (cloud masking, NDVI/EVI calculation).\n\n**Response 200:**\n```json\n{\n  \"job_id\": 1,\n  \"status\": \"completed\",\n  \"result\": {\n    \"cloud_masking\": \"applied\",\n    \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n    \"ndvi_calculated\": 0.72,\n    \"evi_calculated\": 0.54,\n    \"images_processed\": 1\n  }\n}\n```"
+            "description": "Process satellite imagery for a field (cloud masking, NDVI/EVI calculation).\nNote: current implementation uses simulated processing results.\n\n**Response 200:**\n```json\n{\n  \"job_id\": 1,\n  \"status\": \"completed\",\n  \"result\": {\n    \"cloud_masking\": \"applied\",\n    \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n    \"ndvi_calculated\": 0.72,\n    \"evi_calculated\": 0.54,\n    \"images_processed\": 1\n  }\n}\n```"
+          }
+        },
+        {
+          "name": "List Satellite Images",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/images/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "images"]
+            },
+            "description": "List all satellite images for the user's fields (paginated).\n\n**Response 200:**\n```json\n{\n  \"count\": 1,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"field\": 1,\n      \"date\": \"2026-06-24\",\n      \"source_url\": \"https://scihub.copernicus.eu/...\",\n      \"cloud_cover\": 12.5,\n      \"bands\": {\"B02\": 0.15, \"B03\": 0.22, \"B04\": 0.31, \"B08\": 0.68},\n      \"ingested_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```"
+          }
+        },
+        {
+          "name": "Get / Delete Satellite Image",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/images/{{image_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "images", "{{image_id}}"]
+            },
+            "description": "GET to retrieve a satellite image by ID.\nDELETE to remove a satellite image.\nOnly images belonging to the authenticated user's fields are accessible."
+          }
+        },
+        {
+          "name": "List Processing Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/jobs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "jobs"]
+            },
+            "description": "List all processing jobs for the user's fields (paginated).\n\n**Response 200:**\n```json\n{\n  \"count\": 1,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"field\": 1,\n      \"status\": \"completed\",\n      \"result\": {\n        \"cloud_masking\": \"applied\",\n        \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n        \"ndvi_calculated\": 0.72,\n        \"evi_calculated\": 0.54,\n        \"images_processed\": 1\n      },\n      \"error\": \"\",\n      \"created_at\": \"2026-06-24T00:00:00Z\",\n      \"completed_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```"
+          }
+        },
+        {
+          "name": "Get Processing Job",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/jobs/{{job_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "jobs", "{{job_id}}"]
+            },
+            "description": "Get details for a specific processing job by ID."
           }
         }
       ],
-      "description": "Satellite imagery fetch and processing endpoints"
+      "description": "Satellite imagery fetch, process, list images, and list jobs"
     },
     {
       "name": "Carbon",
@@ -474,9 +606,50 @@
             },
             "description": "Returns carbon sequestration data for a field.\nMethodology options: ndvi_based, soil_organic_carbon, biomass_estimation.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"carbon_tons\": 2.3,\n  \"confidence_score\": 0.87,\n  \"methodology\": \"ndvi_based\",\n  \"calculated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
           }
+        },
+        {
+          "name": "Create Carbon Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carbon_tons\": 5.0,\n  \"confidence_score\": 0.9,\n  \"methodology\": \"soil_organic_carbon\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/carbon/{{field_id}}/create/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon", "{{field_id}}", "create"]
+            },
+            "description": "Manually create a carbon sequestration record for a field.\nMethodology options: ndvi_based, soil_organic_carbon, biomass_estimation.\n\n**Response 201:**\n```json\n{\n  \"field_id\": 1,\n  \"carbon_tons\": 5.0,\n  \"confidence_score\": 0.9,\n  \"methodology\": \"soil_organic_carbon\",\n  \"calculated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
         }
       ],
       "description": "Carbon sequestration data endpoints"
+    },
+    {
+      "name": "Soil",
+      "item": [
+        {
+          "name": "Get Soil Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/soil/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "soil", "{{field_id}}"]
+            },
+            "description": "Returns soil health data (nitrogen proxy, moisture index, degradation risk) for a field.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"nitrogen_proxy\": 0.62,\n  \"moisture_index\": 0.48,\n  \"degradation_risk\": \"moderate\",\n  \"recorded_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Soil health data endpoints"
     },
     {
       "name": "Reports",

@@ -1,7 +1,7 @@
 from datetime import date
 
 from drf_spectacular.utils import extend_schema
-from rest_framework import serializers, status
+from rest_framework import generics, serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,12 +12,42 @@ from .serializers import (
     FetchImageryResponseSerializer,
     ProcessImageryInputSerializer,
     ProcessImageryResponseSerializer,
+    ProcessingJobSerializer,
+    SatelliteImageSerializer,
 )
+
+
+class SatelliteImageListCreateView(generics.ListCreateAPIView):
+    serializer_class = SatelliteImageSerializer
+
+    def get_queryset(self):
+        return SatelliteImage.objects.filter(field__user=self.request.user)
+
+
+class SatelliteImageDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = SatelliteImageSerializer
+
+    def get_queryset(self):
+        return SatelliteImage.objects.filter(field__user=self.request.user)
+
+
+class ProcessingJobListView(generics.ListAPIView):
+    serializer_class = ProcessingJobSerializer
+
+    def get_queryset(self):
+        return ProcessingJob.objects.filter(field__user=self.request.user)
+
+
+class ProcessingJobDetailView(generics.RetrieveAPIView):
+    serializer_class = ProcessingJobSerializer
+
+    def get_queryset(self):
+        return ProcessingJob.objects.filter(field__user=self.request.user)
 
 
 @extend_schema(
     summary='Fetch satellite imagery',
-    description='Fetches satellite imagery for a field from Sentinel-2',
+    description='Fetches satellite imagery for a field from Sentinel-2 (stub — returns simulated data)',
     tags=['Satellite'],
     request=FetchImageryInputSerializer,
     responses={201: FetchImageryResponseSerializer},
@@ -27,7 +57,7 @@ class FetchImageryView(APIView):
     def post(self, request):
         serializer = FetchImageryInputSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         field_id = serializer.validated_data['field_id']
         date_range = serializer.validated_data.get('date_range', [])
@@ -66,7 +96,7 @@ class FetchImageryView(APIView):
 
 @extend_schema(
     summary='Process satellite imagery',
-    description='Processes fetched satellite imagery (NDVI calculation, cloud masking)',
+    description='Processes fetched satellite imagery (NDVI calculation, cloud masking). Note: current implementation uses simulated processing results.',
     tags=['Satellite'],
     request=ProcessImageryInputSerializer,
     responses={200: ProcessImageryResponseSerializer},
@@ -76,7 +106,7 @@ class ProcessImageryView(APIView):
     def post(self, request):
         serializer = ProcessImageryInputSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         field_id = serializer.validated_data['field_id']
 

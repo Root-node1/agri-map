@@ -41,6 +41,7 @@ class CooperativeMember(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        ordering = ('joined_at',)
         unique_together = ('cooperative', 'farmer')
 
     def __str__(self):
