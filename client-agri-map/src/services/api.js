@@ -24,7 +24,6 @@ api.interceptors.response.use(
       const refresh = localStorage.getItem('refreshToken')
       if (refresh) {
         try {
-          // Use Django's refresh endpoint
           const { data } = await axios.post(`${API_URL}/api/auth/refresh/`, { refresh })
           const payload = data.data || data
           const newToken = payload.access || payload.token
@@ -48,16 +47,13 @@ const unwrap = (res) => res.data?.data ?? res.data
 
 // Auth API - Matches Django URLs
 export const authAPI = {
-  resetPassword: (data) => api.post(/api/auth/reset-password/, data).then(unwrap),
-  forgotPassword: (data) => api.post(/api/auth/forgot-password/, data).then(unwrap),
   register: (data) => api.post('/api/auth/register/', data).then(unwrap),
   login: (data) => api.post('/api/auth/login/', data).then(unwrap),
-  // Django uses /me/ not /profile/
   profile: () => api.get('/api/auth/me/').then(unwrap),
-  // Django uses /refresh/ not /refresh-token/
   refresh: (refreshToken) => api.post('/api/auth/refresh/', { refresh: refreshToken }).then(unwrap),
-  // Django doesn't have logout yet - keep as placeholder
   logout: () => api.post('/api/auth/logout/').then(unwrap),
+  forgotPassword: (data) => api.post('/api/auth/forgot-password/', data).then(unwrap),
+  resetPassword: (data) => api.post('/api/auth/reset-password/', data).then(unwrap),
 }
 
 // Field API
