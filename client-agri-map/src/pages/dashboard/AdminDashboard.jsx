@@ -39,10 +39,10 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="dashboard admin-dashboard">
-      <header className="dashboard-header glass">
-        <h1>Admin Dashboard</h1>
-        <p>Welcome back, {user?.name}!</p>
+    <div className="page-shell page-shell-dark max-w-6xl mx-auto px-4 py-8">
+      <header className="dashboard-header glass-card rounded-[2rem] p-8 mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Admin Dashboard</h1>
+        <p className="text-slate-600 dark:text-slate-300">Welcome back, {user?.name}!</p>
       </header>
 
       <div className="stats-grid">
@@ -86,9 +86,9 @@ const AdminDashboard = () => {
         </motion.div>
       </div>
 
-      <div className="users-section glass">
+      <div className="users-section glass-card rounded-[2rem] p-6">
         <div className="section-header">
-          <h2>User Management</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">User Management</h2>
           <div className="search-bar">
             <FaSearch className="search-icon" />
             <input
@@ -97,6 +97,7 @@ const AdminDashboard = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               aria-label="Search users"
+              className="w-full rounded-3xl border border-slate-200 bg-white/95 dark:bg-slate-950/80 dark:border-slate-700 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-400"
             />
           </div>
         </div>

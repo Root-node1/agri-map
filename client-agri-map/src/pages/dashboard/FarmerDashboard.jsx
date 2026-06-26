@@ -13,18 +13,26 @@ const FarmerDashboard = () => {
   ]
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 page-shell-dark">
+    <div className="max-w-6xl mx-auto px-4 py-8 page-shell page-shell-dark">
       <div className="glass-card rounded-[2rem] p-8 mb-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold mb-2 text-white">Welcome, {user?.name || 'Farmer'}!</h1>
-            <p className="text-slate-300">Your agricultural dashboard</p>
+            <h1 className="text-3xl font-extrabold mb-2 text-slate-900 dark:text-white">Welcome, {user?.name || 'Farmer'}!</h1>
+            <p className="text-slate-600 dark:text-slate-300">Your agricultural dashboard</p>
           </div>
-          <div className="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-3 text-sm text-slate-200 border border-white/10">
+          <div className="inline-flex items-center gap-3 rounded-full bg-slate-100/90 dark:bg-white/10 px-4 py-3 text-sm text-slate-900 dark:text-slate-200 border border-slate-200/70 dark:border-white/10">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
             Live insights active
           </div>
         </div>
+      </div>
+
+      <div className="glass-card rounded-[2rem] overflow-hidden mb-10">
+        <img
+          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+          alt="Kenyan farmers working in a field"
+          className="w-full h-64 object-cover sm:h-72"
+        />
       </div>
 
       <div className="dashboard-grid dashboard-grid-4 mb-8">
@@ -33,23 +41,23 @@ const FarmerDashboard = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-300 mx-auto mb-5">
               {React.cloneElement(stat.icon, { className: 'text-2xl' })}
             </div>
-            <div className="text-3xl font-semibold text-white mb-2">{stat.value}</div>
-            <div className="text-sm text-slate-400">{stat.label}</div>
+            <div className="text-3xl font-semibold text-slate-900 dark:text-white mb-2">{stat.value}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">{stat.label}</div>
           </div>
         ))}
       </div>
 
       <div className="dashboard-grid dashboard-grid-2 gap-6">
         <div className="glass-card rounded-[2rem] p-6">
-          <h2 className="text-xl font-semibold mb-4 text-white">Recent Activity</h2>
+          <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Recent Activity</h2>
           <ul className="space-y-3 text-sm text-slate-300">
-            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">🌱 Planted new crop in Field A</li>
-            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">📊 Updated harvest data</li>
-            <li className="flex items-center gap-3 rounded-3xl bg-white/5 p-4">🚜 Equipment maintenance scheduled</li>
+            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">🌱 Planted new crop in Field A</li>
+            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">📊 Updated harvest data</li>
+            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">🚜 Equipment maintenance scheduled</li>
           </ul>
         </div>
         <div className="glass-card rounded-[2rem] p-6">
-          <h2 className="text-xl font-semibold mb-4 text-white">Quick Actions</h2>
+          <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Quick Actions</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button className="btn-secondary w-full justify-center">Add Field</button>
             <button className="btn-secondary w-full justify-center">Log Harvest</button>

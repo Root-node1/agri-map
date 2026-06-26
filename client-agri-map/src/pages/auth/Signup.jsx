@@ -43,16 +43,20 @@ const Signup = () => {
     }
 
     setLoading(false)
-    navigate('/dashboard')
+    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
   }
 
   const handleGoogleSuccess = async (response) => {
+    setLoading(true)
     const result = await googleLogin(response)
     if (!result.success) {
       setError(result.error)
+      setLoading(false)
       return
     }
-    navigate('/dashboard')
+
+    setLoading(false)
+    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
   }
 
   return (
@@ -79,7 +83,7 @@ const Signup = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="Lenny Gitonga"
                   required
                 />
@@ -95,7 +99,7 @@ const Signup = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="name@domain.com"
                   required
                 />
@@ -111,7 +115,7 @@ const Signup = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="••••••••"
                   required
                 />
@@ -127,7 +131,7 @@ const Signup = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="••••••••"
                   required
                 />
@@ -141,7 +145,7 @@ const Signup = () => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-700"></div>
             </div>
-            <div className="relative flex justify-center text-[0.65rem] uppercase tracking-[0.35em] font-semibold text-slate-400 bg-slate-950 px-3">
+            <div className="relative flex justify-center text-[0.65rem] uppercase tracking-[0.35em] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-900 dark:text-slate-300 px-3">
               Third Party
             </div>
           </div>

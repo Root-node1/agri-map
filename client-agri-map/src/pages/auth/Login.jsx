@@ -25,16 +25,20 @@ const Login = () => {
     }
 
     setLoading(false)
-    navigate('/dashboard')
+    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
   }
 
   const handleGoogleSuccess = async (response) => {
+    setLoading(true)
     const result = await googleLogin(response)
     if (!result.success) {
       setError(result.error)
+      setLoading(false)
       return
     }
-    navigate('/dashboard')
+
+    setLoading(false)
+    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
   }
 
   return (
@@ -62,7 +66,7 @@ const Login = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="name@domain.com"
                   required
                 />
@@ -79,7 +83,7 @@ const Login = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="••••••••"
                   required
                 />
@@ -99,7 +103,7 @@ const Login = () => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-700"></div>
             </div>
-            <div className="relative flex justify-center text-[0.65rem] uppercase tracking-[0.35em] font-semibold text-slate-400 bg-slate-950 px-3">
+            <div className="relative flex justify-center text-[0.65rem] uppercase tracking-[0.35em] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-900 dark:text-slate-300 px-3">
               Third Party
             </div>
           </div>
@@ -110,7 +114,7 @@ const Login = () => {
 
           <p className="text-center text-sm text-slate-400 font-light mt-8">
             Need a registration profile?{' '}
-            <Link to="/signup" className="text-emerald-300 font-semibold hover:text-white">
+            <Link to="/register" className="text-emerald-300 font-semibold hover:text-white">
               Register Here
             </Link>
           </p>

@@ -67,12 +67,12 @@ const Fields = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 page-shell-dark">
+    <div className="max-w-6xl mx-auto px-4 py-8 page-shell page-shell-dark">
       <div className="glass-card rounded-[2rem] p-8 mb-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t('fields.title') || 'My Fields'}</h1>
-            <p className="text-slate-300 mt-2">Track field details and crop health in one place.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('fields.title') || 'My Fields'}</h1>
+            <p className="text-slate-600 dark:text-slate-300 mt-2">Track field details and crop health in one place.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[280px]">
@@ -82,7 +82,7 @@ const Fields = () => {
                 placeholder={t('dashboard.admin.search') || 'Search fields...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100 placeholder:text-slate-500"
+                className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
             <button className="btn-primary" onClick={() => setShowAddModal(true)}>
@@ -105,8 +105,8 @@ const Fields = () => {
             >
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-white">{field.name}</h3>
-                  <p className="text-slate-400 text-sm mt-1">{field.cropType || 'N/A'}</p>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{field.name}</h3>
+                  <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">{field.cropType || 'N/A'}</p>
                 </div>
                 <div className="flex items-center gap-2 text-slate-300 text-sm">
                   <button className="icon-btn" title={t('fields.viewField') || 'View'}>
@@ -124,16 +124,16 @@ const Fields = () => {
                   </button>
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 text-slate-300 text-sm">
-                <div className="rounded-3xl bg-white/5 p-4">{t('fields.location') || 'Location'}: {field.location || 'N/A'}</div>
-                <div className="rounded-3xl bg-white/5 p-4">{t('fields.size') || 'Size'}: {field.size || 0} ha</div>
-                <div className="rounded-3xl bg-white/5 p-4">{t('fields.cropType') || 'Crop Type'}: {field.cropType || 'N/A'}</div>
-                <div className="rounded-3xl bg-white/5 p-4">{t('fields.soilHealth') || 'Soil Health'}: {field.soilHealth || 'Unknown'}</div>
+              <div className="grid gap-3 sm:grid-cols-2 text-slate-700 dark:text-slate-300 text-sm">
+                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.location') || 'Location'}: {field.location || 'N/A'}</div>
+                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.size') || 'Size'}: {field.size || 0} ha</div>
+                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.cropType') || 'Crop Type'}: {field.cropType || 'N/A'}</div>
+                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.soilHealth') || 'Soil Health'}: {field.soilHealth || 'Unknown'}</div>
               </div>
             </motion.div>
           ))
         ) : (
-          <div className="glass-card rounded-[2rem] p-12 text-center text-slate-300">
+          <div className="glass-card rounded-[2rem] p-12 text-center text-slate-700 dark:text-slate-300">
             <p>No fields found. Add your first field!</p>
           </div>
         )}
@@ -152,7 +152,7 @@ const Fields = () => {
                   onChange={(e) => setNewField({ ...newField, name: e.target.value })}
                   required
                   placeholder="Enter field name"
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none"
+                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
                 />
               </div>
               <div className="form-group">
@@ -162,7 +162,7 @@ const Fields = () => {
                   value={newField.location}
                   onChange={(e) => setNewField({ ...newField, location: e.target.value })}
                   placeholder="Enter location"
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none"
+                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
                 />
               </div>
               <div className="form-group">
@@ -173,7 +173,7 @@ const Fields = () => {
                   onChange={(e) => setNewField({ ...newField, size: e.target.value })}
                   required
                   placeholder="Enter size in hectares"
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none"
+                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
                 />
               </div>
               <div className="form-group">
@@ -183,7 +183,7 @@ const Fields = () => {
                   value={newField.cropType}
                   onChange={(e) => setNewField({ ...newField, cropType: e.target.value })}
                   placeholder="Enter crop type"
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none"
+                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
                 />
               </div>
               <div className="modal-actions flex flex-wrap gap-3 justify-end pt-3">

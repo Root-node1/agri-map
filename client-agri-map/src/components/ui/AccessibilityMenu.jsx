@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FaUniversalAccess, FaFont, FaAdjust, FaLanguage } from 'react-icons/fa'
 import LanguageSelector from './LanguageSelector'
+import { useTheme } from '../../contexts/ThemeContext'
 
 const AccessibilityMenu = () => {
   const { t } = useTranslation()
+  const { darkMode, toggleDarkMode } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [fontSize, setFontSize] = useState(() => {
     const saved = localStorage.getItem('fontSize')
@@ -72,6 +74,17 @@ const AccessibilityMenu = () => {
                   <FaFont /> A+
                 </button>
               </div>
+            </div>
+
+            <div className="control-group">
+              <label>Theme</label>
+              <button
+                onClick={toggleDarkMode}
+                className={`contrast-btn ${darkMode ? 'active' : ''}`}
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                <FaAdjust /> {darkMode ? 'Light mode' : 'Dark mode'}
+              </button>
             </div>
 
             <button 
