@@ -9,7 +9,9 @@ const Signup = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'farmer',
+    phone: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -70,6 +72,24 @@ const Signup = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 mb-2">Account Type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['farmer', 'cooperative', 'investor'].map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, role })}
+                    className={`py-2.5 rounded-2xl text-sm font-medium capitalize transition focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                      formData.role === role ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-300 border border-white/10'
+                    }`}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 mb-2">Full Name</label>
               <div className="relative">

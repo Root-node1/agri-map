@@ -7,6 +7,7 @@ import { FaEnvelope, FaLock } from 'react-icons/fa'
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login, googleLogin } = useAuth()
@@ -17,7 +18,7 @@ const Login = () => {
     setError('')
     setLoading(true)
 
-    const result = await login(email, password)
+    const result = await login(email, password, rememberMe)
     if (!result.success) {
       setError(result.error)
       setLoading(false)
@@ -84,6 +85,21 @@ const Login = () => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500 rounded"
+                />
+                Remember me
+              </label>
+              <Link to="/forgot-password" className="text-emerald-300 hover:text-white font-medium">
+                Forgot password?
+              </Link>
             </div>
 
             <button

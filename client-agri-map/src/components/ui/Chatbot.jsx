@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { FaComments, FaTimes, FaPaperPlane, FaRobot } from 'react-icons/fa'
 import { useTranslation } from 'react-i18next'
+import { chatbotAPI } from '../../services/api'
 
 const Chatbot = () => {
   const { t } = useTranslation()
@@ -32,27 +33,26 @@ const Chatbot = () => {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response based on keywords
-    setTimeout(() => {
+    try {
+      const data = await chatbotAPI.sendMessage(input)
+      const botMessage = { text: data.reply || data.message || data.response, sender: 'bot' }
+      setMessages(prev => [...prev, botMessage])
+    } catch {
       let response = "I'm here to help you with AgriMap. How can I assist you today?"
-      
       const lowerInput = input.toLowerCase()
       if (lowerInput.includes('loan') || lowerInput.includes('finance')) {
-        response = "Great! You can apply for green financing through our platform. I can help you check your eligibility or guide you through the loan application process."
+        response = "You can apply for green financing through Finance → Loans. I can guide you through eligibility and the application process."
       } else if (lowerInput.includes('satellite') || lowerInput.includes('crop')) {
-        response = "Our satellite intelligence provides real-time NDVI indices, crop health monitoring, and field boundary detection. Would you like to analyze a specific field?"
+        response = "Our satellite intelligence provides NDVI indices, crop health monitoring, and field boundary detection. Visit AI Services to analyze a field."
       } else if (lowerInput.includes('carbon') || lowerInput.includes('credit')) {
-        response = "We calculate carbon sequestration from your fields using NDVI-based estimation. You can tokenize and sell your carbon credits on our marketplace."
+        response = "Carbon sequestration is calculated from NDVI data. Tokenize credits in Finance → Tokenization, then sell on the Carbon Marketplace."
       } else if (lowerInput.includes('soil')) {
-        response = "We analyze soil health including nitrogen proxies and moisture indices. This helps you make informed decisions about fertilizer and irrigation."
-      } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-        response = "Hello! How can I help you today? I can assist with satellite analysis, green financing, carbon credits, or field management."
+        response = "Soil analysis covers nitrogen, phosphorus, potassium, and pH. Run AI Soil Analysis for personalized fertilizer recommendations."
       }
-      
-      const botMessage = { text: response, sender: 'bot' }
-      setMessages(prev => [...prev, botMessage])
+      setMessages(prev => [...prev, { text: response, sender: 'bot' }])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleKeyPress = (e) => {

@@ -1,19 +1,17 @@
 import React from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import LoadingSpinner from '../ui/LoadingSpinner'
 
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, loading } = useAuth()
+const ProtectedRoute = ({ children, roles }) => {
+  const { isAuthenticated, loading, user } = useAuth()
+  const location = useLocation()
 
-  if (loading) {
-    return <div className="loading-screen">Loading...</div>
-  }
+  if (loading) return <LoadingSpinner fullScreen message="Authenticating..." />
 
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location.pathname }} />
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (roles && user?.role && !roles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />
   }
 
