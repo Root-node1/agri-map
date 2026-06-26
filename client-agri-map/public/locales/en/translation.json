@@ -81,6 +81,7 @@
   },
   "fields": {
     "title": "My Fields",
+    "searchPlaceholder": "Search fields...",
     "addField": "Add Field",
     "fieldName": "Field Name",
     "location": "Location",
