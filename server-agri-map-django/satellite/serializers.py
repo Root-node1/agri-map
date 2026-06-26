@@ -37,11 +37,11 @@ class ProcessImageryInputSerializer(serializers.Serializer):
 
 
 class _ProcessResultSerializer(serializers.Serializer):
-    cloud_masking = serializers.CharField()
-    bands_extracted = serializers.ListField(child=serializers.CharField())
     ndvi_calculated = serializers.FloatField()
     evi_calculated = serializers.FloatField()
     images_processed = serializers.IntegerField()
+    image_ids_processed = serializers.ListField(child=serializers.IntegerField(), required=False)
+    vegetation_index_dates = serializers.ListField(child=serializers.CharField(), required=False)
 
 
 class ProcessImageryResponseSerializer(serializers.Serializer):

@@ -12,4 +12,6 @@ scikit-learn
 joblib
 numpy
 pandas
+sentinelhub>=3.0
+requests
 
