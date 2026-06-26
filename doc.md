@@ -1,51 +1,56 @@
-# 🌾 AgriMap API Documentation
+# 🌾 AgriMap API Documentation (v2)
 
 ## 🧭 Overview
 
-**AgriMap** is an AI-powered agricultural mapping and soil intelligence platform designed to help **smallholder farming cooperatives access green financing**.
+**AgriMap** is an AI-powered agricultural mapping and soil intelligence platform designed to help **smallholder farmers and cooperatives access climate intelligence and green financing**.
 
-The system leverages **Sentinel-2 satellite imagery** to:
+The platform transforms **free Sentinel-2 satellite imagery** into:
 
-* Detect crop boundaries
-* Predict crop types
-* Monitor vegetation health
-* Estimate soil mineral proxies (nitrogen, moisture)
-* Track environmental degradation
-* Calculate verifiable carbon sequestration metrics
+* 🌱 Crop detection & classification
+* 📊 Vegetation health monitoring (NDVI, EVI)
+* 🧪 Soil proxy insights (moisture, nitrogen)
+* 🌍 Environmental degradation tracking
+* 🌿 Verified carbon sequestration data
 
 ---
 
 ## 🏗️ System Architecture
 
-### 🛰️ Django Backend (Primary - Geospatial Intelligence)
+AgriMap follows a **dual-backend architecture**:
+
+### 🛰️ Django Backend (Primary — Geospatial Intelligence)
+
+Responsible for **all AI, geospatial, and scientific computation**.
 
 Handles:
 
 * Satellite imagery ingestion (Sentinel-2)
-* Field boundary detection
-* Crop classification (ML models)
-* Vegetation indices (NDVI, EVI)
+* NDVI/EVI calculations
+* Crop classification models
 * Soil proxy analysis
-* Carbon sequestration calculations
-* Farmer/cooperative data
+* Carbon sequestration estimation
+* Farmer & cooperative data
+* Report generation
 
 ---
 
-### 💰 Node.js Backend (Secondary - Finance Layer)
+### 💰 Node.js Backend (Secondary — Finance & Monetization)
+
+Responsible for **turning insights into financial value**.
 
 Handles:
 
-* Cooperative financing
-* Loan applications
+* Loan systems
 * Carbon credit monetization
-* Payments & disbursements
-* Wallets & transactions
+* Wallet & transactions
+* Payments & disbursement
+* Audit logging
 
 ---
 
 ## 🔗 Base URLs
 
-### Django (Core API)
+### Django (Core AI API)
 
 * Dev: `http://localhost:8000/api`
 * Prod: `https://agrimap-django.onrender.com/api`
@@ -60,7 +65,7 @@ Handles:
 ## 🔐 Authentication
 
 * JWT issued by Django
-* Node validates Django tokens
+* Node validates JWT tokens
 
 ```
 Authorization: Bearer <token>
@@ -86,8 +91,6 @@ Authorization: Bearer <token>
 
 `POST /cooperatives`
 
----
-
 ### Get Cooperative Details
 
 `GET /cooperatives/:id`
@@ -99,8 +102,6 @@ Authorization: Bearer <token>
 ### Upload Field Boundary (GeoJSON)
 
 `POST /fields`
-
-**Body:**
 
 ```json
 {
@@ -115,8 +116,6 @@ Authorization: Bearer <token>
 
 `GET /fields`
 
----
-
 ### Get Field Details
 
 `GET /fields/:id`
@@ -128,8 +127,6 @@ Authorization: Bearer <token>
 ### Fetch Sentinel-2 Imagery
 
 `POST /satellite/fetch`
-
-**Body:**
 
 ```json
 {
@@ -144,19 +141,21 @@ Authorization: Bearer <token>
 
 `POST /satellite/process`
 
-* Runs:
+Processes:
 
-  * Cloud masking
-  * Band extraction
-  * Feature engineering
+* Cloud masking
+* Band extraction
+* Feature engineering
 
 ---
 
 ## 🌱 Vegetation & Crop Intelligence
 
-### Get Vegetation Indices (NDVI/EVI)
+### Get Vegetation Indices
 
 `GET /analysis/vegetation/:field_id`
+
+Returns NDVI, EVI values
 
 ---
 
@@ -178,8 +177,6 @@ Authorization: Bearer <token>
 
 `GET /analysis/soil/:field_id`
 
-**Response:**
-
 ```json
 {
   "nitrogen_proxy": 0.62,
@@ -192,13 +189,11 @@ Authorization: Bearer <token>
 
 ## 🌍 Environmental Monitoring
 
-### Get Vegetation Health Trends
+### Vegetation Trends
 
 `GET /analysis/trends/:field_id`
 
----
-
-### Detect Land Degradation
+### Land Degradation Detection
 
 `GET /analysis/degradation/:field_id`
 
@@ -206,11 +201,9 @@ Authorization: Bearer <token>
 
 ## 🌿 Carbon Sequestration
 
-### Calculate Carbon Sequestration
+### Calculate Carbon
 
 `GET /carbon/:field_id`
-
-**Response:**
 
 ```json
 {
@@ -239,13 +232,17 @@ Includes:
 
 # 💰 NODE.JS BACKEND (FINANCE & MONETIZATION)
 
-## 🏦 Cooperative Financing
+## 🧠 Core Principle
+
+> Node.js does NOT compute AI — it **consumes AI outputs from Django and monetizes them**
+
+---
+
+## 🏦 Loans
 
 ### Apply for Loan
 
 `POST /loans/apply`
-
-**Body:**
 
 ```json
 {
@@ -265,7 +262,7 @@ Includes:
 
 ## 🌿 Carbon Credit Marketplace
 
-### List Verified Credits
+### List Credits
 
 `GET /carbon-credits`
 
@@ -274,6 +271,18 @@ Includes:
 ### Tokenize Carbon Credits
 
 `POST /carbon-credits/tokenize`
+
+```json
+{
+  "field_id": "123"
+}
+```
+
+🔹 Internally:
+
+* Calls Django `/carbon/:field_id`
+* Converts `carbon_tons` → credits
+* Assigns market value
 
 ---
 
@@ -285,13 +294,11 @@ Includes:
 
 ## 💳 Payments
 
-### Initiate Disbursement
+### Disburse Loan
 
 `POST /payments/disburse`
 
----
-
-### Repayment
+### Repay Loan
 
 `POST /payments/repay`
 
@@ -303,68 +310,100 @@ Includes:
 
 `GET /wallet`
 
----
-
 ### Transactions
 
 `GET /wallet/transactions`
 
 ---
 
+## 📊 Logging & Audit Trail
+
+All financial and environmental actions are logged:
+
+* Carbon calculations
+* Loan approvals
+* Payments
+* Credit sales
+
+Purpose:
+
+* Transparency
+* Investor trust
+* Compliance
+
+---
+
 # 🔄 Backend Interaction Flow
 
-### Example Flow:
+## 🔗 End-to-End Flow
 
 1. Farmer maps field → Django
 2. Django processes satellite data
-3. System calculates:
+3. AI generates:
 
-   * Soil health
-   * Crop type
-   * Carbon sequestration
-4. Cooperative applies for financing → Node
-5. Node evaluates using Django insights
-6. Loan issued / carbon credits sold
+   * Soil insights
+   * Crop data
+   * Carbon metrics
+4. Node fetches carbon data
+5. Node:
+
+   * Tokenizes credits
+   * Enables financing
+6. Funds/credits returned to farmer
+
+---
+
+## 🔧 Integration Example
+
+### Node calling Django:
+
+```js
+const res = await fetch(
+  "http://localhost:8000/api/carbon/123"
+);
+const data = await res.json();
+```
 
 ---
 
 # 🔗 Internal Integration
 
-* Django = **source of truth (geospatial + science)**
+* Django = **source of truth (AI + geospatial)**
 * Node = **financial execution layer**
 
-### Integration Methods:
+### Communication:
 
-* REST API calls
-* Webhooks (e.g., `/webhooks/carbon-verified`)
+* REST APIs
+* Future: Webhooks (`/webhooks/carbon-verified`)
 
 ---
 
-# ⚠️ Frontend Rules
+# ⚠️ Frontend Integration Rules
 
 ### Use Django for:
 
 * Mapping
-* Satellite data
-* Crop & soil insights
+* Satellite insights
+* Crop & soil data
 * Carbon analytics
 
 ### Use Node for:
 
 * Loans
 * Payments
-* Carbon credit sales
 * Wallet
+* Carbon credits
 
 ---
 
 # 🚀 Future Enhancements
 
-* Integration with European Space Agency APIs for real-time satellite feeds
-* AI-driven yield prediction
-* M-Pesa integration for rural payments
-* Blockchain carbon credit registry
-* Offline-first mobile support for farmers
+* Real-time satellite ingestion
+* AI yield prediction
+* M-Pesa integration
+* Blockchain carbon registry
+* Offline-first mobile support
+* Voice-based farmer interaction (Kiswahili/Sheng)
 
 ---
 
@@ -396,4 +435,9 @@ Includes:
 
 ---
 
-**AgriMap = Geospatial Intelligence + Climate Finance for Smallholder Farmers**
+## 🎯 Final Positioning
+
+**AgriMap is not just an AI platform — it is a financial bridge powered by geospatial intelligence.**
+
+It converts:
+👉 Satellite data → Insights → Financial opportunity

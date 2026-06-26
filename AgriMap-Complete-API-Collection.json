@@ -1,14 +1,14 @@
 {
   "info": {
     "name": "AgriMap Complete API",
-    "description": "Complete API collection for AgriMap - Agriculture Intelligence Platform\n\nBase URL: https://agrimap-node-api.onrender.com\nLocal URL: http://localhost:3000\n\nFeatures:\n- 🔐 Authentication (Email + Firebase OAuth)\n- 🤖 AI Services (Crop, Soil, Carbon, Yield)\n- 💬 Chatbot Assistant\n- 💰 Loans & Financing\n- 🌿 Carbon Credits\n- 💳 Payments & Wallet\n- 📋 Subscriptions & API Keys",
+    "description": "Complete API collection for AgriMap - Agriculture Intelligence Platform\n\nBase URL: https://agri-map-v81v.onrender.com\nLocal URL: http://localhost:3000\n\nFeatures:\n- 🔐 Authentication (Email + Firebase OAuth)\n- 🤖 AI Services (Crop, Soil, Carbon, Yield)\n- 💬 Chatbot Assistant\n- 💰 Loans & Financing\n- 🌿 Carbon Credits\n- 💳 Payments & Wallet\n- 📋 Subscriptions & API Keys\n\n🚀 Live API: https://agri-map-v81v.onrender.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": "3.0.0"
   },
   "variable": [
     {
       "key": "base_url",
-      "value": "https://agrimap-node-api.onrender.com",
+      "value": "https://agri-map-v81v.onrender.com",
       "type": "string"
     },
     {
@@ -42,43 +42,37 @@
       "name": "🏠 Health & Status",
       "item": [
         {
+          "name": "Root API",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
           "name": "Health Check",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/health",
               "host": ["{{base_url}}"],
               "path": ["health"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "API Root",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/api",
               "host": ["{{base_url}}"],
               "path": ["api"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Environment Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/test/env",
-              "host": ["{{base_url}}"],
-              "path": ["api", "test", "env"]
-            }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -86,7 +80,7 @@
       "name": "🔐 Authentication",
       "item": [
         {
-          "name": "Register (Email)",
+          "name": "Register User",
           "request": {
             "method": "POST",
             "header": [
@@ -104,11 +98,10 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "register"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Login (Email)",
+          "name": "Login User",
           "request": {
             "method": "POST",
             "header": [
@@ -126,52 +119,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "login"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Register with Firebase",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firebaseToken\": \"YOUR_FIREBASE_ID_TOKEN\",\n  \"role\": \"farmer\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"phone\": \"1234567890\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/firebase/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "firebase", "register"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Login with Firebase",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firebaseToken\": \"YOUR_FIREBASE_ID_TOKEN\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/firebase/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "firebase", "login"]
-            }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Profile",
@@ -188,8 +136,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "profile"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Refresh Token",
@@ -210,8 +157,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "refresh-token"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Logout",
@@ -228,8 +174,49 @@
               "host": ["{{base_url}}"],
               "path": ["api", "auth", "logout"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Register with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"firebase@example.com\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login with Firebase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"firebase@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/firebase/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "firebase", "login"]
+            }
+          }
         }
       ]
     },
@@ -259,8 +246,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "detect-crop"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Analyze Soil",
@@ -278,18 +264,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4,\n    \"temperature\": 25,\n    \"organicMatter\": 2.3\n  },\n  \"options\": {}\n}"
+              "raw": "{\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4,\n    \"temperature\": 25,\n    \"organicMatter\": 2.3\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/analyze-soil",
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "analyze-soil"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Predict Carbon Sequestration",
+          "name": "Predict Carbon",
           "request": {
             "method": "POST",
             "header": [
@@ -304,15 +289,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilData\": {\n    \"carbon\": 2.3\n  }\n}"
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/predict-carbon",
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "predict-carbon"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Predict Yield",
@@ -330,18 +314,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilQuality\": 0.7\n}"
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/predict-yield",
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "predict-yield"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Analyze Vegetation Health",
+          "name": "Analyze Vegetation",
           "request": {
             "method": "POST",
             "header": [
@@ -356,18 +339,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55,\n    \"chlorophyll\": 45.2\n  }\n}"
+              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/analyze-vegetation",
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "analyze-vegetation"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Comprehensive Field Analysis",
+          "name": "Analyze Field",
           "request": {
             "method": "POST",
             "header": [
@@ -382,44 +364,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"imageData\": \"base64_image_data\",\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4\n  },\n  \"cropType\": \"maize\"\n}"
+              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilData\": {\"ph\": 6.5, \"moisture\": 0.4}\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/ai/analyze-field",
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "analyze-field"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Batch Field Analysis",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fields\": [\n    {\n      \"fieldId\": \"field_123\",\n      \"area\": 5,\n      \"cropType\": \"maize\"\n    },\n    {\n      \"fieldId\": \"field_456\",\n      \"area\": 3,\n      \"cropType\": \"wheat\"\n    }\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/batch-analyze",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "batch-analyze"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get AI Models Info",
+          "name": "Get AI Models",
           "request": {
             "method": "GET",
             "header": [
@@ -433,8 +388,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "ai", "models"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -457,18 +411,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {\n    \"fieldId\": \"field_123\",\n    \"region\": \"East Africa\"\n  }\n}"
+              "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {}\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/chatbot/message",
               "host": ["{{base_url}}"],
               "path": ["api", "chatbot", "message"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Conversation History",
+          "name": "Get History",
           "request": {
             "method": "GET",
             "header": [
@@ -482,11 +435,10 @@
               "host": ["{{base_url}}"],
               "path": ["api", "chatbot", "history"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Farm Recommendations",
+          "name": "Get Recommendations",
           "request": {
             "method": "POST",
             "header": [
@@ -501,18 +453,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farmData\": {\n    \"soil\": {\n      \"nitrogen\": 0.3,\n      \"moisture\": 0.25,\n      \"ph\": 5.2\n    },\n    \"crop\": {\n      \"type\": \"maize\",\n      \"healthScore\": 0.45\n    },\n    \"carbon\": {\n      \"tons\": 2.5\n    }\n  }\n}"
+              "raw": "{\n  \"farmData\": {\n    \"soil\": {\"nitrogen\": 0.3, \"moisture\": 0.25},\n    \"crop\": {\"type\": \"maize\", \"healthScore\": 0.45}\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/chatbot/recommendations",
               "host": ["{{base_url}}"],
               "path": ["api", "chatbot", "recommendations"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Chat Analytics",
+          "name": "Get Analytics",
           "request": {
             "method": "GET",
             "header": [
@@ -526,8 +477,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "chatbot", "analytics"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Clear History",
@@ -544,8 +494,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "chatbot", "history"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -568,15 +517,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"purpose\": \"irrigation_upgrade\",\n  \"purposeDescription\": \"Installing drip irrigation system\",\n  \"tenureMonths\": 12,\n  \"collateral\": \"Farm equipment\",\n  \"coSigner\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"9876543210\",\n    \"email\": \"john@example.com\"\n  }\n}"
+              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"purpose\": \"irrigation_upgrade\",\n  \"tenureMonths\": 12\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/loans/apply",
               "host": ["{{base_url}}"],
               "path": ["api", "loans", "apply"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get All Loans",
@@ -589,7 +537,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/loans?status=pending&limit=10&skip=0",
+              "raw": "{{base_url}}/api/loans?status=pending&limit=10",
               "host": ["{{base_url}}"],
               "path": ["api", "loans"],
               "query": [
@@ -600,15 +548,10 @@
                 {
                   "key": "limit",
                   "value": "10"
-                },
-                {
-                  "key": "skip",
-                  "value": "0"
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Loan Details",
@@ -625,8 +568,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "loans", "{{loan_id}}"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Approve Loan (Admin)",
@@ -644,15 +586,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved based on good credit score\"\n}"
+              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/loans/{{loan_id}}/approve",
               "host": ["{{base_url}}"],
               "path": ["api", "loans", "{{loan_id}}", "approve"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Disburse Loan (Admin)",
@@ -677,8 +618,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "loans", "{{loan_id}}", "disburse"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -700,8 +640,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Available Credits",
@@ -718,8 +657,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits", "available"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Credit Stats",
@@ -736,26 +674,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits", "stats"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Credit Details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits/{{credit_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits", "{{credit_id}}"]
-            }
-          },
-          "response": []
+          }
         },
         {
           "name": "Create Credit (Admin)",
@@ -773,15 +692,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"fieldId\": \"field_123\",\n  \"amountInTons\": 2.5,\n  \"methodology\": \"NDVI-based estimation\",\n  \"confidenceScore\": 0.87,\n  \"pricePerTon\": 50,\n  \"metadata\": {\n    \"cropType\": \"maize\",\n    \"period\": {\n      \"start\": \"2026-01-01\",\n      \"end\": \"2026-06-01\"\n    }\n  }\n}"
+              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"fieldId\": \"field_123\",\n  \"amountInTons\": 2.5,\n  \"pricePerTon\": 50\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/carbon-credits",
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Tokenize Credit",
@@ -806,8 +724,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits", "{{credit_id}}", "tokenize"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Sell Credit",
@@ -832,8 +749,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "carbon-credits", "{{credit_id}}", "sell"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -841,7 +757,7 @@
       "name": "💳 Wallet & Payments",
       "item": [
         {
-          "name": "Get Wallet Balance",
+          "name": "Get Balance",
           "request": {
             "method": "GET",
             "header": [
@@ -855,8 +771,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "wallet"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Transactions",
@@ -869,25 +784,20 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/wallet/transactions?limit=10&skip=0",
+              "raw": "{{base_url}}/api/wallet/transactions?limit=10",
               "host": ["{{base_url}}"],
               "path": ["api", "wallet", "transactions"],
               "query": [
                 {
                   "key": "limit",
                   "value": "10"
-                },
-                {
-                  "key": "skip",
-                  "value": "0"
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Deposit Funds",
+          "name": "Deposit",
           "request": {
             "method": "POST",
             "header": [
@@ -902,18 +812,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"card\",\n  \"reference\": \"deposit_123\"\n}"
+              "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"card\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/wallet/deposit",
               "host": ["{{base_url}}"],
               "path": ["api", "wallet", "deposit"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Withdraw Funds",
+          "name": "Withdraw",
           "request": {
             "method": "POST",
             "header": [
@@ -928,18 +837,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"bank_transfer\",\n  \"bankDetails\": {\n    \"accountName\": \"John Doe\",\n    \"accountNumber\": \"1234567890\",\n    \"bankName\": \"Example Bank\",\n    \"branch\": \"Main Branch\",\n    \"swiftCode\": \"EXMPUS33\"\n  }\n}"
+              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"bank_transfer\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/wallet/withdraw",
               "host": ["{{base_url}}"],
               "path": ["api", "wallet", "withdraw"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Transfer Funds",
+          "name": "Transfer",
           "request": {
             "method": "POST",
             "header": [
@@ -961,8 +869,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "wallet", "transfer"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Initiate Payment",
@@ -980,18 +887,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"card\",\n  \"paymentType\": \"loan_repayment\",\n  \"cooperativeId\": \"coop_123\",\n  \"description\": \"Loan repayment - Loan #LN123\",\n  \"cardToken\": \"tok_mock_123\"\n}"
+              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"card\",\n  \"paymentType\": \"loan_repayment\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/payments/initiate",
               "host": ["{{base_url}}"],
               "path": ["api", "payments", "initiate"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Payment History",
+          "name": "Get Payments",
           "request": {
             "method": "GET",
             "header": [
@@ -1001,22 +907,11 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/payments?status=completed&limit=10",
+              "raw": "{{base_url}}/api/payments",
               "host": ["{{base_url}}"],
-              "path": ["api", "payments"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "completed"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
+              "path": ["api", "payments"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Refund Payment (Admin)",
@@ -1041,8 +936,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "payments", "{{payment_id}}", "refund"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -1050,17 +944,15 @@
       "name": "📋 Subscriptions & API Keys",
       "item": [
         {
-          "name": "Get Available Plans",
+          "name": "Get Plans",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/api/subscriptions/plans",
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "plans"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Create Subscription",
@@ -1078,15 +970,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\",\n  \"paymentMethod\": \"stripe\",\n  \"metadata\": {\n    \"organization\": \"FarmCo Ltd\",\n    \"industry\": \"agriculture\",\n    \"teamSize\": 5\n  }\n}"
+              "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/subscriptions/create",
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "create"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get My Subscription",
@@ -1103,8 +994,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "my-subscription"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Generate API Key",
@@ -1122,15 +1012,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Production API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+              "raw": "{\n  \"name\": \"My API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/subscriptions/generate-api-key",
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "generate-api-key"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "List API Keys",
@@ -1147,8 +1036,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "api-keys"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Revoke API Key",
@@ -1165,8 +1053,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "api-keys", "{{api_key_id}}"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Usage Stats",
@@ -1183,8 +1070,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "usage"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Cancel Subscription",
@@ -1209,153 +1095,24 @@
               "host": ["{{base_url}}"],
               "path": ["api", "subscriptions", "cancel"]
             }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "🌾 Django-style Routes (Compatibility)",
-      "item": [
-        {
-          "name": "Farmers",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/farmers",
-              "host": ["{{base_url}}"],
-              "path": ["api", "farmers"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Cooperatives",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/cooperatives",
-              "host": ["{{base_url}}"],
-              "path": ["api", "cooperatives"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Satellite - Fetch",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"field_id\": \"field_123\",\n  \"date_range\": [\"2026-01-01\", \"2026-03-01\"]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/satellite/fetch",
-              "host": ["{{base_url}}"],
-              "path": ["api", "satellite", "fetch"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Analysis - Vegetation",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/analysis/vegetation/{{field_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "analysis", "vegetation", "{{field_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Analysis - Soil",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/analysis/soil/{{field_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "analysis", "soil", "{{field_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Carbon - Calculate",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carbon/{{field_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon", "{{field_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Reports - Field Report",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/reports/field/{{field_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports", "field", "{{field_id}}"]
-            }
-          },
-          "response": []
+          }
         }
       ]
     },
     {
       "name": "🔗 Webhooks",
       "item": [
+        {
+          "name": "Webhook Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "status"]
+            }
+          }
+        },
         {
           "name": "Stripe Webhook",
           "request": {
@@ -1367,20 +1124,19 @@
               },
               {
                 "key": "stripe-signature",
-                "value": "whsec_mock_signature"
+                "value": "whsec_mock"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"evt_mock_123\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_mock_123\",\n      \"amount\": 50000,\n      \"currency\": \"usd\",\n      \"metadata\": {\n        \"paymentId\": \"pay_123\"\n      }\n    }\n  }\n}"
+              "raw": "{\n  \"id\": \"evt_mock_123\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_mock_123\",\n      \"amount\": 50000,\n      \"currency\": \"usd\"\n    }\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/webhooks/stripe",
               "host": ["{{base_url}}"],
               "path": ["api", "webhooks", "stripe"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Loan Approved Webhook",
@@ -1401,43 +1157,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "webhooks", "loan-approved"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Carbon Verified Webhook",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"creditId\": \"cc_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 2.5,\n  \"verificationData\": {\n    \"verified\": true,\n    \"confidence\": 0.87\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/webhooks/carbon-verified",
-              "host": ["{{base_url}}"],
-              "path": ["api", "webhooks", "carbon-verified"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Webhook Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/webhooks/status",
-              "host": ["{{base_url}}"],
-              "path": ["api", "webhooks", "status"]
-            }
-          },
-          "response": []
+          }
         }
       ]
     }
