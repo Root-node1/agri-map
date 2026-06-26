@@ -38,7 +38,9 @@ const Fields = () => {
     e.preventDefault()
     try {
       await fieldAPI.create(newField)
-    } catch { /* demo mode */ }
+    } catch (error) {
+      console.error('Error adding field:', error)
+    }
     setFields((prev) => [...prev, { ...newField, id: Date.now(), health: 85, soilHealth: 'Good' }])
     setShowAddModal(false)
     setNewField({ name: '', location: '', size: '', cropType: '' })
@@ -46,15 +48,18 @@ const Fields = () => {
 
   const handleDeleteField = async (id) => {
     if (!window.confirm('Delete this field?')) return
-    try { await fieldAPI.delete(id) } catch { /* demo */ }
+    try {
+      await fieldAPI.delete(id)
+    } catch (error) {
+      console.error('Error deleting field:', error)
+    }
     setFields((prev) => prev.filter((f) => f.id !== id))
   }
 
   if (loading) return <LoadingSpinner fullScreen />
 
   return (
-<<<<<<< HEAD
-    <div>
+    <div className="page-shell page-shell-dark">
       <PageHeader
         eyebrow="Field Management"
         title={t('fields.title') || 'My Fields'}
@@ -78,107 +83,133 @@ const Fields = () => {
             aria-label="Search fields"
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {crops.map((crop) => (
+
+        <div className="flex items-center gap-3">
+          <select
+            value={filterCrop}
+            onChange={(e) => setFilterCrop(e.target.value)}
+            className="px-4 py-3 rounded-3xl input-floating text-slate-100"
+            aria-label="Filter by crop"
+          >
+            {crops.map((crop) => (
+              <option key={crop} value={crop}>
+                {crop === 'all' ? 'All Crops' : crop}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex rounded-3xl overflow-hidden border border-white/10">
             <button
-              key={crop}
-              onClick={() => setFilterCrop(crop)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-emerald-400 ${
-                filterCrop === crop ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-300 border border-white/10'
-              }`}
+              onClick={() => setViewMode('grid')}
+              className={`px-4 py-3 ${viewMode === 'grid' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+              aria-label="Grid view"
             >
-              {crop === 'all' ? 'All' : crop}
-=======
-    <div className="max-w-6xl mx-auto px-4 py-8 page-shell page-shell-dark">
-      <div className="glass-card rounded-[2rem] p-8 mb-8">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('fields.title') || 'My Fields'}</h1>
-            <p className="text-slate-600 dark:text-slate-300 mt-2">Track field details and crop health in one place.</p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[280px]">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
-                type="text"
-                placeholder={t('dashboard.admin.search') || 'Search fields...'}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-              />
-            </div>
-            <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-              <FaPlus className="text-sm" /> {t('fields.addField') || 'Add Field'}
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
+              <FaTh />
             </button>
-          ))}
-        </div>
-        <div className="flex gap-1 rounded-xl bg-white/5 p-1">
-          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400'}`} aria-label="Grid view"><FaTh /></button>
-          <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400'}`} aria-label="List view"><FaList /></button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-3 ${viewMode === 'list' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+              aria-label="List view"
+            >
+              <FaList />
+            </button>
+          </div>
         </div>
       </div>
 
       {filteredFields.length === 0 ? (
-        <div className="glass-card rounded-[2rem] p-12 text-center text-slate-300">
-          <p>No fields found. Add your first field to get started.</p>
+        <div className="frosted-panel text-center py-16">
+          <p className="text-slate-300 text-lg">No fields found</p>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn-primary mt-4"
+          >
+            <FaPlus className="mr-2" /> Add Your First Field
+          </button>
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="dashboard-grid dashboard-grid-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFields.map((field, index) => (
-            <motion.div key={field.id || index} className="stat-card rounded-[2rem]" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-<<<<<<< HEAD
-                  <h3 className="text-xl font-semibold text-white">{field.name}</h3>
-                  <p className="text-slate-400 text-sm mt-1">{field.cropType || 'N/A'}</p>
-                  {field.health && (
-                    <span className="inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300">
-                      {field.health}% health
-                    </span>
-                  )}
-=======
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{field.name}</h3>
-                  <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">{field.cropType || 'N/A'}</p>
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <Link to={`/fields/${field.id}`} className="p-2 hover:text-emerald-300" aria-label={`View ${field.name}`}><FaEye /></Link>
-                  <button className="p-2 hover:text-emerald-300" aria-label={`Edit ${field.name}`}><FaEdit /></button>
-                  <button className="p-2 hover:text-rose-400" onClick={() => handleDeleteField(field.id)} aria-label={`Delete ${field.name}`}><FaTrash /></button>
+            <motion.div
+              key={field.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="frosted-panel hover:shadow-xl transition-all"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="text-lg font-semibold text-white">{field.name}</h3>
+                <div className="flex gap-2">
+                  <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300">
+                    <FaEye />
+                  </Link>
+                  <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300">
+                    <FaEdit />
+                  </Link>
+                  <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300">
+                    <FaTrash />
+                  </button>
                 </div>
               </div>
-<<<<<<< HEAD
-              <div className="grid gap-3 sm:grid-cols-2 text-slate-300 text-sm">
-                <div className="rounded-3xl bg-white/5 p-4">Location: {field.location || 'N/A'}</div>
-                <div className="rounded-3xl bg-white/5 p-4">Size: {field.size || 0} ha</div>
-                <div className="rounded-3xl bg-white/5 p-4">Soil: {field.soilHealth || 'Unknown'}</div>
-                <div className="rounded-3xl bg-white/5 p-4">Carbon: {field.carbon || '—'} t</div>
+              <div className="space-y-2 text-sm text-slate-300">
+                <p><span className="text-slate-500">Crop:</span> {field.cropType || 'Not set'}</p>
+                <p><span className="text-slate-500">Location:</span> {field.location || 'Not set'}</p>
+                <p><span className="text-slate-500">Size:</span> {field.size || 'Not set'}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Health:</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${
+                    field.health > 70 ? 'bg-emerald-500/20 text-emerald-400' :
+                    field.health > 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                    'bg-red-500/20 text-red-400'
+                  }`}>
+                    {field.health || 85}%
+                  </span>
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
       ) : (
         <div className="frosted-panel overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="text-slate-400 border-b border-white/10">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Crop</th>
-                <th className="py-3 px-4">Size</th>
-                <th className="py-3 px-4">Health</th>
-                <th className="py-3 px-4">Actions</th>
+          <table className="w-full text-left">
+            <thead className="border-b border-white/10">
+              <tr>
+                <th className="py-3 px-4 text-slate-400 font-medium">Name</th>
+                <th className="py-3 px-4 text-slate-400 font-medium">Crop</th>
+                <th className="py-3 px-4 text-slate-400 font-medium">Location</th>
+                <th className="py-3 px-4 text-slate-400 font-medium">Size</th>
+                <th className="py-3 px-4 text-slate-400 font-medium">Health</th>
+                <th className="py-3 px-4 text-slate-400 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredFields.map((field) => (
-                <tr key={field.id} className="border-b border-white/5 text-slate-300 hover:bg-white/5">
-                  <td className="py-3 px-4 font-medium text-white">{field.name}</td>
-                  <td className="py-3 px-4">{field.cropType}</td>
-                  <td className="py-3 px-4">{field.size} ha</td>
-                  <td className="py-3 px-4">{field.health || '—'}%</td>
+                <tr key={field.id} className="border-b border-white/5 hover:bg-white/5">
+                  <td className="py-3 px-4 text-white">{field.name}</td>
+                  <td className="py-3 px-4 text-slate-300">{field.cropType || '-'}</td>
+                  <td className="py-3 px-4 text-slate-300">{field.location || '-'}</td>
+                  <td className="py-3 px-4 text-slate-300">{field.size || '-'}</td>
                   <td className="py-3 px-4">
-                    <Link to={`/fields/${field.id}`} className="text-emerald-300 hover:text-white">View</Link>
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${
+                      field.health > 70 ? 'bg-emerald-500/20 text-emerald-400' :
+                      field.health > 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                      'bg-red-500/20 text-red-400'
+                    }`}>
+                      {field.health || 85}%
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex gap-2">
+                      <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300">
+                        <FaEye />
+                      </Link>
+                      <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300">
+                        <FaEdit />
+                      </Link>
+                      <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300">
+                        <FaTrash />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -186,96 +217,46 @@ const Fields = () => {
           </table>
         </div>
       )}
-=======
-              <div className="grid gap-3 sm:grid-cols-2 text-slate-700 dark:text-slate-300 text-sm">
-                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.location') || 'Location'}: {field.location || 'N/A'}</div>
-                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.size') || 'Size'}: {field.size || 0} ha</div>
-                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.cropType') || 'Crop Type'}: {field.cropType || 'N/A'}</div>
-                <div className="rounded-3xl bg-slate-50/90 dark:bg-white/5 p-4">{t('fields.soilHealth') || 'Soil Health'}: {field.soilHealth || 'Unknown'}</div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="glass-card rounded-[2rem] p-12 text-center text-slate-700 dark:text-slate-300">
-            <p>No fields found. Add your first field!</p>
-          </div>
-        )}
-      </div>
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
 
       {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)} role="dialog" aria-modal="true" aria-labelledby="add-field-title">
-          <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
-            <h2 id="add-field-title" className="text-xl font-bold text-white mb-4">Add Field</h2>
-            <form onSubmit={handleAddField} className="space-y-4">
-<<<<<<< HEAD
-              {['name', 'location', 'size', 'cropType'].map((field) => (
-                <div key={field}>
-                  <label htmlFor={`field-${field}`} className="block text-sm text-slate-300 mb-1 capitalize">{field.replace('cropType', 'Crop Type')}</label>
-                  <input
-                    id={`field-${field}`}
-                    type={field === 'size' ? 'number' : 'text'}
-                    value={newField[field]}
-                    onChange={(e) => setNewField({ ...newField, [field]: e.target.value })}
-                    required={field === 'name' || field === 'size'}
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none focus:ring-2 focus:ring-emerald-400"
-                  />
-                </div>
-              ))}
-              <div className="flex gap-3 justify-end pt-3">
-                <button type="button" className="btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Add Field</button>
-=======
-              <div className="form-group">
-                <label>{t('fields.fieldName') || 'Field Name'}</label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="frosted-panel w-full max-w-md p-6 rounded-2xl">
+            <h2 className="text-2xl font-bold text-white mb-4">Add New Field</h2>
+            <form onSubmit={handleAddField}>
+              <div className="space-y-4">
                 <input
                   type="text"
+                  placeholder="Field Name"
                   value={newField.name}
                   onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
                   required
-                  placeholder="Enter field name"
-                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
                 />
-              </div>
-              <div className="form-group">
-                <label>{t('fields.location') || 'Location'}</label>
                 <input
                   type="text"
-                  value={newField.location}
-                  onChange={(e) => setNewField({ ...newField, location: e.target.value })}
-                  placeholder="Enter location"
-                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
-                />
-              </div>
-              <div className="form-group">
-                <label>{t('fields.size') || 'Size (hectares)'}</label>
-                <input
-                  type="number"
-                  value={newField.size}
-                  onChange={(e) => setNewField({ ...newField, size: e.target.value })}
-                  required
-                  placeholder="Enter size in hectares"
-                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
-                />
-              </div>
-              <div className="form-group">
-                <label>{t('fields.cropType') || 'Crop Type'}</label>
-                <input
-                  type="text"
+                  placeholder="Crop Type"
                   value={newField.cropType}
                   onChange={(e) => setNewField({ ...newField, cropType: e.target.value })}
-                  placeholder="Enter crop type"
-                  className="w-full rounded-2xl border border-slate-200 bg-white/95 dark:border-slate-700 dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 outline-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={newField.location}
+                  onChange={(e) => setNewField({ ...newField, location: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Size (ha)"
+                  value={newField.size}
+                  onChange={(e) => setNewField({ ...newField, size: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
                 />
               </div>
-              <div className="modal-actions flex flex-wrap gap-3 justify-end pt-3">
-                <button type="button" className="btn-secondary" onClick={() => setShowAddModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  Add Field
-                </button>
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
+              <div className="flex gap-3 mt-6">
+                <button type="submit" className="btn-primary flex-1">Add Field</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary flex-1">Cancel</button>
               </div>
             </form>
           </div>

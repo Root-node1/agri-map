@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaBars, FaTimes } from 'react-icons/fa'
-import Logo from '../common/Logo'
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  
 
   return (
     <nav className="py-4 px-4 md:px-6 bg-white/95 dark:bg-slate-950/95 border-b border-slate-200/70 dark:border-white/10 fixed inset-x-0 top-0 z-40 shadow-2xl backdrop-blur-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-3 text-lg md:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-          <Logo />
           <span>AgriMap</span>
         </Link>
 

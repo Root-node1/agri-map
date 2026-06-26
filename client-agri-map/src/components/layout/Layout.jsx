@@ -7,7 +7,7 @@ import AccessibilityMenu from '../ui/AccessibilityMenu'
 const Layout = ({ children }) => {
   return (
     <div className="page-shell page-shell-dark flex flex-col min-h-screen">
-      <SkipLink />
+      {/* <SkipLink /> */}
       <Navbar />
       <AccessibilityMenu />
       <main className="flex-1 pt-24">

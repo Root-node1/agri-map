@@ -87,3 +87,62 @@ export const demoStats = {
   carbon: 16.9,
   balance: 45750
 }
+
+// Soil data for demonstration - FIXED EXPORT
+export const demoSoilData = {
+  nitrogen: 0.62,
+  phosphorus: 0.48,
+  potassium: 0.55,
+  ph: 6.5,
+  organicMatter: 2.3,
+  moisture: 0.4,
+  temperature: 25,
+  fertility: 'moderate',
+  degradationRisk: 'low',
+  recommendations: [
+    'Add organic compost to improve soil structure',
+    'Apply nitrogen-rich fertilizer for better growth',
+    'Monitor moisture levels regularly'
+  ]
+}
+
+// Nutrient heatmap data - FIXED EXPORT
+export const nutrientHeatmap = {
+  nitrogen: { value: 0.62, status: 'optimal', color: '#10b981' },
+  phosphorus: { value: 0.48, status: 'moderate', color: '#f59e0b' },
+  potassium: { value: 0.55, status: 'optimal', color: '#10b981' },
+  ph: { value: 6.5, status: 'optimal', color: '#10b981' },
+  organicMatter: { value: 2.3, status: 'moderate', color: '#f59e0b' },
+  moisture: { value: 0.4, status: 'optimal', color: '#10b981' }
+}
+
+// Crop predictions
+export const demoPredictions = [
+  { crop: 'Maize', confidence: 0.92, season: 'Long Rains' },
+  { crop: 'Wheat', confidence: 0.78, season: 'Short Rains' },
+  { crop: 'Soybean', confidence: 0.65, season: 'Dry Season' }
+]
+
+// Carbon credit data
+export const demoCarbonData = {
+  totalCredits: 12.5,
+  totalValue: 625,
+  pricePerTon: 50,
+  history: [
+    { date: '2026-01-01', credits: 2.5, value: 125 },
+    { date: '2026-02-01', credits: 3.0, value: 150 },
+    { date: '2026-03-01', credits: 2.0, value: 100 },
+    { date: '2026-04-01', credits: 2.5, value: 125 },
+    { date: '2026-05-01', credits: 2.5, value: 125 }
+  ]
+}
+
+export default {
+  demoFields,
+  demoActivities,
+  demoStats,
+  demoSoilData,
+  nutrientHeatmap,
+  demoPredictions,
+  demoCarbonData
+}

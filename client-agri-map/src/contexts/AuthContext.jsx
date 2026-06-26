@@ -1,185 +1,141 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { farmerAPI } from '../services/djangoApi'
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
-export const AuthContext = createContext()
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [token, setToken] = useState(localStorage.getItem('token'))
-  const navigate = useNavigate()
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
 
+  // Check if user is authenticated on mount
   useEffect(() => {
-    if (token) fetchUser()
-    else setLoading(false)
-  }, [token])
-
-  const fetchFarmerProfile = async () => {
-    try {
-      const response = await farmerAPI.getProfile()
-      return response.data
-    } catch {
-      return null
-    }
-  }
-
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      // Node API wraps payload in { success, statusCode, message, data }
-      const authUser = response.data.data.user || response.data.data
-      let mergedUser = authUser
-
-      if (authUser?.role === 'farmer') {
-        const farmerProfile = await fetchFarmerProfile()
-        if (farmerProfile) {
-          mergedUser = { ...authUser, phone: farmerProfile.phone, location: farmerProfile.location }
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        try {
+          const userData = await authAPI.profile();
+          setUser(userData);
+          setToken(storedToken);
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          setToken(null);
+          setUser(null);
         }
       }
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
 
-      setUser(mergedUser)
-    } catch (error) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      setToken(null)
-      setUser(null)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const login = async (email, password, rememberMe = false) => {
+  // Login function
+  const login = async (email, password) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        email,
-        password
-      })
-      const payload = response.data.data
-      const tokenResp = payload.token
-      const userResp = payload.user
-      localStorage.setItem('token', tokenResp)
-      setToken(tokenResp)
-
-      let finalUser = userResp
-      if (userResp?.role === 'farmer') {
-        const farmerProfile = await fetchFarmerProfile()
-        if (farmerProfile) {
-          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
-        }
-      }
-
-      setUser(finalUser)
-      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
-      return { success: true, needsProfile }
+      const response = await authAPI.login({ email, password });
+      const { token, refreshToken, user } = response;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
+      setToken(token);
+      setUser(user);
+      
+      return { success: true, user };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Invalid email or password. Please try again.' }
+      console.error('Login failed:', error);
+      return { success: false, error: error.message };
     }
-  }
+  };
 
+  // Register function
   const signup = async (userData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, userData)
-      const payload = response.data.data
-      const tokenResp = payload.token
-      const userResp = payload.user
-      localStorage.setItem('token', tokenResp)
-      setToken(tokenResp)
-
-      let finalUser = userResp
-      if (userResp?.role === 'farmer') {
-        const farmerProfile = await fetchFarmerProfile()
-        if (farmerProfile) {
-          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
-        }
-      }
-
-      setUser(finalUser)
-      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
-      return { success: true, needsProfile }
+      const response = await authAPI.register(userData);
+      const { token, refreshToken, user } = response;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
+      setToken(token);
+      setUser(user);
+      
+      return { success: true, user };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Registration failed. Please check your details.' }
+      console.error('Registration failed:', error);
+      return { success: false, error: error.message };
     }
-  }
+  };
 
-  const googleLogin = async (credentialResponse) => {
+  // Google Login (mock for now)
+  const googleLogin = async (idToken) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
-        credential: credentialResponse.credential
-      })
-      const payload = response.data.data
-      const tokenResp = payload.token
-      const userResp = payload.user
-      localStorage.setItem('token', tokenResp)
-      setToken(tokenResp)
-
-      let finalUser = userResp
-      if (userResp?.role === 'farmer') {
-        const farmerProfile = await fetchFarmerProfile()
-        if (farmerProfile) {
-          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
-        }
-      }
-
-      setUser(finalUser)
-      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
-      return { success: true, needsProfile }
+      // Mock implementation - replace with actual Google login
+      console.log('Google login with token:', idToken);
+      const response = await authAPI.login({ 
+        email: 'google@example.com', 
+        password: 'google_password' 
+      });
+      const { token, refreshToken, user } = response;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
+      setToken(token);
+      setUser(user);
+      
+      return { success: true, user };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Unable to send reset email.' }
+      console.error('Google login failed:', error);
+      return { success: false, error: error.message };
     }
-  }
+  };
 
-  const logout = async () => {
-    try { await authAPI.logout() } catch { /* ignore */ }
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
-    setToken(null)
-    setUser(null)
-    navigate('/login')
-  }
-
-  const completeFarmerProfile = async (profileData) => {
+  // Forgot Password function
+  const forgotPassword = async (email) => {
     try {
-      const response = await farmerAPI.register(profileData)
-      const farmerProfile = response.data
-      setUser((prevUser) => ({ ...prevUser, ...farmerProfile }))
-      return { success: true, farmerProfile }
+      // Mock implementation - replace with actual API call
+      console.log('Password reset requested for:', email);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return { success: true, message: 'Password reset email sent' };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Failed to complete farmer profile' }
+      console.error('Forgot password failed:', error);
+      return { success: false, error: error.message };
     }
-  }
+  };
 
-  const isFarmer = user?.role === 'farmer'
-  const needsFarmerProfile = isFarmer && (!user?.phone || !user?.location)
+  // Logout function
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    setToken(null);
+    setUser(null);
+  };
 
   const value = {
     user,
     loading,
+    token,
     login,
     signup,
     googleLogin,
+    forgotPassword,
     logout,
-    completeFarmerProfile,
-    needsFarmerProfile,
-    isAuthenticated: !!user,
+    isAuthenticated: !!token || !!user,
     isAdmin: user?.role === 'admin'
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{
-      user, loading, login, signup, googleLogin, forgotPassword, logout,
-      isAuthenticated: !!token || !!user,
-      isAdmin: user?.role === 'admin',
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within an AuthProvider')
-  return context
-}
+export default AuthContext;

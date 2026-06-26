@@ -48,8 +48,7 @@ const FarmerDashboard = () => {
   if (loading) return <LoadingSpinner fullScreen message="Loading dashboard..." />
 
   return (
-<<<<<<< HEAD
-    <div>
+    <div className="page-shell page-shell-dark">
       <PageHeader
         eyebrow="Live Dashboard"
         title={`Welcome, ${user?.firstName || user?.name || 'Farmer'}!`}
@@ -61,39 +60,34 @@ const FarmerDashboard = () => {
           </span>
         }
       />
-=======
-    <div className="max-w-6xl mx-auto px-4 py-8 page-shell page-shell-dark">
-      <div className="glass-card rounded-[2rem] p-8 mb-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold mb-2 text-slate-900 dark:text-white">Welcome, {user?.name || 'Farmer'}!</h1>
-            <p className="text-slate-600 dark:text-slate-300">Your agricultural dashboard</p>
-          </div>
-          <div className="inline-flex items-center gap-3 rounded-full bg-slate-100/90 dark:bg-white/10 px-4 py-3 text-sm text-slate-900 dark:text-slate-200 border border-slate-200/70 dark:border-white/10">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-            Live insights active
-          </div>
-        </div>
-      </div>
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
 
-      <div className="glass-card rounded-[2rem] overflow-hidden mb-10">
-        <img
-          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
-          alt="Kenyan farmers working in a field"
-          className="w-full h-64 object-cover sm:h-72"
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard 
+          icon={<FaTractor className="text-2xl" />} 
+          label="Total Fields" 
+          value={stats.fields} 
+          trend={12} 
+        />
+        <StatCard 
+          icon={<FaSeedling className="text-2xl" />} 
+          label="Active Crops" 
+          value={stats.crops} 
+          trend={8} 
+        />
+        <StatCard 
+          icon={<FaLeaf className="text-2xl" />} 
+          label="Carbon Credits" 
+          value={`${stats.carbon} t`} 
+          trend={15} 
+        />
+        <StatCard 
+          icon={<FaWallet className="text-2xl" />} 
+          label="Wallet Balance" 
+          value={`KES ${stats.balance.toLocaleString()}`} 
         />
       </div>
 
-      <div className="dashboard-grid dashboard-grid-4 mb-8">
-<<<<<<< HEAD
-        <StatCard icon={<FaTractor className="text-2xl" />} label="Total Fields" value={stats.fields} trend={12} />
-        <StatCard icon={<FaSeedling className="text-2xl" />} label="Active Crops" value={stats.crops} trend={8} />
-        <StatCard icon={<FaLeaf className="text-2xl" />} label="Carbon Credits" value={`${stats.carbon} t`} trend={15} />
-        <StatCard icon={<FaWallet className="text-2xl" />} label="Wallet Balance" value={`KES ${stats.balance.toLocaleString()}`} />
-      </div>
-
-      <div className="dashboard-grid dashboard-grid-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="frosted-panel lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Field Map</h2>
@@ -135,36 +129,6 @@ const FarmerDashboard = () => {
           <Link to="/finance/loans" className="btn-secondary justify-center">Apply Loan</Link>
           <Link to="/finance/tokenize" className="btn-secondary justify-center">Tokenize Credits</Link>
           <button className="btn-secondary justify-center" aria-label="Export reports"><FaFileExport /> Export</button>
-=======
-        {stats.map((stat, index) => (
-          <div key={index} className="stat-card rounded-[1.75rem] text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-300 mx-auto mb-5">
-              {React.cloneElement(stat.icon, { className: 'text-2xl' })}
-            </div>
-            <div className="text-3xl font-semibold text-slate-900 dark:text-white mb-2">{stat.value}</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="dashboard-grid dashboard-grid-2 gap-6">
-        <div className="glass-card rounded-[2rem] p-6">
-          <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Recent Activity</h2>
-          <ul className="space-y-3 text-sm text-slate-300">
-            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">🌱 Planted new crop in Field A</li>
-            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">📊 Updated harvest data</li>
-            <li className="flex items-center gap-3 rounded-3xl bg-slate-50/90 dark:bg-slate-950/70 p-4 text-slate-700 dark:text-slate-200">🚜 Equipment maintenance scheduled</li>
-          </ul>
-        </div>
-        <div className="glass-card rounded-[2rem] p-6">
-          <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Quick Actions</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <button className="btn-secondary w-full justify-center">Add Field</button>
-            <button className="btn-secondary w-full justify-center">Log Harvest</button>
-            <button className="btn-secondary w-full justify-center">View Reports</button>
-            <button className="btn-secondary w-full justify-center">Schedule Task</button>
-          </div>
->>>>>>> baa478a6589f6cad9f2271e9c8fc366e071cc0ff
         </div>
       </div>
     </div>

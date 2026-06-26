@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import Layout from './components/layout/Layout'
 import WelcomeLanding from './pages/public/WelcomeLanding'
@@ -28,6 +28,7 @@ import CooperativeDetails from './pages/public/CooperativeDetails'
 import CooperativeRegister from './pages/public/CooperativeRegister'
 import Settings from './pages/public/Settings'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import Logo from './components/common/Logo'
 
 function App() {
   const { user, needsFarmerProfile } = useAuth()
@@ -44,6 +45,7 @@ function App() {
   }
 
   return (
+    <BrowserRouter>
     <Layout>
       <Routes>
         {/* Logged-out visitors land on the welcome tag before login/register.
@@ -60,6 +62,7 @@ function App() {
           }
         />
         <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Logo/>}/>
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsConditions />} />
@@ -168,6 +171,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
+    </BrowserRouter>
   )
 }
 
