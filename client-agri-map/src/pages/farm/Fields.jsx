@@ -79,7 +79,7 @@ const Fields = () => {
               <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
-                placeholder={t('dashboard.admin.search') || 'Search fields...'}
+                placeholder={t('fields.searchPlaceholder') || 'Search fields...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
