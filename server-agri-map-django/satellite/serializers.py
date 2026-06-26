@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .models import ProcessingJob, SatelliteImage
+
 
 class FetchImageryInputSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()
@@ -46,3 +48,17 @@ class ProcessImageryResponseSerializer(serializers.Serializer):
     job_id = serializers.IntegerField()
     status = serializers.CharField()
     result = _ProcessResultSerializer()
+
+
+class SatelliteImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SatelliteImage
+        fields = '__all__'
+        read_only_fields = ('id', 'ingested_at')
+
+
+class ProcessingJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessingJob
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'completed_at')

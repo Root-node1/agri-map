@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from .models import Field
@@ -39,6 +40,50 @@ class FieldModelTest(TestCase):
         )
         self.assertAlmostEqual(field.centroid_lat, 3.0)
         self.assertAlmostEqual(field.centroid_lng, 3.0)
+
+    def test_centroid_linestring(self):
+        field = Field.objects.create(
+            user=User.objects.create_user('u4', 'u4@e.com', 'pass'),
+            name='Line Field',
+            geometry={'type': 'LineString', 'coordinates': [[0, 0], [10, 10]]},
+        )
+        self.assertAlmostEqual(field.centroid_lat, 5.0)
+        self.assertAlmostEqual(field.centroid_lng, 5.0)
+
+    def test_geometry_validation_valid(self):
+        field = Field(
+            user=User.objects.create_user('u5', 'u5@e.com', 'pass'),
+            name='Valid Field',
+            geometry={'type': 'Polygon', 'coordinates': [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]},
+        )
+        field.full_clean()
+
+    def test_geometry_validation_invalid_type(self):
+        with self.assertRaises(ValidationError):
+            field = Field(
+                user=User.objects.create_user('u6', 'u6@e.com', 'pass'),
+                name='Bad Field',
+                geometry={'type': 'InvalidType', 'coordinates': []},
+            )
+            field.full_clean()
+
+    def test_geometry_validation_missing_coordinates(self):
+        with self.assertRaises(ValidationError):
+            field = Field(
+                user=User.objects.create_user('u7', 'u7@e.com', 'pass'),
+                name='No Coords',
+                geometry={'type': 'Point'},
+            )
+            field.full_clean()
+
+    def test_geometry_validation_not_dict(self):
+        with self.assertRaises(ValidationError):
+            field = Field(
+                user=User.objects.create_user('u8', 'u8@e.com', 'pass'),
+                name='Not dict',
+                geometry='not geojson',
+            )
+            field.full_clean()
 
 
 class FieldAPITest(TestCase):
@@ -132,3 +177,40 @@ class FieldAPITest(TestCase):
         self.assertEqual(resp.status_code, 200)
         names = [f['properties']['name'] for f in resp.json()['features']]
         self.assertIn('Shared Field', names)
+
+    def test_update_field(self):
+        field = Field.objects.create(
+            user=self.user, name='Old Name',
+            geometry={'type': 'Point', 'coordinates': [0, 0]},
+        )
+        resp = self.client.patch(f'/api/fields/{field.id}/', {
+            'name': 'Updated Name',
+        }, **self.headers, content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()['name'], 'Updated Name')
+        field.refresh_from_db()
+        self.assertEqual(field.name, 'Updated Name')
+
+    def test_delete_field(self):
+        field = Field.objects.create(
+            user=self.user, name='To Delete',
+            geometry={'type': 'Point', 'coordinates': [0, 0]},
+        )
+        resp = self.client.delete(f'/api/fields/{field.id}/', **self.headers)
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(Field.objects.count(), 0)
+
+    def test_bbox_invalid_format(self):
+        resp = self.client.get('/api/fields/?bbox=not,a,bbox', **self.headers)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_bbox_wrong_part_count(self):
+        resp = self.client.get('/api/fields/?bbox=1,2,3', **self.headers)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_invalid_geometry_rejected(self):
+        resp = self.client.post('/api/fields/', {
+            'name': 'Bad',
+            'geometry': {'type': 'Invalid', 'coordinates': []},
+        }, **self.headers, content_type='application/json')
+        self.assertEqual(resp.status_code, 400)

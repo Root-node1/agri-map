@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ProcessingJob, SatelliteImage
+
+admin.site.register(SatelliteImage)
+admin.site.register(ProcessingJob)

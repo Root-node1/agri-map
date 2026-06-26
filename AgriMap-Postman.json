@@ -29,6 +29,16 @@
       "key": "member_id",
       "value": "1",
       "type": "string"
+    },
+    {
+      "key": "image_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "1",
+      "type": "string"
     }
   ],
   "item": [
@@ -513,11 +523,71 @@
               "host": ["{{base_url}}"],
               "path": ["api", "satellite", "process"]
             },
-            "description": "Process satellite imagery for a field (cloud masking, NDVI/EVI calculation).\n\n**Response 200:**\n```json\n{\n  \"job_id\": 1,\n  \"status\": \"completed\",\n  \"result\": {\n    \"cloud_masking\": \"applied\",\n    \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n    \"ndvi_calculated\": 0.72,\n    \"evi_calculated\": 0.54,\n    \"images_processed\": 1\n  }\n}\n```"
+            "description": "Process satellite imagery for a field (cloud masking, NDVI/EVI calculation).\nNote: current implementation uses simulated processing results.\n\n**Response 200:**\n```json\n{\n  \"job_id\": 1,\n  \"status\": \"completed\",\n  \"result\": {\n    \"cloud_masking\": \"applied\",\n    \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n    \"ndvi_calculated\": 0.72,\n    \"evi_calculated\": 0.54,\n    \"images_processed\": 1\n  }\n}\n```"
+          }
+        },
+        {
+          "name": "List Satellite Images",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/images/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "images"]
+            },
+            "description": "List all satellite images for the user's fields (paginated).\n\n**Response 200:**\n```json\n{\n  \"count\": 1,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"field\": 1,\n      \"date\": \"2026-06-24\",\n      \"source_url\": \"https://scihub.copernicus.eu/...\",\n      \"cloud_cover\": 12.5,\n      \"bands\": {\"B02\": 0.15, \"B03\": 0.22, \"B04\": 0.31, \"B08\": 0.68},\n      \"ingested_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```"
+          }
+        },
+        {
+          "name": "Get / Delete Satellite Image",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/images/{{image_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "images", "{{image_id}}"]
+            },
+            "description": "GET to retrieve a satellite image by ID.\nDELETE to remove a satellite image.\nOnly images belonging to the authenticated user's fields are accessible."
+          }
+        },
+        {
+          "name": "List Processing Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/jobs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "jobs"]
+            },
+            "description": "List all processing jobs for the user's fields (paginated).\n\n**Response 200:**\n```json\n{\n  \"count\": 1,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"field\": 1,\n      \"status\": \"completed\",\n      \"result\": {\n        \"cloud_masking\": \"applied\",\n        \"bands_extracted\": [\"B02\", \"B03\", \"B04\", \"B08\"],\n        \"ndvi_calculated\": 0.72,\n        \"evi_calculated\": 0.54,\n        \"images_processed\": 1\n      },\n      \"error\": \"\",\n      \"created_at\": \"2026-06-24T00:00:00Z\",\n      \"completed_at\": \"2026-06-24T00:00:00Z\"\n    }\n  ]\n}\n```"
+          }
+        },
+        {
+          "name": "Get Processing Job",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/jobs/{{job_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "satellite", "jobs", "{{job_id}}"]
+            },
+            "description": "Get details for a specific processing job by ID."
           }
         }
       ],
-      "description": "Satellite imagery fetch and processing endpoints"
+      "description": "Satellite imagery fetch, process, list images, and list jobs"
     },
     {
       "name": "Carbon",
@@ -536,9 +606,50 @@
             },
             "description": "Returns carbon sequestration data for a field.\nMethodology options: ndvi_based, soil_organic_carbon, biomass_estimation.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"carbon_tons\": 2.3,\n  \"confidence_score\": 0.87,\n  \"methodology\": \"ndvi_based\",\n  \"calculated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
           }
+        },
+        {
+          "name": "Create Carbon Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carbon_tons\": 5.0,\n  \"confidence_score\": 0.9,\n  \"methodology\": \"soil_organic_carbon\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/carbon/{{field_id}}/create/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "carbon", "{{field_id}}", "create"]
+            },
+            "description": "Manually create a carbon sequestration record for a field.\nMethodology options: ndvi_based, soil_organic_carbon, biomass_estimation.\n\n**Response 201:**\n```json\n{\n  \"field_id\": 1,\n  \"carbon_tons\": 5.0,\n  \"confidence_score\": 0.9,\n  \"methodology\": \"soil_organic_carbon\",\n  \"calculated_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
         }
       ],
       "description": "Carbon sequestration data endpoints"
+    },
+    {
+      "name": "Soil",
+      "item": [
+        {
+          "name": "Get Soil Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/soil/{{field_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "soil", "{{field_id}}"]
+            },
+            "description": "Returns soil health data (nitrogen proxy, moisture index, degradation risk) for a field.\n\n**Response 200:**\n```json\n{\n  \"field_id\": 1,\n  \"nitrogen_proxy\": 0.62,\n  \"moisture_index\": 0.48,\n  \"degradation_risk\": \"moderate\",\n  \"recorded_at\": \"2026-06-24T00:00:00Z\"\n}\n```"
+          }
+        }
+      ],
+      "description": "Soil health data endpoints"
     },
     {
       "name": "Reports",

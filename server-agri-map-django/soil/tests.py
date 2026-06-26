@@ -27,16 +27,16 @@ class SoilTest(TestCase):
         SoilHealthRecord.objects.create(field=self.field, nitrogen_proxy=0.62, moisture_index=0.48, degradation_risk='moderate')
 
     def test_soil_health(self):
-        resp = self.client.get(f'/api/analysis/soil/{self.field.id}/', **self.headers)
+        resp = self.client.get(f'/api/soil/{self.field.id}/', **self.headers)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('nitrogen_proxy', resp.json())
         self.assertIn('moisture_index', resp.json())
         self.assertIn('degradation_risk', resp.json())
 
     def test_soil_health_not_own_field(self):
-        resp = self.client.get(f'/api/analysis/soil/{self.other_field.id}/', **self.headers)
+        resp = self.client.get(f'/api/soil/{self.other_field.id}/', **self.headers)
         self.assertEqual(resp.status_code, 404)
 
     def test_unauthenticated(self):
-        resp = self.client.get(f'/api/analysis/soil/{self.field.id}/')
+        resp = self.client.get(f'/api/soil/{self.field.id}/')
         self.assertEqual(resp.status_code, 401)

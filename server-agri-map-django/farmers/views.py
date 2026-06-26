@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -35,29 +37,29 @@ class CooperativeDetailView(generics.RetrieveAPIView):
     serializer_class = CooperativeSerializer
 
 
+def _assert_admin(cooperative, user):
+    if cooperative.created_by == user:
+        return
+    try:
+        farmer = Farmer.objects.get(user=user)
+        if CooperativeMember.objects.filter(
+            cooperative=cooperative, farmer=farmer, role='admin'
+        ).exists():
+            return
+    except Farmer.DoesNotExist:
+        pass
+    raise PermissionDenied('Only cooperative admins can manage members.')
+
+
 class CooperativeMemberListCreateView(generics.ListCreateAPIView):
     serializer_class = CooperativeMemberSerializer
 
     def get_queryset(self):
         return CooperativeMember.objects.filter(cooperative_id=self.kwargs['pk'])
 
-    def _assert_admin(self, cooperative):
-        user = self.request.user
-        if cooperative.created_by == user:
-            return
-        try:
-            farmer = Farmer.objects.get(user=user)
-            if CooperativeMember.objects.filter(
-                cooperative=cooperative, farmer=farmer, role='admin'
-            ).exists():
-                return
-        except Farmer.DoesNotExist:
-            pass
-        raise PermissionDenied('Only cooperative admins can manage members.')
-
     def perform_create(self, serializer):
         cooperative = generics.get_object_or_404(Cooperative, pk=self.kwargs['pk'])
-        self._assert_admin(cooperative)
+        _assert_admin(cooperative, self.request.user)
 
         user_id = self.request.data.get('user_id')
         if not user_id:
@@ -67,7 +69,10 @@ class CooperativeMemberListCreateView(generics.ListCreateAPIView):
         except Farmer.DoesNotExist:
             raise ValidationError({'user_id': 'User does not have a farmer profile.'})
 
-        serializer.save(cooperative=cooperative, farmer=farmer)
+        try:
+            serializer.save(cooperative=cooperative, farmer=farmer)
+        except IntegrityError:
+            raise ValidationError({'error': 'This user is already a member of this cooperative.'})
 
 
 class CooperativeMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -77,24 +82,10 @@ class CooperativeMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return CooperativeMember.objects.filter(cooperative_id=self.kwargs['pk'])
 
-    def _assert_admin(self, cooperative):
-        user = self.request.user
-        if cooperative.created_by == user:
-            return
-        try:
-            farmer = Farmer.objects.get(user=user)
-            if CooperativeMember.objects.filter(
-                cooperative=cooperative, farmer=farmer, role='admin'
-            ).exists():
-                return
-        except Farmer.DoesNotExist:
-            pass
-        raise PermissionDenied('Only cooperative admins can manage members.')
-
     def perform_update(self, serializer):
-        self._assert_admin(serializer.instance.cooperative)
+        _assert_admin(serializer.instance.cooperative, self.request.user)
         serializer.save()
 
     def perform_destroy(self, instance):
-        self._assert_admin(instance.cooperative)
+        _assert_admin(instance.cooperative, self.request.user)
         instance.delete()

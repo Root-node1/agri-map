@@ -164,6 +164,17 @@ class CooperativeMemberTest(TestCase):
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(CooperativeMember.objects.count(), 0)
 
+    def test_duplicate_member_returns_400(self):
+        CooperativeMember.objects.create(
+            cooperative=self.coop, farmer=self.member_farmer, role='member',
+        )
+        resp = self.client.post(
+            f'/api/farmers/cooperatives/{self.coop.id}/members/',
+            {'user_id': self.member_user.id},
+            **self.headers, content_type='application/json',
+        )
+        self.assertEqual(resp.status_code, 400)
+
     def test_non_admin_cannot_remove(self):
         member = CooperativeMember.objects.create(
             cooperative=self.coop, farmer=self.member_farmer, role='member',
