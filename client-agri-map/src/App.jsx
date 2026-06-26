@@ -2,10 +2,7 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import Layout from './components/layout/Layout'
-import DashboardLayout from './components/layout/DashboardLayout'
-import ProtectedRoute from './components/auth/ProtectedRoute'
-import LoadingSpinner from './components/ui/LoadingSpinner'
-
+import WelcomeLanding from './pages/public/WelcomeLanding'
 import Home from './pages/public/Home'
 import About from './pages/public/About'
 import PrivacyPolicy from './pages/public/PrivacyPolicy'
@@ -22,91 +19,155 @@ import Fields from './pages/farm/Fields'
 import FieldDetail from './pages/farm/FieldDetail'
 import HeatmapView from './pages/farm/HeatmapView'
 import SatelliteAnalysis from './pages/farm/SatelliteAnalysis'
-
-import CropDetection from './pages/ai/CropDetection'
-import SoilAnalysis from './pages/ai/SoilAnalysis'
-import YieldPrediction from './pages/ai/YieldPrediction'
-import VegetationHealth from './pages/ai/VegetationHealth'
-import FieldAnalysis from './pages/ai/FieldAnalysis'
-
-import ChatbotPage from './pages/chatbot/ChatbotPage'
-
-import Loans from './pages/finance/Loans'
-import LoanDashboard from './pages/finance/LoanDashboard'
-import CarbonMarketplace from './pages/finance/CarbonMarketplace'
-import Tokenization from './pages/finance/Tokenization'
-
-import WalletDashboard from './pages/wallet/WalletDashboard'
-
-import Pricing from './pages/subscriptions/Pricing'
-import ApiKeys from './pages/subscriptions/ApiKeys'
-
-import Settings from './pages/settings/Settings'
-
-const DashboardRouter = () => {
-  const { user } = useAuth()
-  switch (user?.role) {
-    case 'admin': return <AdminDashboard />
-    case 'cooperative': return <CooperativeDashboard />
-    case 'investor': return <FarmerDashboard />
-    default: return <FarmerDashboard />
-  }
-}
-
-const AppShell = ({ children }) => (
-  <DashboardLayout>{children}</DashboardLayout>
-)
+import FieldDetails from './pages/farm/FieldDetails'
+import FieldReport from './pages/farm/FieldReport'
+import NewField from './pages/farm/NewField'
+import FarmerProfileSetup from './pages/farm/FarmerProfileSetup'
+import Cooperatives from './pages/public/Cooperatives'
+import CooperativeDetails from './pages/public/CooperativeDetails'
+import CooperativeRegister from './pages/public/CooperativeRegister'
+import Settings from './pages/public/Settings'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 
 function App() {
-  const { loading } = useAuth()
+  const { user, needsFarmerProfile } = useAuth()
 
-  if (loading) {
-    return (
-      <div className="page-shell page-shell-dark min-h-screen">
-        <LoadingSpinner fullScreen message="Loading AgriMap..." />
-      </div>
-    )
+  const renderDashboard = () => {
+    switch (user?.role) {
+      case 'admin':
+        return <AdminDashboard />
+      case 'cooperative':
+        return <CooperativeDashboard />
+      default:
+        return <FarmerDashboard />
+    }
   }
 
   return (
-    <Routes>
-      {/* Public routes with marketing layout */}
-      <Route path="/" element={<Layout><Home /></Layout>} />
-      <Route path="/about" element={<Layout><About /></Layout>} />
-      <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
-      <Route path="/terms" element={<Layout><TermsConditions /></Layout>} />
-      <Route path="/login" element={<Layout><Login /></Layout>} />
-      <Route path="/signup" element={<Layout><Signup /></Layout>} />
-      <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
-      <Route path="/subscriptions" element={<Layout><Pricing /></Layout>} />
+    <Layout>
+      <Routes>
+        {/* Logged-out visitors land on the welcome tag before login/register.
+            Logged-in farmers who still need to complete profile are sent to the
+            farmer registration step before they can use the dashboard. */}
+        <Route
+          path="/"
+          element={
+            user ? (
+              needsFarmerProfile ? <Navigate to="/farmer/register" replace /> : <Navigate to="/dashboard" replace />
+            ) : (
+              <WelcomeLanding />
+            )
+          }
+        />
+        <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsConditions />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Signup />} />
+        <Route path="/signup" element={<Signup />} />
 
-      {/* Protected dashboard routes */}
-      <Route path="/dashboard" element={<ProtectedRoute><AppShell><DashboardRouter /></AppShell></ProtectedRoute>} />
-      <Route path="/fields" element={<ProtectedRoute><AppShell><Fields /></AppShell></ProtectedRoute>} />
-      <Route path="/fields/:id" element={<ProtectedRoute><AppShell><FieldDetail /></AppShell></ProtectedRoute>} />
-      <Route path="/heatmap" element={<ProtectedRoute><AppShell><HeatmapView /></AppShell></ProtectedRoute>} />
-      <Route path="/satellite" element={<ProtectedRoute><AppShell><SatelliteAnalysis /></AppShell></ProtectedRoute>} />
+        {/* Farmer profile (phone + location) is a separate, authenticated step
+            after account creation — POST /api/farmers/register/ needs a token,
+            so this can't reuse the public Signup component. */}
+        <Route
+          path="/farmer/register"
+          element={
+            <ProtectedRoute requiredRole="farmer">
+              <FarmerProfileSetup />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/ai/crop-detection" element={<ProtectedRoute><AppShell><CropDetection /></AppShell></ProtectedRoute>} />
-      <Route path="/ai/soil-analysis" element={<ProtectedRoute><AppShell><SoilAnalysis /></AppShell></ProtectedRoute>} />
-      <Route path="/ai/yield-prediction" element={<ProtectedRoute><AppShell><YieldPrediction /></AppShell></ProtectedRoute>} />
-      <Route path="/ai/vegetation" element={<ProtectedRoute><AppShell><VegetationHealth /></AppShell></ProtectedRoute>} />
-      <Route path="/ai/field-analysis" element={<ProtectedRoute><AppShell><FieldAnalysis /></AppShell></ProtectedRoute>} />
+        {/* /api/farmers/cooperatives/ is JWT-gated on the backend — these were
+            public before, which meant a logged-out visit would 401 silently. */}
+        <Route
+          path="/cooperatives"
+          element={
+            <ProtectedRoute>
+              <Cooperatives />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cooperatives/new"
+          element={
+            <ProtectedRoute>
+              <CooperativeRegister />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cooperatives/:id"
+          element={
+            <ProtectedRoute>
+              <CooperativeDetails />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/chatbot" element={<ProtectedRoute><AppShell><ChatbotPage /></AppShell></ProtectedRoute>} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              {needsFarmerProfile ? <Navigate to="/farmer/register" replace /> : renderDashboard()}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fields"
+          element={
+            <ProtectedRoute>
+              <Fields />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fields/new"
+          element={
+            <ProtectedRoute>
+              <NewField />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fields/:id"
+          element={
+            <ProtectedRoute>
+              <FieldDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fields/:id/report"
+          element={
+            <ProtectedRoute>
+              <FieldReport />
+            </ProtectedRoute>
+          }
+        />
+        {/* SatelliteAnalysis was imported but had no route — wiring it in
+            under the field it analyzes, matching the Satellite tab flow. */}
+        <Route
+          path="/fields/:id/satellite"
+          element={
+            <ProtectedRoute>
+              <SatelliteAnalysis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/finance/loans" element={<ProtectedRoute><AppShell><Loans /></AppShell></ProtectedRoute>} />
-      <Route path="/finance/loans/dashboard" element={<ProtectedRoute><AppShell><LoanDashboard /></AppShell></ProtectedRoute>} />
-      <Route path="/finance/carbon" element={<ProtectedRoute><AppShell><CarbonMarketplace /></AppShell></ProtectedRoute>} />
-      <Route path="/finance/tokenize" element={<ProtectedRoute><AppShell><Tokenization /></AppShell></ProtectedRoute>} />
-
-      <Route path="/wallet" element={<ProtectedRoute><AppShell><WalletDashboard /></AppShell></ProtectedRoute>} />
-
-      <Route path="/api-keys" element={<ProtectedRoute><AppShell><ApiKeys /></AppShell></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><AppShell><Settings /></AppShell></ProtectedRoute>} />
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   )
 }
 

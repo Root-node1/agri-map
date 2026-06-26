@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .models import ProcessingJob, SatelliteImage
+
 
 class FetchImageryInputSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()
@@ -35,14 +37,28 @@ class ProcessImageryInputSerializer(serializers.Serializer):
 
 
 class _ProcessResultSerializer(serializers.Serializer):
-    cloud_masking = serializers.CharField()
-    bands_extracted = serializers.ListField(child=serializers.CharField())
     ndvi_calculated = serializers.FloatField()
     evi_calculated = serializers.FloatField()
     images_processed = serializers.IntegerField()
+    image_ids_processed = serializers.ListField(child=serializers.IntegerField(), required=False)
+    vegetation_index_dates = serializers.ListField(child=serializers.CharField(), required=False)
 
 
 class ProcessImageryResponseSerializer(serializers.Serializer):
     job_id = serializers.IntegerField()
     status = serializers.CharField()
     result = _ProcessResultSerializer()
+
+
+class SatelliteImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SatelliteImage
+        fields = '__all__'
+        read_only_fields = ('id', 'ingested_at')
+
+
+class ProcessingJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessingJob
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'completed_at')

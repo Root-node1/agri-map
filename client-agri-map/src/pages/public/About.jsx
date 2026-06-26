@@ -15,12 +15,12 @@ const About = () => {
       <div className="max-w-5xl mx-auto">
         
         {/* Header Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 border border-slate-200/10 p-8 md:p-12 mb-12 shadow-xl text-center">
+        <div className="relative overflow-hidden rounded-3xl bg-white/95 dark:bg-slate-900/90 border border-slate-200/60 dark:border-slate-800/60 p-8 md:p-12 mb-12 shadow-xl text-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
           <span className="text-xs uppercase font-bold tracking-widest text-emerald-400 mb-3 block">
             Who We Are
           </span>
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
             {t('about.title')}
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto font-light leading-relaxed text-sm md:text-base">

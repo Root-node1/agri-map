@@ -4,7 +4,6 @@ django>=4.2
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
-django-filter
 drf-spectacular
 gunicorn
 whitenoise
@@ -13,5 +12,6 @@ scikit-learn
 joblib
 numpy
 pandas
-rasterio
-shapely
+sentinelhub>=3.0
+requests
+

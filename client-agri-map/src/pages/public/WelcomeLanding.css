@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600&display=swap');
+
+.welcome-landing {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.welcome-landing__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.welcome-landing__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(20, 15, 5, 0) 35%, rgba(20, 15, 5, 0.55) 100%);
+}
+
+.welcome-landing__tag {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  z-index: 2;
+  width: min(360px, 86vw);
+  background: #f6efdd;
+  color: #1f2e1a;
+  border-radius: 4px;
+  padding: 2.25rem 1.75rem 2.25rem;
+  box-shadow: 0 24px 48px -16px rgba(15, 10, 2, 0.5);
+  transform: rotate(-1.5deg);
+  transform-origin: 80% 0%;
+  animation: tag-stake 0.8s cubic-bezier(0.22, 0.8, 0.25, 1) both;
+}
+
+.welcome-landing__eyelet {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid #c98a3d;
+  background: #f6efdd;
+}
+
+.welcome-landing__string {
+  position: absolute;
+  top: -18px;
+  left: 21px;
+  width: 1.5px;
+  height: 22px;
+  background: #c98a3d;
+  transform: rotate(15deg);
+  transform-origin: bottom center;
+}
+
+.welcome-landing__eyebrow {
+  margin: 0 0 0.35rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a5d22;
+  font-weight: 600;
+}
+
+.welcome-landing__title {
+  margin: 0 0 0.75rem;
+  font-family: 'Lora', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  line-height: 1.2;
+  color: #1f2e1a;
+}
+
+.welcome-landing__lede {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #44503a;
+}
+
+.welcome-landing__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.welcome-landing__btn {
+  border: none;
+  border-radius: 6px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.welcome-landing__btn:hover {
+  transform: translateY(-1px);
+}
+
+.welcome-landing__btn:focus-visible {
+  outline: 2px solid #c98a3d;
+  outline-offset: 2px;
+}
+
+.welcome-landing__btn--primary {
+  background: #3b6b2e;
+  color: #f6efdd;
+}
+
+.welcome-landing__btn--primary:hover {
+  background: #2f5524;
+}
+
+.welcome-landing__btn--ghost {
+  background: transparent;
+  color: #3b6b2e;
+  border: 1.5px solid #3b6b2e;
+}
+
+.welcome-landing__btn--ghost:hover {
+  background: rgba(59, 107, 46, 0.08);
+}
+
+@keyframes tag-stake {
+  from {
+    opacity: 0;
+    transform: rotate(-1.5deg) translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1.5deg) translateY(0);
+  }
+}
+
+.welcome-landing__tag.is-peeling {
+  animation: tag-peel 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes tag-peel {
+  0% {
+    opacity: 1;
+    transform: rotate(-1.5deg) translate(0, 0) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: rotate(6deg) translate(10px, -14px) scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(22deg) translate(60px, -160px) scale(0.85);
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-landing__tag {
+    left: 4%;
+    right: 4%;
+    width: auto;
+    bottom: 6%;
+    transform: rotate(-1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-landing__tag {
+    animation: none;
+    opacity: 1;
+    transform: rotate(-1.5deg) translateY(0);
+  }
+}

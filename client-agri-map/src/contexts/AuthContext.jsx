@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { authAPI } from '../services/api'
+import { farmerAPI } from '../services/djangoApi'
 
 export const AuthContext = createContext()
 
@@ -15,23 +15,33 @@ export const AuthProvider = ({ children }) => {
     else setLoading(false)
   }, [token])
 
-  const persistAuth = (payload) => {
-    const tokenResp = payload.token || payload.access
-    const refreshResp = payload.refreshToken || payload.refresh
-    const userResp = payload.user || payload
-    if (tokenResp) {
-      localStorage.setItem('token', tokenResp)
-      setToken(tokenResp)
+  const fetchFarmerProfile = async () => {
+    try {
+      const response = await farmerAPI.getProfile()
+      return response.data
+    } catch {
+      return null
     }
-    if (refreshResp) localStorage.setItem('refreshToken', refreshResp)
-    if (userResp?.email || userResp?.id) setUser(userResp)
   }
 
   const fetchUser = async () => {
     try {
-      const profile = await authAPI.profile()
-      setUser(profile.user || profile)
-    } catch {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      // Node API wraps payload in { success, statusCode, message, data }
+      const authUser = response.data.data.user || response.data.data
+      let mergedUser = authUser
+
+      if (authUser?.role === 'farmer') {
+        const farmerProfile = await fetchFarmerProfile()
+        if (farmerProfile) {
+          mergedUser = { ...authUser, phone: farmerProfile.phone, location: farmerProfile.location }
+        }
+      }
+
+      setUser(mergedUser)
+    } catch (error) {
       localStorage.removeItem('token')
       localStorage.removeItem('refreshToken')
       setToken(null)
@@ -43,10 +53,27 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, rememberMe = false) => {
     try {
-      const payload = await authAPI.login({ email, password })
-      persistAuth(payload)
-      if (rememberMe) localStorage.setItem('rememberMe', 'true')
-      return { success: true }
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        email,
+        password
+      })
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
+
+      let finalUser = userResp
+      if (userResp?.role === 'farmer') {
+        const farmerProfile = await fetchFarmerProfile()
+        if (farmerProfile) {
+          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
+        }
+      }
+
+      setUser(finalUser)
+      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
+      return { success: true, needsProfile }
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Invalid email or password. Please try again.' }
     }
@@ -54,16 +81,24 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      const payload = await authAPI.register({
-        email: userData.email,
-        password: userData.password,
-        firstName: userData.firstName || userData.name?.split(' ')[0] || '',
-        lastName: userData.lastName || userData.name?.split(' ').slice(1).join(' ') || '',
-        phone: userData.phone || '',
-        role: userData.role || 'farmer',
-      })
-      persistAuth(payload)
-      return { success: true }
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, userData)
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
+
+      let finalUser = userResp
+      if (userResp?.role === 'farmer') {
+        const farmerProfile = await fetchFarmerProfile()
+        if (farmerProfile) {
+          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
+        }
+      }
+
+      setUser(finalUser)
+      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
+      return { success: true, needsProfile }
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Registration failed. Please check your details.' }
     }
@@ -71,24 +106,26 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = async (credentialResponse) => {
     try {
-      const payload = await authAPI.googleLogin(credentialResponse.credential)
-      persistAuth(payload)
-      return { success: true }
-    } catch (error) {
-      try {
-        const payload = await authAPI.firebaseLogin({ credential: credentialResponse.credential })
-        persistAuth(payload)
-        return { success: true }
-      } catch {
-        return { success: false, error: error.response?.data?.message || 'Google authentication failed.' }
-      }
-    }
-  }
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
+        credential: credentialResponse.credential
+      })
+      const payload = response.data.data
+      const tokenResp = payload.token
+      const userResp = payload.user
+      localStorage.setItem('token', tokenResp)
+      setToken(tokenResp)
 
-  const forgotPassword = async (email) => {
-    try {
-      await authAPI.forgotPassword(email)
-      return { success: true }
+      let finalUser = userResp
+      if (userResp?.role === 'farmer') {
+        const farmerProfile = await fetchFarmerProfile()
+        if (farmerProfile) {
+          finalUser = { ...userResp, phone: farmerProfile.phone, location: farmerProfile.location }
+        }
+      }
+
+      setUser(finalUser)
+      const needsProfile = userResp?.role === 'farmer' && (!finalUser?.phone || !finalUser?.location)
+      return { success: true, needsProfile }
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Unable to send reset email.' }
     }
@@ -101,6 +138,33 @@ export const AuthProvider = ({ children }) => {
     setToken(null)
     setUser(null)
     navigate('/login')
+  }
+
+  const completeFarmerProfile = async (profileData) => {
+    try {
+      const response = await farmerAPI.register(profileData)
+      const farmerProfile = response.data
+      setUser((prevUser) => ({ ...prevUser, ...farmerProfile }))
+      return { success: true, farmerProfile }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message || 'Failed to complete farmer profile' }
+    }
+  }
+
+  const isFarmer = user?.role === 'farmer'
+  const needsFarmerProfile = isFarmer && (!user?.phone || !user?.location)
+
+  const value = {
+    user,
+    loading,
+    login,
+    signup,
+    googleLogin,
+    logout,
+    completeFarmerProfile,
+    needsFarmerProfile,
+    isAuthenticated: !!user,
+    isAdmin: user?.role === 'admin'
   }
 
   return (

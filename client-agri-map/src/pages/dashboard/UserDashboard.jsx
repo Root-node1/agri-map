@@ -14,10 +14,10 @@ const UserDashboard = () => {
   ]
 
   return (
-    <div className="dashboard user-dashboard">
-      <header className="dashboard-header glass">
-        <h1>Welcome, {user?.name}!</h1>
-        <p>Your agricultural dashboard</p>
+    <div className="page-shell page-shell-dark max-w-6xl mx-auto px-4 py-8">
+      <header className="dashboard-header glass-card rounded-[2rem] p-8 mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome, {user?.name}!</h1>
+        <p className="text-slate-600 dark:text-slate-300">Your agricultural dashboard</p>
       </header>
 
       <div className="stats-grid">
@@ -39,9 +39,9 @@ const UserDashboard = () => {
       </div>
 
       <div className="dashboard-content">
-        <div className="recent-activity glass">
-          <h2>Recent Activity</h2>
-          <ul>
+        <div className="recent-activity glass-card rounded-[2rem] p-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Recent Activity</h2>
+          <ul className="mt-4 space-y-3 text-slate-600 dark:text-slate-300">
             <li>🌱 Planted new crop in Field A</li>
             <li>📊 Updated harvest data</li>
             <li>🚜 Equipment maintenance scheduled</li>
@@ -49,8 +49,8 @@ const UserDashboard = () => {
           </ul>
         </div>
 
-        <div className="quick-actions glass">
-          <h2>Quick Actions</h2>
+        <div className="quick-actions glass-card rounded-[2rem] p-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Quick Actions</h2>
           <div className="action-grid">
             <button className="action-btn">Add Field</button>
             <button className="action-btn">Log Harvest</button>

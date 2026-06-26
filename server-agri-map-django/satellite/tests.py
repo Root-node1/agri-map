@@ -62,3 +62,41 @@ class SatelliteTest(TestCase):
     def test_unauthenticated(self):
         resp = self.client.post('/api/satellite/fetch/', {'field_id': 1}, content_type='application/json')
         self.assertEqual(resp.status_code, 401)
+
+    def test_list_images(self):
+        self.client.post('/api/satellite/fetch/', {
+            'field_id': self.field.id,
+        }, **self.headers, content_type='application/json')
+        resp = self.client.get('/api/satellite/images/', **self.headers)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.json()['results']), 1)
+
+    def test_image_detail(self):
+        self.client.post('/api/satellite/fetch/', {
+            'field_id': self.field.id,
+        }, **self.headers, content_type='application/json')
+        img_resp = self.client.get('/api/satellite/images/', **self.headers)
+        image_id = img_resp.json()['results'][0]['id']
+        resp = self.client.get(f'/api/satellite/images/{image_id}/', **self.headers)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('bands', resp.json())
+
+    def test_delete_image(self):
+        self.client.post('/api/satellite/fetch/', {
+            'field_id': self.field.id,
+        }, **self.headers, content_type='application/json')
+        img_resp = self.client.get('/api/satellite/images/', **self.headers)
+        image_id = img_resp.json()['results'][0]['id']
+        resp = self.client.delete(f'/api/satellite/images/{image_id}/', **self.headers)
+        self.assertEqual(resp.status_code, 204)
+
+    def test_list_jobs(self):
+        self.client.post('/api/satellite/fetch/', {
+            'field_id': self.field.id,
+        }, **self.headers, content_type='application/json')
+        self.client.post('/api/satellite/process/', {
+            'field_id': self.field.id,
+        }, **self.headers, content_type='application/json')
+        resp = self.client.get('/api/satellite/jobs/', **self.headers)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.json()['results']), 1)
