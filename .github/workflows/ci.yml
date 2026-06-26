@@ -52,15 +52,21 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Django dependencies
+        working-directory: ./server-agri-map-django
         run: |
-          cd server-agri-map-django
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found, skipping Django dependency install."; fi
+          pip install -r requirements.txt
 
       - name: Run Django tests
+        working-directory: ./server-agri-map-django
+        env:
+          DATABASE_URL: sqlite:///test_db.sqlite3
+          SECRET_KEY: ci-test-key
+          DEBUG: False
+          ALLOWED_HOSTS: localhost
+          CORS_ALLOWED_ORIGINS: http://localhost:3000
         run: |
-          cd server-agri-map-django
-          if [ -f manage.py ]; then python manage.py test; else echo "No Django app detected, skipping Django test step."; fi
+          python manage.py test
 
   build-docker:
     name: build-docker
