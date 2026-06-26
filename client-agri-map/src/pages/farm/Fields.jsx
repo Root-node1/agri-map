@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaSearch, FaTh, FaList } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import PageHeader from '../../components/ui/PageHeader'
@@ -9,7 +8,6 @@ import { fieldAPI } from '../../services/api'
 import { demoFields } from '../../lib/demoData'
 
 const Fields = () => {
-  const { t } = useTranslation()
   const [fields, setFields] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -62,11 +60,11 @@ const Fields = () => {
     <div className="page-shell page-shell-dark">
       <PageHeader
         eyebrow="Field Management"
-        title={t('fields.title') || 'My Fields'}
+        title="My Fields"
         description="Track field details, crop health, and satellite insights"
         actions={
           <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-            <FaPlus className="text-sm" /> {t('fields.addField') || 'Add Field'}
+            <FaPlus className="text-sm" /> Add Field
           </button>
         }
       />
