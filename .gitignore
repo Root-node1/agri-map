@@ -25,3 +25,5 @@ Thumbs.db
 *.log
 .env
 .opencode/
+
+node_modules/
