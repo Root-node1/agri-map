@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaSearch, FaTh, FaList } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import PageHeader from '../../components/ui/PageHeader'
@@ -9,7 +8,6 @@ import { fieldAPI } from '../../services/api'
 import { demoFields } from '../../lib/demoData'
 
 const Fields = () => {
-  const { t } = useTranslation()
   const [fields, setFields] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -38,7 +36,9 @@ const Fields = () => {
     e.preventDefault()
     try {
       await fieldAPI.create(newField)
-    } catch { /* demo mode */ }
+    } catch (error) {
+      console.error('Error adding field:', error)
+    }
     setFields((prev) => [...prev, { ...newField, id: Date.now(), health: 85, soilHealth: 'Good' }])
     setShowAddModal(false)
     setNewField({ name: '', location: '', size: '', cropType: '' })
@@ -46,7 +46,11 @@ const Fields = () => {
 
   const handleDeleteField = async (id) => {
     if (!window.confirm('Delete this field?')) return
-    try { await fieldAPI.delete(id) } catch { /* demo */ }
+    try {
+      await fieldAPI.delete(id)
+    } catch (error) {
+      console.error('Error deleting field:', error)
+    }
     setFields((prev) => prev.filter((f) => f.id !== id))
   }
 
@@ -56,11 +60,11 @@ const Fields = () => {
     <div className="page-shell page-shell-dark">
       <PageHeader
         eyebrow="Field Management"
-        title={t('fields.title') || 'My Fields'}
+        title="My Fields"
         description="Track field details, crop health, and satellite insights"
         actions={
           <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-            <FaPlus className="text-sm" /> {t('fields.addField') || 'Add Field'}
+            <FaPlus className="text-sm" /> Add Field
           </button>
         }
       />
@@ -147,7 +151,6 @@ const Fields = () => {
                   </button>
                 </div>
               </div>
-              
               <div className="space-y-2 text-sm text-slate-300">
                 <p><span className="text-slate-500">Crop:</span> {field.cropType || 'Not set'}</p>
                 <p><span className="text-slate-500">Location:</span> {field.location || 'Not set'}</p>

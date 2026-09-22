@@ -21,10 +21,6 @@ RUN pip install --no-cache-dir --default-timeout=180 -r requirements.txt || \
 # Copy application code
 COPY server-agri-map-django/ .
 
-# Create .env file with default values
-RUN echo "SECRET_KEY=django-insecure-dev-key-12345" > .env && \
-    echo "DEBUG=True" >> .env && \
-    echo "DATABASE_URL=sqlite:///db.sqlite3" >> .env
 
 # Expose port
 EXPOSE 8000

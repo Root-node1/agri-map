@@ -47,6 +47,13 @@ export const walletAPI = {
 }
 
 // Health check
+// Chatbot endpoints
+export const chatbotAPI = {
+  sendMessage: (message, context) => nodeApi.post('/chatbot/message', { message, context }).then(res => res.data.data),
+  getHistory: () => nodeApi.get('/chatbot/history').then(res => res.data.data),
+  clearHistory: () => nodeApi.delete('/chatbot/history').then(res => res.data.data),
+}
+
 export const nodeHealthAPI = {
   check: () => nodeApi.get('/health'),
 }

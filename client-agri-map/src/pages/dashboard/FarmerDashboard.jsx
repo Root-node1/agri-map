@@ -48,33 +48,19 @@ const FarmerDashboard = () => {
   if (loading) return <LoadingSpinner fullScreen message="Loading dashboard..." />
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 page-shell page-shell-dark">
-      {/* Header */}
-      <div className="glass-card rounded-[2rem] p-8 mb-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold mb-2 text-slate-900 dark:text-white">
-              Welcome, {user?.firstName || user?.name || 'Farmer'}!
-            </h1>
-            <p className="text-slate-600 dark:text-slate-300">Your agricultural intelligence overview</p>
-          </div>
-          <div className="inline-flex items-center gap-3 rounded-full bg-slate-100/90 dark:bg-white/10 px-4 py-3 text-sm text-slate-900 dark:text-slate-200 border border-slate-200/70 dark:border-white/10">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-            {apiLatency != null ? `LIVE · ${apiLatency}ms` : 'Live insights active'}
-          </div>
-        </div>
-      </div>
+    <div className="page-shell page-shell-dark">
+      <PageHeader
+        eyebrow="Live Dashboard"
+        title={`Welcome, ${user?.firstName || user?.name || 'Farmer'}!`}
+        description="Your agricultural intelligence overview"
+        actions={
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300 border border-emerald-500/20">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+            LIVE {apiLatency != null && `· ${apiLatency}ms`}
+          </span>
+        }
+      />
 
-      {/* Hero Image */}
-      <div className="glass-card rounded-[2rem] overflow-hidden mb-10">
-        <img
-          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
-          alt="Kenyan farmers working in a field"
-          className="w-full h-64 object-cover sm:h-72"
-        />
-      </div>
-
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard 
           icon={<FaTractor className="text-2xl" />} 
@@ -101,9 +87,7 @@ const FarmerDashboard = () => {
         />
       </div>
 
-      {/* Field Map & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Field Map */}
         <div className="frosted-panel lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Field Map</h2>

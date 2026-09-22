@@ -24,3 +24,4 @@ server-agri-map-django/.env
 Thumbs.db
 *.log
 .env
+.opencode/

@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { GoogleLogin } from '@react-oauth/google'
-import { FaEnvelope, FaLock } from 'react-icons/fa'
+import { FaEnvelope, FaLock, FaGoogle, FaFacebook, FaApple } from 'react-icons/fa'
+import { motion } from 'framer-motion'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -18,124 +19,154 @@ const Login = () => {
     setError('')
     setLoading(true)
 
-    const result = await login(email, password, rememberMe)
-    if (!result.success) {
-      setError(result.error)
+    try {
+      const result = await login(email, password)
+      if (result.success) {
+        navigate('/dashboard')
+      } else {
+        setError(result.error || 'Login failed')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setLoading(false)
-    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
   }
 
-  const handleGoogleSuccess = async (response) => {
-    setLoading(true)
-    const result = await googleLogin(response)
-    if (!result.success) {
-      setError(result.error)
-      setLoading(false)
-      return
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const result = await googleLogin(credentialResponse.credential)
+      if (result.success) {
+        navigate('/dashboard')
+      } else {
+        setError('Google login failed')
+      }
+    } catch (err) {
+      setError('Google login error')
     }
+  }
 
-    setLoading(false)
-    navigate(result.needsProfile ? '/farmer/register' : '/dashboard')
+  const handleGoogleError = () => {
+    setError('Google login failed. Please try again.')
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center page-shell page-shell-dark px-4 py-12">
-      <div className="mobile-card w-full max-w-md overflow-hidden rounded-[2rem]">
-        <div className="bg-gradient-to-br from-green-600 via-slate-950 to-slate-900 px-8 py-10 text-center">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">Welcome Back</h1>
-          <p className="text-sm text-emerald-200/90">Sign in to access your platform dashboard</p>
-        </div>
-        <div className="p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <div className="frosted-panel p-8 rounded-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+            <p className="text-slate-400 mt-2">Sign in to your AgriMap account</p>
+          </div>
+
           {error && (
-            <div className="bg-rose-50/10 border border-rose-200/10 text-rose-100 p-3.5 rounded-3xl text-sm font-medium">
+            <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl mb-4">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Email Address
               </label>
               <div className="relative">
-                <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm" />
+                <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                  placeholder="name@domain.com"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
+                  placeholder="you@example.com"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-1">
                 Password
               </label>
               <div className="relative">
-                <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm" />
+                <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
                   placeholder="••••••••"
                   required
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-slate-400">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 accent-emerald-500 rounded"
+                  className="rounded border-white/10"
                 />
                 Remember me
               </label>
-              <Link to="/forgot-password" className="text-emerald-300 hover:text-white font-medium">
+              <Link to="/forgot-password" className="text-sm text-emerald-400 hover:text-emerald-300">
                 Forgot password?
               </Link>
             </div>
 
             <button
               type="submit"
-              className="w-full btn-primary disabled:opacity-60"
               disabled={loading}
+              className="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition disabled:opacity-50"
             >
-              {loading ? 'Authenticating...' : 'Sign In'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <div className="relative my-8">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700"></div>
+              <div className="w-full border-t border-white/10"></div>
             </div>
-            <div className="relative flex justify-center text-[0.65rem] uppercase tracking-[0.35em] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-900 dark:text-slate-300 px-3">
-              Third Party
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-slate-800 text-slate-400">Or continue with</span>
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google authentication failed')} />
+          <div className="space-y-3">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              theme="filled_black"
+              shape="pill"
+              width="100%"
+              text="continue_with"
+              locale="en"
+            />
+
+            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition">
+              <FaFacebook className="text-blue-400" />
+              <span className="text-sm text-white">Continue with Facebook</span>
+            </button>
+
+            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition">
+              <FaApple className="text-white" />
+              <span className="text-sm text-white">Continue with Apple</span>
+            </button>
           </div>
 
-          <p className="text-center text-sm text-slate-400 font-light mt-8">
-            Need a registration profile?{' '}
-            <Link to="/register" className="text-emerald-300 font-semibold hover:text-white">
-              Register Here
+          <p className="text-center text-slate-400 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
+              Sign up
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
