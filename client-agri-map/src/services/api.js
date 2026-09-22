@@ -93,6 +93,12 @@ export const walletAPI = {
   transfer: (data) => api.post('/api/wallet/transfer/', data).then(unwrap),
 }
 
+// Satellite API
+export const satelliteAPI = {
+  fetch: (data) => api.post('/api/satellite/fetch/', data).then(unwrap),
+  process: (data) => api.post('/api/satellite/process/', data).then(unwrap),
+}
+
 export default {
   authAPI,
   fieldAPI,
