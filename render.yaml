@@ -21,10 +21,6 @@ services:
         value: 7d
       - key: JWT_REFRESH_EXPIRE
         value: 30d
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_PUBLISHABLE_KEY
-        sync: false
       - key: DJANGO_API_URL
         sync: false
       - key: DJANGO_API_KEY
