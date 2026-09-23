@@ -16,6 +16,7 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=development
+      - PORT=3001                   # ← add this
     depends_on:
       - client
 
@@ -29,6 +30,12 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agrimap"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   django-backend:
     build:
@@ -41,9 +48,14 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=server_agri_map_django.settings.local
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/agrimap
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8002"
     depends_on:
-      - postgres
-      - node-backend
+      postgres:
+        condition: service_healthy
+      node-backend:
+        condition: service_started
 
 volumes:
   pgdata:
