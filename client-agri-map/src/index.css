@@ -1,3 +1,6 @@
+/* Design-system typography — see design-system/agrimap/MASTER.md */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,12 +11,42 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body, 'Fira Sans'), 'Inter', system-ui, -apple-system, sans-serif;
     background-color: #f7fafc;
     color: #111827;
     transition: background-color 0.3s, color 0.3s;
+  }
+
+  /* Design-system rule: every clickable element shows a pointer cursor.
+     Disabled controls are excluded so they never look actionable. */
+  button,
+  a,
+  [role='button'],
+  [role='tab'],
+  [role='menuitem'],
+  label[for],
+  summary,
+  select,
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='submit'],
+  input[type='button'],
+  input[type='reset'] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled='true'],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading, 'Fira Code'), 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.015em;
   }
   
   .dark body {
