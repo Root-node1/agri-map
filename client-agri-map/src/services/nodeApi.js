@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const NODE_API_URL = import.meta.env.VITE_NODE_API_URL || 'http://localhost:5000/api'
+const NODE_API_URL = import.meta.env.VITE_NODE_API_URL
+if (!NODE_API_URL) {
+  console.error('[nodeApi] VITE_NODE_API_URL is not set. Configure it in your environment.')
+}
 
 const nodeApi = axios.create({
   baseURL: NODE_API_URL,

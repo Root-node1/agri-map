@@ -9,22 +9,22 @@ const Home = () => {
 
   const features = [
     {
-      icon: <FaSeedling className="text-3xl" />,
+      icon: <FaSeedling className="text-3xl" aria-hidden="true" />,
       title: 'Crop Detection',
       description: 'Identify crops with 92% accuracy using AI'
     },
     {
-      icon: <FaLeaf className="text-3xl" />,
+      icon: <FaLeaf className="text-3xl" aria-hidden="true" />,
       title: 'Soil Analysis',
       description: 'Get detailed soil health reports'
     },
     {
-      icon: <FaWallet className="text-3xl" />,
+      icon: <FaWallet className="text-3xl" aria-hidden="true" />,
       title: 'Green Financing',
       description: 'Access loans and carbon credits'
     },
     {
-      icon: <FaRobot className="text-3xl" />,
+      icon: <FaRobot className="text-3xl" aria-hidden="true" />,
       title: 'AI Assistant',
       description: 'Get instant farming advice from our AI'
     }
@@ -37,9 +37,10 @@ const Home = () => {
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-bold text-white mb-6"
+          className="text-4xl sm:text-5xl font-bold text-white mb-6 flex items-center justify-center gap-3"
         >
-          🌾 Welcome to AgriMap
+          <FaSeedling className="text-5xl text-emerald-400" aria-hidden="true" />
+          <span>Welcome to AgriMap</span>
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0 }}
@@ -55,15 +56,15 @@ const Home = () => {
           transition={{ delay: 0.4 }}
         >
           {isAuthenticated ? (
-            <Link to="/dashboard" className="btn-primary text-lg">
+            <Link to="/dashboard" className="btn-primary text-lg focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
               Go to Dashboard <FaArrowRight className="inline ml-2" />
             </Link>
           ) : (
             <div className="flex gap-4 justify-center flex-wrap">
-              <Link to="/register" className="btn-primary text-lg">
+              <Link to="/register" className="btn-primary text-lg focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
                 Get Started <FaArrowRight className="inline ml-2" />
               </Link>
-              <Link to="/login" className="btn-secondary text-lg">
+              <Link to="/login" className="btn-secondary text-lg focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
                 Sign In
               </Link>
             </div>

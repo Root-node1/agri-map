@@ -62,8 +62,8 @@ const Fields = () => {
         eyebrow="Field Management"
         title="My Fields"
         description="Track field details, crop health, and satellite insights"
-        actions={
-          <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+          actions={
+          <button className="btn-primary focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900" onClick={() => setShowAddModal(true)}>
             <FaPlus className="text-sm" /> Add Field
           </button>
         }
@@ -78,7 +78,7 @@ const Fields = () => {
             placeholder="Search fields..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 outline-none text-slate-100"
+            className="w-full pl-12 pr-4 py-3 rounded-3xl input-floating focus:ring-2 focus:ring-emerald-400 focus-visible:outline-none text-slate-100"
             aria-label="Search fields"
           />
         </div>
@@ -100,14 +100,14 @@ const Fields = () => {
           <div className="flex rounded-3xl overflow-hidden border border-white/10">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-4 py-3 ${viewMode === 'grid' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-3 ${viewMode === 'grid' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'} focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none`}
               aria-label="Grid view"
             >
               <FaTh />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-4 py-3 ${viewMode === 'list' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-3 ${viewMode === 'list' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'} focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none`}
               aria-label="List view"
             >
               <FaList />
@@ -120,10 +120,7 @@ const Fields = () => {
       {filteredFields.length === 0 ? (
         <div className="frosted-panel text-center py-16">
           <p className="text-slate-300 text-lg">No fields found</p>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="btn-primary mt-4"
-          >
+          <button className="btn-primary mt-4 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900" onClick={() => setShowAddModal(true)}>
             <FaPlus className="mr-2" /> Add Your First Field
           </button>
         </div>
@@ -137,16 +134,16 @@ const Fields = () => {
               transition={{ delay: index * 0.05 }}
               className="frosted-panel hover:shadow-xl transition-all"
             >
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold text-white">{field.name}</h3>
                 <div className="flex gap-2">
-                  <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300">
+                  <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:rounded focus-visible:outline-none">
                     <FaEye />
                   </Link>
-                  <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300">
+                  <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:rounded focus-visible:outline-none">
                     <FaEdit />
                   </Link>
-                  <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300">
+                  <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:rounded focus-visible:outline-none">
                     <FaTrash />
                   </button>
                 </div>
@@ -198,19 +195,19 @@ const Fields = () => {
                       {field.health || 85}%
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300">
-                        <FaEye />
-                      </Link>
-                      <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300">
-                        <FaEdit />
-                      </Link>
-                      <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300">
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </td>
+                   <td className="py-3 px-4">
+                      <div className="flex gap-2">
+                        <Link to={`/fields/${field.id}`} className="text-emerald-400 hover:text-emerald-300 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:rounded focus-visible:outline-none">
+                          <FaEye />
+                        </Link>
+                        <Link to={`/fields/${field.id}/edit`} className="text-blue-400 hover:text-blue-300 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:rounded focus-visible:outline-none">
+                          <FaEdit />
+                        </Link>
+                        <button onClick={() => handleDeleteField(field.id)} className="text-red-400 hover:text-red-300 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:rounded focus-visible:outline-none">
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
                 </tr>
               ))}
             </tbody>
@@ -230,7 +227,7 @@ const Fields = () => {
                   placeholder="Field Name"
                   value={newField.name}
                   onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                   required
                 />
                 <input
@@ -238,26 +235,26 @@ const Fields = () => {
                   placeholder="Crop Type"
                   value={newField.cropType}
                   onChange={(e) => setNewField({ ...newField, cropType: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                 />
                 <input
                   type="text"
                   placeholder="Location"
                   value={newField.location}
                   onChange={(e) => setNewField({ ...newField, location: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                 />
                 <input
                   type="text"
                   placeholder="Size (ha)"
                   value={newField.size}
                   onChange={(e) => setNewField({ ...newField, size: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                 />
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="submit" className="btn-primary flex-1">Add Field</button>
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary flex-1">Cancel</button>
+                <button type="submit" className="btn-primary flex-1 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">Add Field</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary flex-1 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">Cancel</button>
               </div>
             </form>
           </div>

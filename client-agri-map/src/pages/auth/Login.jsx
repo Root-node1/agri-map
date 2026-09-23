@@ -75,12 +75,12 @@ const Login = () => {
                 Email Address
               </label>
               <div className="relative">
-                <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                   placeholder="you@example.com"
                   required
                 />
@@ -92,12 +92,12 @@ const Login = () => {
                 Password
               </label>
               <div className="relative">
-                <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus-visible:outline-none"
                   placeholder="••••••••"
                   required
                 />
@@ -110,11 +110,11 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-white/10"
+                  className="rounded border-white/10 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                 />
                 Remember me
               </label>
-              <Link to="/forgot-password" className="text-sm text-emerald-400 hover:text-emerald-300">
+              <Link to="/forgot-password" className="text-sm text-emerald-400 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded">
                 Forgot password?
               </Link>
             </div>
@@ -122,7 +122,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition disabled:opacity-50"
+              className="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -148,12 +148,12 @@ const Login = () => {
               locale="en"
             />
 
-            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition">
+            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
               <FaFacebook className="text-blue-400" />
               <span className="text-sm text-white">Continue with Facebook</span>
             </button>
 
-            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition">
+            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
               <FaApple className="text-white" />
               <span className="text-sm text-white">Continue with Apple</span>
             </button>
@@ -161,7 +161,7 @@ const Login = () => {
 
           <p className="text-center text-slate-400 mt-6">
             Don't have an account?{' '}
-            <Link to="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
+            <Link to="/register" className="text-emerald-400 hover:text-emerald-300 font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded">
               Sign up
             </Link>
           </p>

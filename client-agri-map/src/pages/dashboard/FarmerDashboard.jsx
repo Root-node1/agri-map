@@ -91,7 +91,7 @@ const FarmerDashboard = () => {
         <div className="frosted-panel lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Field Map</h2>
-            <Link to="/fields" className="text-sm text-emerald-300 hover:text-white">View all</Link>
+            <Link to="/fields" className="text-sm text-emerald-300 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded">View all</Link>
           </div>
           <FieldMap
             center={[-1.2864, 36.8172]}
@@ -127,10 +127,10 @@ const FarmerDashboard = () => {
       <div className="frosted-panel">
         <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Link to="/fields" className="btn-secondary justify-center"><FaPlus /> Add Field</Link>
-          <Link to="/finance/loans" className="btn-secondary justify-center">Apply Loan</Link>
-          <Link to="/finance/tokenize" className="btn-secondary justify-center">Tokenize Credits</Link>
-          <button className="btn-secondary justify-center" aria-label="Export reports"><FaFileExport /> Export</button>
+          <Link to="/fields" className="btn-secondary justify-center focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"><FaPlus /> Add Field</Link>
+          <Link to="/finance/loans" className="btn-secondary justify-center focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">Apply Loan</Link>
+          <Link to="/finance/tokenize" className="btn-secondary justify-center focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">Tokenize Credits</Link>
+          <button className="btn-secondary justify-center focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900" aria-label="Export reports"><FaFileExport /> Export</button>
         </div>
       </div>
     </div>
