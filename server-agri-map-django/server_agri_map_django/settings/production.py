@@ -2,9 +2,10 @@ from .base import *
 
 DEBUG = False
 
-INSTALLED_APPS = DJANGO_APPS + [
-    'django.contrib.gis',
-] + THIRD_PARTY_APPS + PROJECT_APPS
+# Render terminates TLS at its proxy and forwards plain HTTP internally.
+# Without this, SECURE_SSL_REDIRECT would 301 Render's own health checks
+# and the deploy would never pass as healthy.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
