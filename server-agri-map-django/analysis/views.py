@@ -33,7 +33,7 @@ class VegetationIndexView(APIView):
     serializer_class = serializers.Serializer
     def get(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=404)
 
@@ -59,7 +59,7 @@ class CropTypeView(APIView):
     serializer_class = CropTypeInputSerializer
     def post(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -67,7 +67,7 @@ class CropTypeView(APIView):
         if not serializer.is_valid():
             return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = predict_crop(field_id=field.id, user=request.user, **serializer.validated_data)
+        result = predict_crop(field_id=field.id, **serializer.validated_data)
 
         logger.info(
             'CropTypeView — field=%s crop=%s confidence=%.4f',
@@ -94,7 +94,7 @@ class SoilCompositionView(APIView):
     serializer_class = MLInputSerializer
     def post(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -102,7 +102,7 @@ class SoilCompositionView(APIView):
         if not serializer.is_valid():
             return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = predict_soil(field_id=field.id, user=request.user, **serializer.validated_data)
+        result = predict_soil(field_id=field.id, **serializer.validated_data)
 
         return Response({
             'field_id': field.id,
@@ -124,7 +124,7 @@ class CropAreaView(APIView):
     serializer_class = MLInputSerializer
     def post(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -132,7 +132,7 @@ class CropAreaView(APIView):
         if not serializer.is_valid():
             return Response({'error': 'Invalid input', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = predict_crop_area(field_id=field.id, user=request.user, **serializer.validated_data)
+        result = predict_crop_area(field_id=field.id, **serializer.validated_data)
 
         logger.info(
             'CropAreaView — field=%s crop=%s confidence=%.4f',
@@ -158,7 +158,7 @@ class BoundaryView(APIView):
     serializer_class = serializers.Serializer
     def get(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=404)
 
@@ -183,7 +183,7 @@ class VegetationTrendsView(APIView):
     serializer_class = serializers.Serializer
     def get(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=404)
 
@@ -213,7 +213,7 @@ class DegradationView(APIView):
     serializer_class = serializers.Serializer
     def get(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=404)
 
