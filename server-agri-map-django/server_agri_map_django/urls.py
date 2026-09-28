@@ -7,7 +7,6 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/health/', views.health, name='health'),
-    path('api/auth/', include('accounts.urls')),
     path('api/farmers/', include('farmers.urls')),
     path('api/fields/', include('fields.urls')),
     path('api/satellite/', include('satellite.urls')),

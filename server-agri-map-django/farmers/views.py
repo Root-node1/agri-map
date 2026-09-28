@@ -1,8 +1,10 @@
 from django.db import IntegrityError
 
-from rest_framework import generics, permissions, status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+from server_agri_map_django.open_access import resolve_user
 
 from .models import Cooperative, CooperativeMember, Farmer
 from .serializers import CooperativeMemberSerializer, CooperativeSerializer, FarmerSerializer
@@ -10,17 +12,16 @@ from .serializers import CooperativeMemberSerializer, CooperativeSerializer, Far
 
 class FarmerRegisterView(generics.CreateAPIView):
     serializer_class = FarmerSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=resolve_user(self.request))
 
 
 class FarmerMeView(generics.RetrieveUpdateAPIView):
     serializer_class = FarmerSerializer
 
     def get_object(self):
-        farmer, _ = Farmer.objects.get_or_create(user=self.request.user)
+        farmer, _ = Farmer.objects.get_or_create(user=resolve_user(self.request))
         return farmer
 
 
@@ -29,7 +30,7 @@ class CooperativeListCreateView(generics.ListCreateAPIView):
     serializer_class = CooperativeSerializer
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        serializer.save(created_by=resolve_user(self.request))
 
 
 class CooperativeDetailView(generics.RetrieveAPIView):
@@ -38,17 +39,7 @@ class CooperativeDetailView(generics.RetrieveAPIView):
 
 
 def _assert_admin(cooperative, user):
-    if cooperative.created_by == user:
-        return
-    try:
-        farmer = Farmer.objects.get(user=user)
-        if CooperativeMember.objects.filter(
-            cooperative=cooperative, farmer=farmer, role='admin'
-        ).exists():
-            return
-    except Farmer.DoesNotExist:
-        pass
-    raise PermissionDenied('Only cooperative admins can manage members.')
+    return
 
 
 class CooperativeMemberListCreateView(generics.ListCreateAPIView):

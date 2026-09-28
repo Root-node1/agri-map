@@ -35,6 +35,7 @@ class MLSchemaTest(TestCase):
         self.assertIn('medium', CONFIDENCE_THRESHOLDS)
         self.assertIsInstance(CONFIDENCE_THRESHOLDS['high'], float)
         self.assertIsInstance(CONFIDENCE_THRESHOLDS['medium'], float)
+        self.assertGreater(CONFIDENCE_THRESHOLDS['high'], CONFIDENCE_THRESHOLDS['medium'])
 
     def test_confidence_messages_structure(self):
         self.assertIn('High', CONFIDENCE_MESSAGES)
@@ -50,7 +51,7 @@ class MLSchemaTest(TestCase):
 class MLServiceTest(TestCase):
     def test_predict_crop_no_field(self):
         from ml.services import predict_crop
-        result = predict_crop(field_id=999, user=None, temperature=28,
+        result = predict_crop(field_id=999, temperature=28,
                               humidity=75, nitrogen=50, phosphorus=30,
                               potassium=40, moisture=40, lon=3.1, lat=43.1)
         self.assertIn('crop_type', result)
@@ -59,18 +60,27 @@ class MLServiceTest(TestCase):
         self.assertIn('message', result)
         self.assertTrue(0 <= result['confidence'] <= 1)
 
-    def test_predict_crop_with_user(self):
-        user = User.objects.create_user('mluser', 'm@e.com', 'pass')
+    def test_predict_crop_persists_for_real_field(self):
+        from fields.models import Field
         from ml.services import predict_crop
-        result = predict_crop(field_id=999, user=user, temperature=28,
+        user = User.objects.create_user('mluser', 'm@e.com', 'pass')
+        field = Field.objects.create(user=user, name='ML field',
+                                     geometry={'type': 'Point', 'coordinates': [0, 0]})
+        result = predict_crop(field_id=field.id, temperature=28,
                               humidity=75, nitrogen=50, phosphorus=30,
                               potassium=40, moisture=40, lon=3.1, lat=43.1)
         self.assertIn('crop_type', result)
         self.assertIn(result['reliability_level'], ('High', 'Medium', 'Low'))
 
+    def test_predict_crop_missing_field_returns_result(self):
+        from ml.services import predict_crop
+        result = predict_crop(field_id=9999, temperature=28)
+        self.assertIn('crop_type', result)
+        self.assertTrue(0 <= result['confidence'] <= 1)
+
     def test_predict_crop_area(self):
         from ml.services import predict_crop_area
-        result = predict_crop_area(field_id=999, user=None, temperature=28,
+        result = predict_crop_area(field_id=999, temperature=28,
                                    humidity=75, nitrogen=50, phosphorus=30,
                                    potassium=40, moisture=40, lon=3.1, lat=43.1)
         self.assertIn('crop_type', result)
@@ -79,8 +89,27 @@ class MLServiceTest(TestCase):
 
     def test_predict_soil(self):
         from ml.services import predict_soil
-        result = predict_soil(field_id=999, user=None, temperature=28,
+        result = predict_soil(field_id=999, temperature=28,
                               humidity=75, nitrogen=50, phosphorus=30,
                               potassium=40, moisture=40, lon=3.1, lat=43.1)
         self.assertIn('prediction', result)
         self.assertIn('confidence', result)
+
+    def test_reliability_levels(self):
+        from ml.services import _get_reliability
+        self.assertEqual(_get_reliability(0.99), 'High')
+        self.assertEqual(_get_reliability(0.60), 'Medium')
+        self.assertEqual(_get_reliability(0.10), 'Low')
+
+
+class OpenAccessHelperTest(TestCase):
+    def test_get_default_user_stable(self):
+        from server_agri_map_django.open_access import get_default_user, resolve_user
+        u1 = get_default_user()
+        u2 = get_default_user()
+        self.assertEqual(u1.pk, u2.pk)
+        self.assertEqual(u1.username, 'open-access')
+
+    def test_resolve_user_returns_default(self):
+        from server_agri_map_django.open_access import get_default_user, resolve_user
+        self.assertEqual(resolve_user(None).pk, get_default_user().pk)
