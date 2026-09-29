@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { FaUniversalAccess, FaFont, FaAdjust, FaLanguage } from 'react-icons/fa'
-import LanguageSelector from './LanguageSelector'
+import { FaUniversalAccess, FaFont, FaAdjust } from 'react-icons/fa'
 import { useTheme } from '../../contexts/ThemeContext'
 
 const AccessibilityMenu = () => {
-  const { t } = useTranslation()
   const { darkMode, toggleDarkMode } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [fontSize, setFontSize] = useState(() => {
@@ -45,7 +42,7 @@ const AccessibilityMenu = () => {
 
   return (
     <div className="accessibility-container">
-      <button 
+      <button
         className="accessibility-toggle"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Accessibility settings"
@@ -55,22 +52,17 @@ const AccessibilityMenu = () => {
 
       {isOpen && (
         <div className="accessibility-menu glass" role="menu">
-          <h4>{t('accessibility.title')}</h4>
-          
-          <div className="accessibility-controls">
-            <div className="control-group">
-              <label>{t('accessibility.language')}</label>
-              <LanguageSelector />
-            </div>
+          <h4>Accessibility</h4>
 
+          <div className="accessibility-controls">
             <div className="control-group">
               <label>Font Size</label>
               <div className="font-controls">
-                <button onClick={decreaseFont} aria-label={t('accessibility.decreaseFont')}>
+                <button onClick={decreaseFont} aria-label="Decrease font size">
                   <FaFont /> A-
                 </button>
                 <span className="font-size-display">{fontSize}px</span>
-                <button onClick={increaseFont} aria-label={t('accessibility.increaseFont')}>
+                <button onClick={increaseFont} aria-label="Increase font size">
                   <FaFont /> A+
                 </button>
               </div>
@@ -87,12 +79,12 @@ const AccessibilityMenu = () => {
               </button>
             </div>
 
-            <button 
+            <button
               onClick={toggleContrast}
               className={`contrast-btn ${highContrast ? 'active' : ''}`}
-              aria-label={t('accessibility.highContrast')}
+              aria-label="Toggle high contrast"
             >
-              <FaAdjust /> {t('accessibility.highContrast')}
+              <FaAdjust /> High Contrast
             </button>
           </div>
         </div>

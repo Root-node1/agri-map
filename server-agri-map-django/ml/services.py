@@ -98,9 +98,9 @@ def predict_crop(*, field_id=None, user=None, **kwargs):
     if assets.rec_model is None:
         from analysis.models import CropPrediction
         from fields.models import Field
-        if field_id is not None and user is not None:
+        if field_id is not None:
             try:
-                field = Field.objects.get(pk=field_id, user=user)
+                field = Field.objects.get(pk=field_id)
                 existing = CropPrediction.objects.filter(field=field).first()
                 if existing:
                     return {
@@ -132,11 +132,11 @@ def predict_crop(*, field_id=None, user=None, **kwargs):
     )
 
     saved_field_id = None
-    if field_id is not None and user is not None:
+    if field_id is not None:
         try:
             from analysis.models import CropPrediction
             from fields.models import Field
-            field = Field.objects.get(pk=field_id, user=user)
+            field = Field.objects.get(pk=field_id)
             CropPrediction.objects.create(field=field, crop_type=crop_type, confidence=confidence)
             saved_field_id = field.id
         except Exception:
@@ -172,11 +172,11 @@ def predict_crop_area(*, field_id=None, user=None, **kwargs):
     )
 
     saved_field_id = None
-    if field_id is not None and user is not None:
+    if field_id is not None:
         try:
             from analysis.models import CropAreaPrediction
             from fields.models import Field
-            field = Field.objects.get(pk=field_id, user=user)
+            field = Field.objects.get(pk=field_id)
             CropAreaPrediction.objects.create(field=field, crop_type=crop_type, confidence=confidence)
             saved_field_id = field.id
         except Exception:

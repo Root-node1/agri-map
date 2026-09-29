@@ -11,7 +11,6 @@ router.get('/env', (req, res) => {
       MONGODB_URI: process.env.MONGODB_URI ? '✅ Configured' : '❌ Missing',
       JWT_SECRET: process.env.JWT_SECRET ? '✅ Configured' : '❌ Missing',
       REDIS_HOST: process.env.REDIS_HOST || 'Not configured',
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ? '✅ Configured' : '❌ Missing',
       ETHEREUM_RPC_URL: process.env.ETHEREUM_RPC_URL ? '✅ Configured' : '❌ Missing',
     }
   });

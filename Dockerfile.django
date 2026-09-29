@@ -2,7 +2,7 @@ FROM python:3.11-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
-    DJANGO_SETTINGS_MODULE=server_agri_map_django.settings.local
+    DJANGO_SETTINGS_MODULE=server_agri_map_django.settings.production
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -21,13 +21,10 @@ RUN pip install --no-cache-dir --default-timeout=180 -r requirements.txt || \
 # Copy application code
 COPY server-agri-map-django/ .
 
-# Create .env file with default values
-RUN echo "SECRET_KEY=django-insecure-dev-key-12345" > .env && \
-    echo "DEBUG=True" >> .env && \
-    echo "DATABASE_URL=sqlite:///db.sqlite3" >> .env
 
 # Expose port
 EXPOSE 8000
 
-# Start the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Migrate, collect static assets, serve via gunicorn
+# (docker-compose.yml overrides both settings module and command for local dev)
+CMD ["bash", "startup.sh"]

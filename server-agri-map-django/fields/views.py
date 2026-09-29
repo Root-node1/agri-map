@@ -2,28 +2,13 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from server_agri_map_django.open_access import resolve_user
+
 from .models import Field
 from .serializers import FieldSerializer
 
 
 def apply_cooperative_sharing(qs, user):
-    try:
-        from farmers.models import CooperativeMember, Farmer
-        farmer = Farmer.objects.get(user=user)
-        coop_ids = CooperativeMember.objects.filter(
-            farmer=farmer
-        ).values_list('cooperative_id', flat=True)
-        if coop_ids:
-            member_farmer_ids = CooperativeMember.objects.filter(
-                cooperative_id__in=coop_ids
-            ).values_list('farmer_id', flat=True)
-            member_user_ids = Farmer.objects.filter(
-                id__in=member_farmer_ids
-            ).exclude(user=user).values_list('user_id', flat=True)
-            if member_user_ids:
-                qs = qs | Field.objects.filter(user_id__in=member_user_ids)
-    except Farmer.DoesNotExist:
-        pass
     return qs
 
 
@@ -49,34 +34,27 @@ class FieldListCreateView(generics.ListCreateAPIView):
     serializer_class = FieldSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        qs = Field.objects.filter(user=user)
-        qs = apply_cooperative_sharing(qs, user)
+        qs = Field.objects.all()
+        qs = apply_cooperative_sharing(qs, None)
         qs = apply_bbox_filter(qs, self.request.query_params.get('bbox'))
         return qs.distinct()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=resolve_user(self.request))
 
 
 class FieldDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FieldSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        qs = Field.objects.filter(user=user)
-        qs = apply_cooperative_sharing(qs, user)
-        return qs.distinct()
+        return Field.objects.all()
 
 
 class FieldGeoJSONListView(generics.ListAPIView):
     serializer_class = FieldSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        qs = Field.objects.filter(user=user)
-        qs = apply_cooperative_sharing(qs, user)
-        return qs.distinct()
+        return Field.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

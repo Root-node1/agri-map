@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const DJANGO_API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000/api'
+const DJANGO_API_URL = import.meta.env.VITE_DJANGO_API_URL
+if (!DJANGO_API_URL) {
+  console.error('[djangoApi] VITE_DJANGO_API_URL is not set. Configure it in your environment.')
+}
 
 const djangoApi = axios.create({
   baseURL: DJANGO_API_URL,

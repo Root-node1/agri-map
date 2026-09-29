@@ -18,7 +18,7 @@ class CarbonDetailView(APIView):
     serializer_class = serializers.Serializer
     def get(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -44,7 +44,7 @@ class CarbonCreateSerializer(serializers.Serializer):
 class CarbonCreateView(APIView):
     def post(self, request, field_id=None):
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 

@@ -3,62 +3,6 @@ const router = express.Router();
 const { webhookService } = require('../services/webhookService');
 const logger = require('../utils/logger');
 
-// Stripe Webhook
-router.post('/stripe', async (req, res) => {
-  try {
-    const signature = req.headers['stripe-signature'];
-    
-    let stripeService;
-    try {
-      stripeService = require('../services/stripService');
-    } catch (error) {
-      logger.warn('Stripe service not available, using mock');
-      stripeService = {
-        verifyWebhookSignature: (payload, signature) => {
-          return { type: 'payment_intent.succeeded', data: { object: { id: 'pi_mock_123' } } };
-        }
-      };
-    }
-
-    const event = stripeService.verifyWebhookSignature(
-      JSON.stringify(req.body),
-      signature
-    );
-
-    logger.info(`Stripe webhook received: ${event.type}`);
-
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object;
-        await webhookService.sendWebhook('payment.confirmed', {
-          paymentId: paymentIntent.metadata?.paymentId || 'unknown',
-          transactionId: paymentIntent.id,
-          amount: paymentIntent.amount / 100,
-          currency: paymentIntent.currency,
-          status: 'completed',
-        });
-        break;
-
-      case 'payment_intent.payment_failed':
-        const failedPayment = event.data.object;
-        logger.warn('Payment failed:', failedPayment.id);
-        break;
-
-      case 'charge.refunded':
-        const refund = event.data.object;
-        logger.info('Refund processed:', refund.id);
-        break;
-
-      default:
-        logger.info(`Unhandled Stripe event: ${event.type}`);
-    }
-
-    res.status(200).json({ received: true });
-  } catch (error) {
-    logger.error('Stripe webhook error:', error);
-    res.status(400).json({ error: 'Webhook error' });
-  }
-});
 
 // Loan Webhooks
 router.post('/loan-approved', async (req, res) => {

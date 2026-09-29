@@ -1,108 +1,318 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { FaArrowRight, FaSeedling, FaTractor, FaChartLine } from 'react-icons/fa'
+import { motion } from 'framer-motion'
+import { FaArrowRight } from 'react-icons/fa'
+import {
+  FiTarget,
+  FiLayers,
+  FiTrendingUp,
+  FiMessageSquare,
+  FiMap,
+  FiShield,
+  FiArrowRight as FiArrowRightLine,
+} from 'react-icons/fi'
+import { useAuth } from '../../contexts/AuthContext'
+import { useHeroReveal, useStaggerReveal } from '../../lib/motion'
+
+/* Feature list — vector icons only (no emoji-as-icons) with a per-feature
+   accent so the grid reads as four distinct capabilities, not four clones. */
+const FEATURES = [
+  {
+    icon: FiTarget,
+    accent: 'emerald',
+    title: 'Crop Detection',
+    description: 'Identify what is growing across your plots with 92% accuracy using satellite and AI imagery.',
+  },
+  {
+    icon: FiLayers,
+    accent: 'sky',
+    title: 'Soil Analysis',
+    description: 'Get nutrient, pH and organic-matter readings translated into plain-language field actions.',
+  },
+  {
+    icon: FiTrendingUp,
+    accent: 'amber',
+    title: 'Green Financing',
+    description: 'Unlock loans and carbon credit payouts backed by verified field and yield data.',
+  },
+  {
+    icon: FiMessageSquare,
+    accent: 'violet',
+    title: 'AI Assistant',
+    description: 'Ask farming questions in English or Swahili and get answers grounded in your own records.',
+  },
+]
+
+/* Trust row — concrete proof points instead of generic marketing copy. */
+const TRUST_SIGNALS = [
+  { icon: FiMap, label: 'Field mapping', value: 'GPS-accurate boundaries' },
+  { icon: FiShield, label: 'Data ownership', value: 'Your records stay yours' },
+  { icon: FiTrendingUp, label: 'Verified payouts', value: 'Carbon credits, auditable' },
+]
+
+/* Mirrors the "Enterprise Gateway" pattern in MASTER.md: the visitor picks
+   their path (farmer / cooperative) rather than reading one generic pitch. */
+const PATHS = [
+  {
+    icon: FiTarget,
+    kicker: 'I am a farmer',
+    title: 'Map and measure my plots',
+    copy: 'Register your fields, track crop health through the season, and build the data record lenders ask for.',
+    to: '/register',
+    cta: 'Start as a farmer',
+  },
+  {
+    icon: FiLayers,
+    kicker: 'I am a cooperative',
+    title: 'Oversee member fields',
+    copy: 'Aggregate member plots, monitor regional health trends, and manage shared financing and carbon programmes.',
+    to: '/cooperatives',
+    cta: 'Explore cooperatives',
+  },
+]
+
+const ACCENT_STYLES = {
+  emerald: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/25',
+  sky: 'bg-sky-500/10 text-sky-300 border-sky-500/25',
+  amber: 'bg-amber-500/10 text-amber-300 border-amber-500/25',
+  violet: 'bg-violet-500/10 text-violet-300 border-violet-500/25',
+}
 
 const Home = () => {
-  const { t } = useTranslation()
-
-  const features = [
-    {
-      icon: <FaSeedling className="text-2xl text-emerald-500" />,
-      title: t('home.features.smartFarming'),
-      desc: t('home.features.smartFarmingDesc')
-    },
-    {
-      icon: <FaTractor className="text-2xl text-emerald-500" />,
-      title: t('home.features.equipment'),
-      desc: t('home.features.equipmentDesc')
-    },
-    {
-      icon: <FaChartLine className="text-2xl text-emerald-500" />,
-      title: t('home.features.analytics'),
-      desc: t('home.features.analyticsDesc')
-    }
-  ]
+  const { isAuthenticated } = useAuth()
+  const hero = useHeroReveal()
+  const featureReveal = useStaggerReveal({ step: 0.07 })
+  const pathReveal = useStaggerReveal({ step: 0.08, delay: 0.08 })
+  const trustReveal = useStaggerReveal({ step: 0.06 })
 
   return (
     <div className="page-shell page-shell-dark">
-      <section className="relative min-h-[88vh] flex items-center px-4 pt-28 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.24),_transparent_35%),linear-gradient(180deg,_rgba(4,17,11,0.92),_rgba(7,23,16,0.96))]" />
-        <div className="absolute inset-0 opacity-30 bg-[url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-black/50" />
+      <div className="max-w-6xl mx-auto px-4 pb-20">
+        {/* ----------------------------------------------------------------
+            Hero
+            ---------------------------------------------------------------- */}
+        <motion.section
+          className="text-center pt-14 pb-16 md:pt-20 md:pb-20"
+          variants={hero.container}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.span variants={hero.item} className="hero-pill mb-6 inline-flex">
+            Agricultural intelligence for Kenya
+          </motion.span>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl">
-          <div className="hero-panel rounded-[2rem] p-6 md:p-10 overflow-hidden hero-glow">
-            <div className="grid gap-8 lg:grid-cols-[1.2fr_0.95fr] lg:items-center">
-              <div className="space-y-8">
-                <span className="hero-pill">Smart Farming</span>
-                <h1 className="text-4xl md:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-950 leading-tight">
-                  {t('home.title')}
-                </h1>
-                <p className="max-w-2xl text-slate-200/85 text-base md:text-lg leading-relaxed">
-                  {t('home.subtitle')}
-                </p>
-                <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-                  <Link to="/register" className="btn-primary w-full sm:w-auto">
-                    {t('home.getStarted')}
-                    <FaArrowRight className="text-sm" />
+          <motion.h1
+            variants={hero.item}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-[1.1] tracking-tight"
+          >
+            Welcome to{' '}
+            <span className="bg-gradient-to-r from-emerald-300 via-emerald-400 to-green-500 bg-clip-text text-transparent">
+              AgriMap
+            </span>
+          </motion.h1>
+
+          <motion.p
+            variants={hero.item}
+            className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-9 leading-relaxed"
+          >
+            AI-powered agricultural intelligence for smallholder farmers and the
+            cooperatives that support them.
+          </motion.p>
+
+          <motion.div
+            variants={hero.item}
+            className="flex flex-wrap items-center justify-center gap-4"
+          >
+            {isAuthenticated ? (
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  to="/dashboard"
+                  className="btn-primary text-base agrimap-focus"
+                >
+                  Go to Dashboard
+                  <FaArrowRight size={14} aria-hidden="true" />
+                </Link>
+              </motion.div>
+            ) : (
+              <>
+                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                  <Link to="/register" className="btn-primary text-base agrimap-focus">
+                    Get Started
+                    <FaArrowRight size={14} aria-hidden="true" />
                   </Link>
-                  <Link to="/about" className="btn-secondary w-full sm:w-auto">
-                    {t('home.learnMore')}
+                </motion.div>
+                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                  <Link to="/login" className="btn-secondary text-base agrimap-focus">
+                    Sign In
                   </Link>
-                </div>
-              </div>
+                </motion.div>
+              </>
+            )}
+          </motion.div>
 
-              <div className="space-y-5">
-                <div className="hero-image-box rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_35px_90px_rgba(0,0,0,0.35)]">
-                  <img
-                    src="https://images.unsplash.com/photo-1499336315816-097655dcfbda?auto=format&fit=crop&w=1200&q=80"
-                    alt="African farm landscape with farmers and crops"
-                    className="h-72 w-full object-cover sm:h-80 lg:h-[420px]"
-                  />
-                  <div className="hero-image-overlay text-slate-100 text-sm">
-                    Real Kenyan and East African agricultural landscapes captured for local farm users.
-                  </div>
-                </div>
+          {/* Trust signals sit directly under the primary CTA */}
+          <motion.ul
+            variants={trustReveal.container}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-14"
+            aria-label="Why farmers choose AgriMap"
+          >
+            {TRUST_SIGNALS.map(({ icon: Icon, label, value }) => (
+              <motion.li
+                key={label}
+                variants={trustReveal.item}
+                className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-white/10 bg-white/5"
+              >
+                <Icon size={18} className="text-emerald-400" aria-hidden="true" />
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  {label}
+                </span>
+                <span className="text-sm text-slate-200 text-center">{value}</span>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </motion.section>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="glass-card rounded-[1.75rem] p-5">
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Field operations</h3>
-                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-                      Keep every plot, crop and soil reading visible in one adaptive dashboard.
-                    </p>
-                  </div>
-                  <div className="glass-card rounded-[1.75rem] p-5">
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Local grower support</h3>
-                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-                      Designed for African farms, with clear charts and stronger mobile readability.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* ----------------------------------------------------------------
+            Features
+            ---------------------------------------------------------------- */}
+        <section className="py-12" aria-labelledby="features-heading">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            className="text-center mb-10"
+          >
+            <span className="agrimap-eyebrow block mb-3">Platform</span>
+            <h2
+              id="features-heading"
+              className="text-2xl sm:text-3xl font-bold text-white mb-3"
+            >
+              Key Features
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
+              Four tools that turn scattered field records into decisions you can act on.
+            </p>
+          </motion.div>
 
-      <section className="py-16 px-4 max-w-6xl mx-auto text-slate-900 dark:text-slate-100">
-        <div className="text-center mb-12">
-          <span className="section-title text-emerald-400 text-xs tracking-[0.35em] mb-3 inline-block">Capabilities</span>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">{t('home.whyChoose')}</h2>
-        </div>
+          <motion.div
+            variants={featureReveal.container}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {FEATURES.map(({ icon: Icon, accent, title, description }) => (
+              <motion.article
+                key={title}
+                variants={featureReveal.item}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="frosted-panel text-left p-6 hover:border-emerald-500/30 transition-colors agrimap-focus"
+              >
+                <span
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl border mb-5 ${ACCENT_STYLES[accent]}`}
+                  aria-hidden="true"
+                >
+                  <Icon size={22} />
+                </span>
+                <h3 className="text-base font-semibold text-white mb-2">{title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
+              </motion.article>
+            ))}
+          </motion.div>
+        </section>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((feature, index) => (
-            <div key={index} className="stat-card rounded-[2rem] p-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-emerald-500/15 text-emerald-300 mb-5">
-                {React.cloneElement(feature.icon, { className: 'text-2xl' })}
-              </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">{feature.title}</h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* ----------------------------------------------------------------
+            Path selection — "I am a..." per the Enterprise Gateway pattern
+            ---------------------------------------------------------------- */}
+        <section className="py-12" aria-labelledby="paths-heading">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            className="text-center mb-10"
+          >
+            <span className="agrimap-eyebrow block mb-3">Get started</span>
+            <h2
+              id="paths-heading"
+              className="text-2xl sm:text-3xl font-bold text-white mb-3"
+            >
+              Choose your path
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
+              AgriMap looks different depending on how you farm.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={pathReveal.container}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            {PATHS.map(({ icon: Icon, kicker, title, copy, to, cta }) => (
+              <motion.div key={title} variants={pathReveal.item} whileHover={{ y: -4 }}>
+                <Link
+                  to={to}
+                  className="frosted-panel block h-full p-7 hover:border-emerald-500/40 transition-colors group agrimap-focus"
+                >
+                  <span
+                    className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 mb-5"
+                    aria-hidden="true"
+                  >
+                    <Icon size={22} />
+                  </span>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300 mb-2">
+                    {kicker}
+                  </p>
+                  <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-6">{copy}</p>
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 group-hover:text-emerald-200 transition-colors">
+                    {cta}
+                    <FiArrowRightLine
+                      size={15}
+                      aria-hidden="true"
+                      className="transition-transform duration-200 group-hover:translate-x-1"
+                    />
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* ----------------------------------------------------------------
+            Closing CTA
+            ---------------------------------------------------------------- */}
+        {!isAuthenticated && (
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            className="frosted-panel text-center px-6 py-12 mt-6 border-emerald-500/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-3">
+              Ready to map your first field?
+            </h2>
+            <p className="text-slate-400 max-w-lg mx-auto mb-7 text-sm sm:text-base">
+              Create an account in under a minute. No payment details required to start.
+            </p>
+            <motion.div
+              className="flex flex-wrap justify-center gap-4"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Link to="/register" className="btn-primary agrimap-focus">
+                Create free account
+                <FaArrowRight size={14} aria-hidden="true" />
+              </Link>
+            </motion.div>
+          </motion.section>
+        )}
+      </div>
     </div>
   )
 }

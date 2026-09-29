@@ -70,7 +70,7 @@ app.get('/health', (req, res) => {
     environment: process.env.NODE_ENV,
     mongodb: process.env.MONGODB_URI ? 'configured' : 'not configured',
     redis: process.env.REDIS_HOST ? 'configured' : 'not configured',
-    stripe: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not configured',
+    
     blockchain: process.env.ETHEREUM_RPC_URL ? 'configured' : 'not configured',
     ai: 'enabled',
     chatbot: 'enabled',

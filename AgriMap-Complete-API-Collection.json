@@ -1,14 +1,24 @@
 {
   "info": {
     "name": "AgriMap Complete API",
-    "description": "Complete API collection for AgriMap - Agriculture Intelligence Platform\n\nBase URL: https://agri-map-v81v.onrender.com\nLocal URL: http://localhost:3000\n\nFeatures:\n- 🔐 Authentication (Email + Firebase OAuth)\n- 🤖 AI Services (Crop, Soil, Carbon, Yield)\n- 💬 Chatbot Assistant\n- 💰 Loans & Financing\n- 🌿 Carbon Credits\n- 💳 Payments & Wallet\n- 📋 Subscriptions & API Keys\n\n🚀 Live API: https://agri-map-v81v.onrender.com",
+    "description": "Complete API collection for AgriMap (dual backend).\n\nDJANGO backend (AI/geospatial, source of truth): {{django_base_url}} (local http://localhost:8002, prod https://agri-map-v81v.onrender.com)\nNODE backend (finance/monetization \u2014 loans, carbon-credit tokenization, wallet, payments, chatbot, subscriptions, webhooks): {{node_base_url}} (local http://localhost:3001)\n\nAuth: Django issues SimpleJWT (username+password). Login stores access->{{auth_token}}, refresh->{{refresh_token}} via test scripts on login/refresh/register.\nFlow: Register/Login -> create farmer profile -> create field (copy id->{{field_id}}) -> satellite fetch/process -> analysis/soil/carbon/reports. Cooperative flow: create coop (id->{{cooperative_id}}) -> add member (id->{{member_id}}).\n\nSections prefixed \ud83d\udfe2 Django match server-agri-map-django/urls.py + smoke_tests.py exactly. Remaining sections target the Node backend.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "3.0.0"
+    "version": "4.0.0"
   },
   "variable": [
     {
       "key": "base_url",
       "value": "https://agri-map-v81v.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "django_base_url",
+      "value": "http://localhost:8002",
+      "type": "string"
+    },
+    {
+      "key": "node_base_url",
+      "value": "http://localhost:3001",
       "type": "string"
     },
     {
@@ -22,8 +32,33 @@
       "type": "string"
     },
     {
-      "key": "api_key",
-      "value": "",
+      "key": "field_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "cooperative_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "image_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "2",
       "type": "string"
     }
   ],
@@ -37,50 +72,75 @@
       }
     ]
   },
+  "event": [],
   "item": [
     {
-      "name": "🏠 Health & Status",
+      "name": "\ud83d\udfe2 Django \u2014 Health & Docs",
       "item": [
-        {
-          "name": "Root API",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/",
-              "host": ["{{base_url}}"],
-              "path": [""]
-            }
-          }
-        },
         {
           "name": "Health Check",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/health",
-              "host": ["{{base_url}}"],
-              "path": ["health"]
+              "raw": "{{django_base_url}}/api/health/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
             }
           }
         },
         {
-          "name": "API Root",
+          "name": "OpenAPI Schema (JSON)",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/api",
-              "host": ["{{base_url}}"],
-              "path": ["api"]
+              "raw": "{{django_base_url}}/api/schema/?format=json",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "schema"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{django_base_url}}/api/docs/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "docs"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "🔐 Authentication",
+      "name": "\ud83d\udfe2 Django \u2014 Auth",
       "item": [
         {
-          "name": "Register User",
+          "name": "Register",
           "request": {
             "method": "POST",
             "header": [
@@ -89,19 +149,45 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/register/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Django RegisterSerializer: username, email, password(min 8). Returns {user, access, refresh}.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"phone\": \"1234567890\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "register"]
+              "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"secret123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var",
+                  "j=null;try{j=pm.response.json();}catch(e){}",
+                  "if(j){if(j.access)pm.collectionVariables.set('auth_token',j.access);",
+                  "if(j.refresh)pm.collectionVariables.set('refresh_token',j.refresh);}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Login User",
+          "name": "Login (obtain JWT pair)",
           "request": {
             "method": "POST",
             "header": [
@@ -110,33 +196,42 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/login/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "SimpleJWT TokenObtainPairView: username + password. Returns {access, refresh}.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
+              "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"secret123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/auth/profile",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "profile"]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var",
+                  "j=null;try{j=pm.response.json();}catch(e){}",
+                  "if(j){if(j.access)pm.collectionVariables.set('auth_token',j.access);",
+                  "if(j.refresh)pm.collectionVariables.set('refresh_token',j.refresh);}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Refresh Token",
@@ -148,21 +243,46 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/refresh/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/refresh-token",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "refresh-token"]
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var",
+                  "j=null;try{j=pm.response.json();}catch(e){}",
+                  "if(j){if(j.access)pm.collectionVariables.set('auth_token',j.access);",
+                  "if(j.refresh)pm.collectionVariables.set('refresh_token',j.refresh);}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Logout",
+          "name": "Get Current User",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Authorization",
@@ -170,14 +290,56 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/auth/logout",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "logout"]
+              "raw": "{{django_base_url}}/api/auth/me/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
             }
           }
         },
         {
-          "name": "Register with Firebase",
+          "name": "Logout (blacklist refresh)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/logout/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
           "request": {
             "method": "POST",
             "header": [
@@ -186,19 +348,30 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/forgot-password/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "forgot-password"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"firebase@example.com\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/firebase/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "firebase", "register"]
+              "raw": "{\n  \"email\": \"alice@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Login with Firebase",
+          "name": "Reset Password",
           "request": {
             "method": "POST",
             "header": [
@@ -207,24 +380,35 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/auth/reset-password/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"firebase@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/firebase/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "firebase", "login"]
+              "raw": "{\n  \"token\": \"reset-token-here\",\n  \"new_password\": \"newsecret123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
       ]
     },
     {
-      "name": "🤖 AI Services",
+      "name": "\ud83d\udfe2 Django \u2014 Farmers & Cooperatives",
       "item": [
         {
-          "name": "Detect Crop",
+          "name": "Register Farmer Profile",
           "request": {
             "method": "POST",
             "header": [
@@ -237,144 +421,31 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/register/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "register"
+              ]
+            },
+            "description": "Creates Farmer linked to request.user. Fields: phone, location.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"imageData\": \"base64_encoded_image_data_here\",\n  \"options\": {\n    \"confidenceThreshold\": 0.7\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/detect-crop",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "detect-crop"]
-            }
-          }
-        },
-        {
-          "name": "Analyze Soil",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"phone\": \"+254700111222\",\n  \"location\": \"Nakuru, Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4,\n    \"temperature\": 25,\n    \"organicMatter\": 2.3\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/analyze-soil",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "analyze-soil"]
             }
           }
         },
         {
-          "name": "Predict Carbon",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/predict-carbon",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "predict-carbon"]
-            }
-          }
-        },
-        {
-          "name": "Predict Yield",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/predict-yield",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "predict-yield"]
-            }
-          }
-        },
-        {
-          "name": "Analyze Vegetation",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/analyze-vegetation",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "analyze-vegetation"]
-            }
-          }
-        },
-        {
-          "name": "Analyze Field",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilData\": {\"ph\": 6.5, \"moisture\": 0.4}\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/ai/analyze-field",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "analyze-field"]
-            }
-          }
-        },
-        {
-          "name": "Get AI Models",
+          "name": "Get My Farmer Profile",
           "request": {
             "method": "GET",
             "header": [
@@ -384,19 +455,79 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/ai/models",
-              "host": ["{{base_url}}"],
-              "path": ["api", "ai", "models"]
+              "raw": "{{django_base_url}}/api/farmers/me/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "me"
+              ]
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "💬 Chatbot",
-      "item": [
+        },
         {
-          "name": "Send Message",
+          "name": "Update My Farmer Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/me/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "me"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+254799999999\",\n  \"location\": \"Eldoret, Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List Cooperatives",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Cooperative",
           "request": {
             "method": "POST",
             "header": [
@@ -409,19 +540,30 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {}\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/chatbot/message",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chatbot", "message"]
+              "raw": "{\n  \"name\": \"Rift Valley Coop\",\n  \"description\": \"Smallholder maize collective\",\n  \"location\": \"Nakuru, Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Get History",
+          "name": "Get Cooperative Detail",
           "request": {
             "method": "GET",
             "header": [
@@ -431,14 +573,46 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/chatbot/history",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chatbot", "history"]
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}"
+              ]
             }
           }
         },
         {
-          "name": "Get Recommendations",
+          "name": "List Cooperative Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/members/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}",
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Cooperative Member",
           "request": {
             "method": "POST",
             "header": [
@@ -451,19 +625,33 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/members/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}",
+                "members"
+              ]
+            },
+            "description": "Requires user_id of a user WITH a farmer profile. role: member|admin. Creator or admin only.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"farmData\": {\n    \"soil\": {\"nitrogen\": 0.3, \"moisture\": 0.25},\n    \"crop\": {\"type\": \"maize\", \"healthScore\": 0.45}\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/chatbot/recommendations",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chatbot", "recommendations"]
+              "raw": "{\n  \"user_id\": 2,\n  \"role\": \"member\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Get Analytics",
+          "name": "Get Member Detail",
           "request": {
             "method": "GET",
             "header": [
@@ -473,14 +661,62 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/chatbot/analytics",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chatbot", "analytics"]
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/members/{{member_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}",
+                "members",
+                "{{member_id}}"
+              ]
             }
           }
         },
         {
-          "name": "Clear History",
+          "name": "Update Member Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/members/{{member_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}",
+                "members",
+                "{{member_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Remove Member",
           "request": {
             "method": "DELETE",
             "header": [
@@ -490,19 +726,79 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/chatbot/history",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chatbot", "history"]
+              "raw": "{{django_base_url}}/api/farmers/cooperatives/{{cooperative_id}}/members/{{member_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "farmers",
+                "cooperatives",
+                "{{cooperative_id}}",
+                "members",
+                "{{member_id}}"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "💰 Loans",
+      "name": "\ud83d\udfe2 Django \u2014 Fields",
       "item": [
         {
-          "name": "Apply for Loan",
+          "name": "List My Fields",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/fields/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields"
+              ]
+            },
+            "description": "Paginated. Supports ?bbox=west,south,east,north."
+          }
+        },
+        {
+          "name": "List Fields (bbox filter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/fields/?bbox=36.7,-1.4,37.0,-1.1",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields"
+              ],
+              "query": [
+                {
+                  "key": "bbox",
+                  "value": "36.7,-1.4,37.0,-1.1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Field",
           "request": {
             "method": "POST",
             "header": [
@@ -515,19 +811,30 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/fields/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields"
+              ]
+            },
+            "description": "geometry must be valid GeoJSON with type+coordinates. area_ha optional.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"purpose\": \"irrigation_upgrade\",\n  \"tenureMonths\": 12\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/loans/apply",
-              "host": ["{{base_url}}"],
-              "path": ["api", "loans", "apply"]
+              "raw": "{\n  \"name\": \"North Plot\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [\n      [\n        [\n          36.8,\n          -1.28\n        ],\n        [\n          36.9,\n          -1.28\n        ],\n        [\n          36.9,\n          -1.18\n        ],\n        [\n          36.8,\n          -1.18\n        ],\n        [\n          36.8,\n          -1.28\n        ]\n      ]\n    ]\n  },\n  \"area_ha\": 2.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Get All Loans",
+          "name": "Fields GeoJSON (FeatureCollection)",
           "request": {
             "method": "GET",
             "header": [
@@ -537,24 +844,20 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/loans?status=pending&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "loans"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "pending"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
+              "raw": "{{django_base_url}}/api/fields/geojson/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields",
+                "geojson"
               ]
             }
           }
         },
         {
-          "name": "Get Loan Details",
+          "name": "Get Field Detail",
           "request": {
             "method": "GET",
             "header": [
@@ -564,14 +867,20 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/loans/{{loan_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "loans", "{{loan_id}}"]
+              "raw": "{{django_base_url}}/api/fields/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields",
+                "{{field_id}}"
+              ]
             }
           }
         },
         {
-          "name": "Approve Loan (Admin)",
+          "name": "Full Update Field (PUT)",
           "request": {
             "method": "PUT",
             "header": [
@@ -584,222 +893,32 @@
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved\"\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/api/loans/{{loan_id}}/approve",
-              "host": ["{{base_url}}"],
-              "path": ["api", "loans", "{{loan_id}}", "approve"]
-            }
-          }
-        },
-        {
-          "name": "Disburse Loan (Admin)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"walletId\": \"{{wallet_id}}\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/loans/{{loan_id}}/disburse",
-              "host": ["{{base_url}}"],
-              "path": ["api", "loans", "{{loan_id}}", "disburse"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "🌿 Carbon Credits",
-      "item": [
-        {
-          "name": "Get All Credits",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits"]
-            }
-          }
-        },
-        {
-          "name": "Get Available Credits",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits/available",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits", "available"]
-            }
-          }
-        },
-        {
-          "name": "Get Credit Stats",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits/stats",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits", "stats"]
-            }
-          }
-        },
-        {
-          "name": "Create Credit (Admin)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"fieldId\": \"field_123\",\n  \"amountInTons\": 2.5,\n  \"pricePerTon\": 50\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits"]
-            }
-          }
-        },
-        {
-          "name": "Tokenize Credit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 2.5\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits/{{credit_id}}/tokenize",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits", "{{credit_id}}", "tokenize"]
-            }
-          }
-        },
-        {
-          "name": "Sell Credit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"buyerId\": \"user_456\",\n  \"amount\": 2.5\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carbon-credits/{{credit_id}}/sell",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carbon-credits", "{{credit_id}}", "sell"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "💳 Wallet & Payments",
-      "item": [
-        {
-          "name": "Get Balance",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/wallet",
-              "host": ["{{base_url}}"],
-              "path": ["api", "wallet"]
-            }
-          }
-        },
-        {
-          "name": "Get Transactions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/wallet/transactions?limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "wallet", "transactions"],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
+              "raw": "{{django_base_url}}/api/fields/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields",
+                "{{field_id}}"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"North Plot \\u2014 replanted\",\n  \"geometry\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [\n      [\n        [\n          36.8,\n          -1.28\n        ],\n        [\n          36.9,\n          -1.28\n        ],\n        [\n          36.9,\n          -1.18\n        ],\n        [\n          36.8,\n          -1.18\n        ],\n        [\n          36.8,\n          -1.28\n        ]\n      ]\n    ]\n  },\n  \"area_ha\": 3.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Deposit",
+          "name": "Partial Update Field (PATCH)",
           "request": {
-            "method": "POST",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -810,236 +929,30 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/fields/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields",
+                "{{field_id}}"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"card\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/wallet/deposit",
-              "host": ["{{base_url}}"],
-              "path": ["api", "wallet", "deposit"]
-            }
-          }
-        },
-        {
-          "name": "Withdraw",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"name\": \"North Plot \\u2014 updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"bank_transfer\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/wallet/withdraw",
-              "host": ["{{base_url}}"],
-              "path": ["api", "wallet", "withdraw"]
             }
           }
         },
         {
-          "name": "Transfer",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"recipientUserId\": \"user_456\",\n  \"amount\": 200,\n  \"description\": \"Payment for services\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/wallet/transfer",
-              "host": ["{{base_url}}"],
-              "path": ["api", "wallet", "transfer"]
-            }
-          }
-        },
-        {
-          "name": "Initiate Payment",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"card\",\n  \"paymentType\": \"loan_repayment\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/payments/initiate",
-              "host": ["{{base_url}}"],
-              "path": ["api", "payments", "initiate"]
-            }
-          }
-        },
-        {
-          "name": "Get Payments",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/payments",
-              "host": ["{{base_url}}"],
-              "path": ["api", "payments"]
-            }
-          }
-        },
-        {
-          "name": "Refund Payment (Admin)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"reason\": \"Customer request\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/payments/{{payment_id}}/refund",
-              "host": ["{{base_url}}"],
-              "path": ["api", "payments", "{{payment_id}}", "refund"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "📋 Subscriptions & API Keys",
-      "item": [
-        {
-          "name": "Get Plans",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/plans",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "plans"]
-            }
-          }
-        },
-        {
-          "name": "Create Subscription",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/create",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "create"]
-            }
-          }
-        },
-        {
-          "name": "Get My Subscription",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/my-subscription",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "my-subscription"]
-            }
-          }
-        },
-        {
-          "name": "Generate API Key",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"My API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/generate-api-key",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "generate-api-key"]
-            }
-          }
-        },
-        {
-          "name": "List API Keys",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/api-keys",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "api-keys"]
-            }
-          }
-        },
-        {
-          "name": "Revoke API Key",
+          "name": "Delete Field",
           "request": {
             "method": "DELETE",
             "header": [
@@ -1049,115 +962,2020 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/subscriptions/api-keys/{{api_key_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "api-keys", "{{api_key_id}}"]
-            }
-          }
-        },
-        {
-          "name": "Get Usage Stats",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/usage",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "usage"]
-            }
-          }
-        },
-        {
-          "name": "Cancel Subscription",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"reason\": \"Too expensive\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/cancel",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscriptions", "cancel"]
+              "raw": "{{django_base_url}}/api/fields/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "fields",
+                "{{field_id}}"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "🔗 Webhooks",
+      "name": "\ud83d\udfe2 Django \u2014 Satellite",
       "item": [
         {
-          "name": "Webhook Status",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/webhooks/status",
-              "host": ["{{base_url}}"],
-              "path": ["api", "webhooks", "status"]
-            }
-          }
-        },
-        {
-          "name": "Stripe Webhook",
+          "name": "Fetch Imagery (Sentinel-2 stub)",
           "request": {
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
               },
               {
-                "key": "stripe-signature",
-                "value": "whsec_mock"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/fetch/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "fetch"
+              ]
+            },
+            "description": "field_id required (must be owned). date_range optional [start,end] date strings.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"evt_mock_123\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_mock_123\",\n      \"amount\": 50000,\n      \"currency\": \"usd\"\n    }\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/webhooks/stripe",
-              "host": ["{{base_url}}"],
-              "path": ["api", "webhooks", "stripe"]
+              "raw": "{\n  \"field_id\": 1,\n  \"date_range\": [\n    \"2026-01-01\",\n    \"2026-09-24\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Loan Approved Webhook",
+          "name": "Process Imagery (NDVI/EVI)",
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/process/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "process"
+              ]
+            },
+            "description": "Requires >=1 fetched image for the field, else 400.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"loanId\": \"loan_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"status\": \"approved\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/webhooks/loan-approved",
-              "host": ["{{base_url}}"],
-              "path": ["api", "webhooks", "loan-approved"]
+              "raw": "{\n  \"field_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
+        },
+        {
+          "name": "List Satellite Images",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/images/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "images"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Satellite Image (direct)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/images/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "images"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field\": 1,\n  \"date\": \"2026-06-01\",\n  \"source_url\": \"https://example.com/s2/img1.tif\",\n  \"cloud_cover\": 5.0,\n  \"bands\": {\n    \"B02\": 0.1,\n    \"B03\": 0.2,\n    \"B04\": 0.3,\n    \"B08\": 0.7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Satellite Image",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/images/{{image_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "images",
+                "{{image_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Satellite Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/images/{{image_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "images",
+                "{{image_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Processing Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/jobs/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "jobs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Processing Job",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/satellite/jobs/{{job_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "jobs",
+                "{{job_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udfe2 Django \u2014 Analysis (ML)",
+      "item": [
+        {
+          "name": "Vegetation Indices (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/vegetation/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "vegetation",
+                "{{field_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Predict Crop Type (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/crop-type/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "crop-type",
+                "{{field_id}}"
+              ]
+            },
+            "description": "All fields optional (defaults shown). Ranges enforced: N/P/K 0-300, temp -10..55, humidity 0-100, rainfall 0-5000, moisture 0-100, lon/lat. Empty {} also valid (uses defaults).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 36.82,\n  \"lat\": -1.29\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Predict Soil Composition (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/soil-composition/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "soil-composition",
+                "{{field_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 36.82,\n  \"lat\": -1.29,\n  \"soil_type\": \"Loamy\",\n  \"region\": \"Rift Valley\",\n  \"country\": \"Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Identify Crop Area (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/crop-area/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "crop-area",
+                "{{field_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nitrogen\": 80,\n  \"phosphorus\": 40,\n  \"potassium\": 40,\n  \"temperature\": 25.0,\n  \"humidity\": 70.0,\n  \"rainfall\": 200.0,\n  \"moisture\": 40.0,\n  \"lon\": 36.82,\n  \"lat\": -1.29,\n  \"soil_type\": \"Loamy\",\n  \"region\": \"Rift Valley\",\n  \"country\": \"Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Field Boundaries (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/boundaries/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "boundaries",
+                "{{field_id}}"
+              ]
+            },
+            "description": "404 if no BoundaryDetection row for field."
+          }
+        },
+        {
+          "name": "Vegetation Trends (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/trends/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "trends",
+                "{{field_id}}"
+              ]
+            },
+            "description": "404 if no VegetationIndex rows for field."
+          }
+        },
+        {
+          "name": "Land Degradation (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/analysis/degradation/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "analysis",
+                "degradation",
+                "{{field_id}}"
+              ]
+            },
+            "description": "404 if no LandDegradation row for field."
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udfe2 Django \u2014 Soil / Carbon / Reports",
+      "item": [
+        {
+          "name": "Soil Health (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/soil/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "soil",
+                "{{field_id}}"
+              ]
+            },
+            "description": "404 if no SoilHealthRecord for field. No POST \u2014 records come from satellite processing pipeline."
+          }
+        },
+        {
+          "name": "Carbon Detail (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/carbon/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "{{field_id}}"
+              ]
+            },
+            "description": "404 if no CarbonSequestration row for field."
+          }
+        },
+        {
+          "name": "Carbon Create (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/carbon/{{field_id}}/create/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "{{field_id}}",
+                "create"
+              ]
+            },
+            "description": "methodology enum: ndvi_based | soil_organic_carbon | biomass_estimation.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carbon_tons\": 5.0,\n  \"confidence_score\": 0.9,\n  \"methodology\": \"soil_organic_carbon\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Field Report (aggregated GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{django_base_url}}/api/reports/field/{{field_id}}/",
+              "host": [
+                "{{django_base_url}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "field",
+                "{{field_id}}"
+              ]
+            },
+            "description": "Aggregates crop, soil, carbon, vegetation for the field."
+          }
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd35 Node Backend (finance \u2014 legacy, kept)",
+      "description": "Original finance/AI/chatbot requests, now pointed at {{node_base_url}}.",
+      "item": [
+        {
+          "name": "\ud83c\udfe0 Health & Status",
+          "item": [
+            {
+              "name": "Root API",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{node_base_url}}/",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Health Check",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{node_base_url}}/health",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "API Root",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{node_base_url}}/api",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udd10 Authentication",
+          "item": [
+            {
+              "name": "Register User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"test@example.com\",\n  \"phone\": \"1234567890\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/register",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Login User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/login",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/profile",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/refresh-token",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "refresh-token"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/logout",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Register with Firebase",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"firebase@example.com\",\n  \"firstName\": \"Firebase\",\n  \"lastName\": \"User\",\n  \"role\": \"farmer\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/firebase/register",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "firebase",
+                    "register"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Login with Firebase",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"firebase@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/auth/firebase/login",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "firebase",
+                    "login"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83e\udd16 AI Services",
+          "item": [
+            {
+              "name": "Detect Crop",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"imageData\": \"base64_encoded_image_data_here\",\n  \"options\": {\n    \"confidenceThreshold\": 0.7\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/detect-crop",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "detect-crop"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Analyze Soil",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"soilData\": {\n    \"ph\": 6.5,\n    \"moisture\": 0.4,\n    \"temperature\": 25,\n    \"organicMatter\": 2.3\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/analyze-soil",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "analyze-soil"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Predict Carbon",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/predict-carbon",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "predict-carbon"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Predict Yield",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/predict-yield",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "predict-yield"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Analyze Vegetation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vegetationData\": {\n    \"ndvi\": 0.65,\n    \"evi\": 0.55\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/analyze-vegetation",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "analyze-vegetation"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Analyze Field",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fieldId\": \"field_123\",\n  \"area\": 5,\n  \"cropType\": \"maize\",\n  \"soilData\": {\"ph\": 6.5, \"moisture\": 0.4}\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/analyze-field",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "analyze-field"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get AI Models",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/ai/models",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "models"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udcac Chatbot",
+          "item": [
+            {
+              "name": "Send Message",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"message\": \"Hello, I need help with my crops\",\n  \"context\": {}\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/chatbot/message",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "chatbot",
+                    "message"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/chatbot/history",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "chatbot",
+                    "history"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Recommendations",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"farmData\": {\n    \"soil\": {\"nitrogen\": 0.3, \"moisture\": 0.25},\n    \"crop\": {\"type\": \"maize\", \"healthScore\": 0.45}\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/chatbot/recommendations",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "chatbot",
+                    "recommendations"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Analytics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/chatbot/analytics",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "chatbot",
+                    "analytics"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Clear History",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/chatbot/history",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "chatbot",
+                    "history"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udcb0 Loans",
+          "item": [
+            {
+              "name": "Apply for Loan",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"purpose\": \"irrigation_upgrade\",\n  \"tenureMonths\": 12\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/loans/apply",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "loans",
+                    "apply"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get All Loans",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/loans?status=pending&limit=10",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "loans"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "pending"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Loan Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/loans/{{loan_id}}",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "loans",
+                    "{{loan_id}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Approve Loan (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"approve\": true,\n  \"note\": \"Loan approved\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/loans/{{loan_id}}/approve",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "loans",
+                    "{{loan_id}}",
+                    "approve"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Disburse Loan (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"walletId\": \"{{wallet_id}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/loans/{{loan_id}}/disburse",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "loans",
+                    "{{loan_id}}",
+                    "disburse"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83c\udf3f Carbon Credits",
+          "item": [
+            {
+              "name": "Get All Credits",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Available Credits",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits/available",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits",
+                    "available"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Credit Stats",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits/stats",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits",
+                    "stats"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Credit (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cooperativeId\": \"coop_123\",\n  \"fieldId\": \"field_123\",\n  \"amountInTons\": 2.5,\n  \"pricePerTon\": 50\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Tokenize Credit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 2.5\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits/{{credit_id}}/tokenize",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits",
+                    "{{credit_id}}",
+                    "tokenize"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Sell Credit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"buyerId\": \"user_456\",\n  \"amount\": 2.5\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/carbon-credits/{{credit_id}}/sell",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "carbon-credits",
+                    "{{credit_id}}",
+                    "sell"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udcb3 Wallet & Payments",
+          "item": [
+            {
+              "name": "Get Balance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/wallet",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "wallet"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/wallet/transactions?limit=10",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "wallet",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Deposit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 1000,\n  \"paymentMethod\": \"card\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/wallet/deposit",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "wallet",
+                    "deposit"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Withdraw",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"bank_transfer\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/wallet/withdraw",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "wallet",
+                    "withdraw"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Transfer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"recipientUserId\": \"user_456\",\n  \"amount\": 200,\n  \"description\": \"Payment for services\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/wallet/transfer",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "wallet",
+                    "transfer"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Initiate Payment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 500,\n  \"paymentMethod\": \"card\",\n  \"paymentType\": \"loan_repayment\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/payments/initiate",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "initiate"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Payments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/payments",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Refund Payment (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Customer request\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/payments/{{payment_id}}/refund",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "{{payment_id}}",
+                    "refund"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udccb Subscriptions & API Keys",
+          "item": [
+            {
+              "name": "Get Plans",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/plans",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "plans"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Subscription",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan\": \"professional\",\n  \"billingCycle\": \"monthly\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/create",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "create"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get My Subscription",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/my-subscription",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "my-subscription"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Generate API Key",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"My API Key\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/generate-api-key",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "generate-api-key"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List API Keys",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/api-keys",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "api-keys"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Revoke API Key",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/api-keys/{{api_key_id}}",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "api-keys",
+                    "{{api_key_id}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Usage Stats",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/usage",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "usage"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Cancel Subscription",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Too expensive\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/subscriptions/cancel",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "subscriptions",
+                    "cancel"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "\ud83d\udd17 Webhooks",
+          "item": [
+            {
+              "name": "Webhook Status",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{node_base_url}}/api/webhooks/status",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "webhooks",
+                    "status"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Stripe Webhook",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "stripe-signature",
+                    "value": "whsec_mock"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"evt_mock_123\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_mock_123\",\n      \"amount\": 50000,\n      \"currency\": \"usd\"\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/webhooks/stripe",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "webhooks",
+                    "stripe"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Loan Approved Webhook",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"loanId\": \"loan_123\",\n  \"cooperativeId\": \"coop_123\",\n  \"amount\": 5000,\n  \"status\": \"approved\"\n}"
+                },
+                "url": {
+                  "raw": "{{node_base_url}}/api/webhooks/loan-approved",
+                  "host": [
+                    "{{node_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "webhooks",
+                    "loan-approved"
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     }

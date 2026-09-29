@@ -1,16 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { FaComments, FaTimes, FaPaperPlane, FaRobot } from 'react-icons/fa'
-import { useTranslation } from 'react-i18next'
-import { chatbotAPI } from '../../services/api'
+import { chatbotAPI } from '../../services/nodeApi'
 
 const Chatbot = () => {
-  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
     { 
-      text: t('chatbot.welcome'), 
+      text: "Hi! I'm here to help you with AgriMap.", 
       sender: 'bot',
-      features: t('chatbot.features')
+      features: 'Ask me about loans, satellite data, carbon credits, or soil analysis.'
     }
   ])
   const [input, setInput] = useState('')
@@ -77,7 +75,7 @@ const Chatbot = () => {
           <div className="chatbot-header bg-gradient-to-r from-green-600 to-blue-600 rounded-t-2xl px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <FaRobot className="text-white text-xl" />
-              <h3 className="text-white font-semibold">{t('chatbot.title')}</h3>
+              <h3 className="text-white font-semibold">AgriMap Assistant</h3>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
@@ -125,7 +123,7 @@ const Chatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={t('chatbot.placeholder')}
+              placeholder="Type a message..."
               className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-gray-900 dark:text-white"
               aria-label="Type your message"
             />

@@ -3,7 +3,7 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'https://agri-map-v81v.onrender.com'
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 })
@@ -24,9 +24,9 @@ api.interceptors.response.use(
       const refresh = localStorage.getItem('refreshToken')
       if (refresh) {
         try {
-          const { data } = await axios.post(`${API_URL}/api/auth/refresh-token`, { refreshToken: refresh })
+          const { data } = await axios.post(`${API_URL}/api/auth/refresh/`, { refresh })
           const payload = data.data || data
-          const newToken = payload.token || payload.access
+          const newToken = payload.access || payload.token
           if (newToken) {
             localStorage.setItem('token', newToken)
             original.headers.Authorization = `Bearer ${newToken}`
@@ -35,6 +35,7 @@ api.interceptors.response.use(
         } catch {
           localStorage.removeItem('token')
           localStorage.removeItem('refreshToken')
+          window.location.href = '/login'
         }
       }
     }
@@ -44,88 +45,64 @@ api.interceptors.response.use(
 
 const unwrap = (res) => res.data?.data ?? res.data
 
+// Auth API - Matches Django URLs
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data).then(unwrap),
-  login: (data) => api.post('/auth/login', data).then(unwrap),
-  profile: () => api.get('/auth/profile').then(unwrap),
-  logout: () => api.post('/auth/logout').then(unwrap),
-  refreshToken: (refreshToken) => api.post('/auth/refresh-token', { refreshToken }).then(unwrap),
-  firebaseRegister: (data) => api.post('/auth/firebase/register', data).then(unwrap),
-  firebaseLogin: (data) => api.post('/auth/firebase/login', data).then(unwrap),
-  forgotPassword: (email) => api.post('/auth/forgot-password', { email }).then(unwrap),
-  resetPassword: (data) => api.post('/auth/reset-password', data).then(unwrap),
-  googleLogin: (credential) => api.post('/auth/google', { credential }).then(unwrap),
+  register: (data) => api.post('/api/auth/register/', data).then(unwrap),
+  login: (data) => api.post('/api/auth/login/', data).then(unwrap),
+  profile: () => api.get('/api/auth/me/').then(unwrap),
+  refresh: (refreshToken) => api.post('/api/auth/refresh/', { refresh: refreshToken }).then(unwrap),
+  logout: () => api.post('/api/auth/logout/').then(unwrap),
+  forgotPassword: (data) => api.post('/api/auth/forgot-password/', data).then(unwrap),
+  resetPassword: (data) => api.post('/api/auth/reset-password/', data).then(unwrap),
 }
 
-export const aiAPI = {
-  detectCrop: (data) => api.post('/ai/detect-crop', data).then(unwrap),
-  analyzeSoil: (data) => api.post('/ai/analyze-soil', data).then(unwrap),
-  predictCarbon: (data) => api.post('/ai/predict-carbon', data).then(unwrap),
-  predictYield: (data) => api.post('/ai/predict-yield', data).then(unwrap),
-  analyzeVegetation: (data) => api.post('/ai/analyze-vegetation', data).then(unwrap),
-  analyzeField: (data) => api.post('/ai/analyze-field', data).then(unwrap),
-  getModels: () => api.get('/ai/models').then(unwrap),
-}
-
-export const chatbotAPI = {
-  sendMessage: (message, context) => api.post('/chatbot/message', { message, context }).then(unwrap),
-  getHistory: () => api.get('/chatbot/history').then(unwrap),
-  getRecommendations: () => api.get('/chatbot/recommendations').then(unwrap),
-  clearHistory: () => api.delete('/chatbot/history').then(unwrap),
-}
-
-export const loanAPI = {
-  apply: (data) => api.post('/loans/apply', data).then(unwrap),
-  getAll: (params) => api.get('/loans', { params }).then(unwrap),
-  getOne: (id) => api.get(`/loans/${id}`).then(unwrap),
-  approve: (id, data) => api.post(`/loans/${id}/approve`, data).then(unwrap),
-  disburse: (id, data) => api.post(`/loans/${id}/disburse`, data).then(unwrap),
-}
-
-export const carbonAPI = {
-  getAll: () => api.get('/carbon-credits').then(unwrap),
-  getAvailable: () => api.get('/carbon-credits/available').then(unwrap),
-  getStats: () => api.get('/carbon-credits/stats').then(unwrap),
-  create: (data) => api.post('/carbon-credits', data).then(unwrap),
-  tokenize: (id, data) => api.post(`/carbon-credits/${id}/tokenize`, data).then(unwrap),
-  sell: (id, data) => api.post(`/carbon-credits/${id}/sell`, data).then(unwrap),
-}
-
-export const walletAPI = {
-  getBalance: () => api.get('/wallet').then(unwrap),
-  getTransactions: (params) => api.get('/wallet/transactions', { params }).then(unwrap),
-  deposit: (data) => api.post('/wallet/deposit', data).then(unwrap),
-  withdraw: (data) => api.post('/wallet/withdraw', data).then(unwrap),
-  transfer: (data) => api.post('/wallet/transfer', data).then(unwrap),
-}
-
-export const paymentAPI = {
-  initiate: (data) => api.post('/payments/initiate', data).then(unwrap),
-  getAll: () => api.get('/payments').then(unwrap),
-  refund: (id, data) => api.post(`/payments/${id}/refund`, data).then(unwrap),
-}
-
-export const subscriptionAPI = {
-  getPlans: () => api.get('/subscriptions/plans').then(unwrap),
-  create: (data) => api.post('/subscriptions/create', data).then(unwrap),
-  getMySubscription: () => api.get('/subscriptions/my-subscription').then(unwrap),
-  generateApiKey: (data) => api.post('/subscriptions/generate-api-key', data).then(unwrap),
-  getApiKeys: () => api.get('/subscriptions/api-keys').then(unwrap),
-  revokeApiKey: (id) => api.delete(`/subscriptions/api-keys/${id}`).then(unwrap),
-  getUsage: () => api.get('/subscriptions/usage').then(unwrap),
-  cancel: () => api.post('/subscriptions/cancel').then(unwrap),
-}
-
+// Field API
 export const fieldAPI = {
-  getAll: () => api.get('/fields').then(unwrap),
-  getOne: (id) => api.get(`/fields/${id}`).then(unwrap),
-  create: (data) => api.post('/fields', data).then(unwrap),
-  update: (id, data) => api.put(`/fields/${id}`, data).then(unwrap),
-  delete: (id) => api.delete(`/fields/${id}`).then(unwrap),
+  getAll: () => api.get('/api/fields/').then(unwrap),
+  getById: (id) => api.get(`/api/fields/${id}/`).then(unwrap),
+  create: (data) => api.post('/api/fields/', data).then(unwrap),
+  update: (id, data) => api.put(`/api/fields/${id}/`, data).then(unwrap),
+  delete: (id) => api.delete(`/api/fields/${id}/`).then(unwrap),
+  getBoundaries: (id) => api.get(`/api/analysis/boundaries/${id}/`).then(unwrap),
 }
 
-export const healthAPI = {
-  check: () => axios.get(`${API_URL}/health`).then((r) => r.data),
+// Analysis API
+export const analysisAPI = {
+  getVegetation: (id) => api.get(`/api/analysis/vegetation/${id}/`).then(unwrap),
+  getCropType: (id) => api.get(`/api/analysis/crop-type/${id}/`).then(unwrap),
+  getSoil: (id) => api.get(`/api/analysis/soil/${id}/`).then(unwrap),
+  getDegradation: (id) => api.get(`/api/analysis/degradation/${id}/`).then(unwrap),
+  getTrends: (id) => api.get(`/api/analysis/trends/${id}/`).then(unwrap),
+  predictCrop: (id, data) => api.post(`/api/analysis/crop-type/${id}/`, data).then(unwrap),
+  predictSoil: (id, data) => api.post(`/api/analysis/soil-composition/${id}/`, data).then(unwrap),
 }
 
-export default api
+// Carbon API
+export const carbonAPI = {
+  getStats: () => api.get('/api/carbon/stats/').then(unwrap),
+  getAll: () => api.get('/api/carbon/').then(unwrap),
+  getForField: (fieldId) => api.get(`/api/carbon/${fieldId}/`).then(unwrap),
+}
+
+// Wallet API
+export const walletAPI = {
+  getBalance: () => api.get('/api/wallet/balance/').then(unwrap),
+  getTransactions: (params) => api.get('/api/wallet/transactions/', { params }).then(unwrap),
+  deposit: (data) => api.post('/api/wallet/deposit/', data).then(unwrap),
+  withdraw: (data) => api.post('/api/wallet/withdraw/', data).then(unwrap),
+  transfer: (data) => api.post('/api/wallet/transfer/', data).then(unwrap),
+}
+
+// Satellite API
+export const satelliteAPI = {
+  fetch: (data) => api.post('/api/satellite/fetch/', data).then(unwrap),
+  process: (data) => api.post('/api/satellite/process/', data).then(unwrap),
+}
+
+export default {
+  authAPI,
+  fieldAPI,
+  analysisAPI,
+  carbonAPI,
+  walletAPI,
+}

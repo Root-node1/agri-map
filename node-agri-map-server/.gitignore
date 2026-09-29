@@ -39,4 +39,4 @@ coverage/
 
 # Database files
 *.db
-*.sqlite
+*.sqlite.env

@@ -22,28 +22,28 @@ class SatelliteImageListCreateView(generics.ListCreateAPIView):
     serializer_class = SatelliteImageSerializer
 
     def get_queryset(self):
-        return SatelliteImage.objects.filter(field__user=self.request.user)
+        return SatelliteImage.objects.all()
 
 
 class SatelliteImageDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = SatelliteImageSerializer
 
     def get_queryset(self):
-        return SatelliteImage.objects.filter(field__user=self.request.user)
+        return SatelliteImage.objects.all()
 
 
 class ProcessingJobListView(generics.ListAPIView):
     serializer_class = ProcessingJobSerializer
 
     def get_queryset(self):
-        return ProcessingJob.objects.filter(field__user=self.request.user)
+        return ProcessingJob.objects.all()
 
 
 class ProcessingJobDetailView(generics.RetrieveAPIView):
     serializer_class = ProcessingJobSerializer
 
     def get_queryset(self):
-        return ProcessingJob.objects.filter(field__user=self.request.user)
+        return ProcessingJob.objects.all()
 
 
 @extend_schema(
@@ -64,7 +64,7 @@ class FetchImageryView(APIView):
         date_range = serializer.validated_data.get('date_range', [])
 
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -109,7 +109,7 @@ class ProcessImageryView(APIView):
         field_id = serializer.validated_data['field_id']
 
         try:
-            field = Field.objects.get(pk=field_id, user=request.user)
+            field = Field.objects.get(pk=field_id)
         except Field.DoesNotExist:
             return Response({'error': 'Field not found'}, status=status.HTTP_404_NOT_FOUND)
 

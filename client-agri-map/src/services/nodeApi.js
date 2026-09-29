@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const NODE_API_URL = import.meta.env.VITE_NODE_API_URL || 'http://localhost:5000/api'
+const NODE_API_URL = import.meta.env.VITE_NODE_API_URL
+if (!NODE_API_URL) {
+  console.error('[nodeApi] VITE_NODE_API_URL is not set. Configure it in your environment.')
+}
 
 const nodeApi = axios.create({
   baseURL: NODE_API_URL,
@@ -47,6 +50,13 @@ export const walletAPI = {
 }
 
 // Health check
+// Chatbot endpoints
+export const chatbotAPI = {
+  sendMessage: (message, context) => nodeApi.post('/chatbot/message', { message, context }).then(res => res.data.data),
+  getHistory: () => nodeApi.get('/chatbot/history').then(res => res.data.data),
+  clearHistory: () => nodeApi.delete('/chatbot/history').then(res => res.data.data),
+}
+
 export const nodeHealthAPI = {
   check: () => nodeApi.get('/health'),
 }

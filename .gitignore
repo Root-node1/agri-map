@@ -10,10 +10,12 @@ node-agri-map-server/node_modules/
 # Build artifacts
 client-agri-map/dist/
 client-agri-map/build/
+server-agri-map-django/staticfiles/
 
 # Python virtualenv and caches
 server-agri-map-django/venv/
 server-agri-map-django/.venv/
+server-agri-map-django/env/
 **/__pycache__/
 
 # Django local env with secrets
@@ -23,3 +25,7 @@ server-agri-map-django/.env
 .DS_Store
 Thumbs.db
 *.log
+.env
+.opencode/
+
+node_modules/
