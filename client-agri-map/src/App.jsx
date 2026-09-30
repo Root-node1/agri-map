@@ -7,6 +7,7 @@ import Home from './pages/public/Home'
 import About from './pages/public/About'
 import PrivacyPolicy from './pages/public/PrivacyPolicy'
 import TermsConditions from './pages/public/TermsConditions'
+import Landing from './pages/public/LandingPage'
 
 import FarmerDashboard from './pages/dashboard/FarmerDashboard'
 import CooperativeDashboard from './pages/dashboard/CooperativeDashboard'
@@ -29,12 +30,17 @@ function App() {
   const { isOnboarded } = useUser()
 
   const renderDashboard = () => {
-    const user = JSON.parse(localStorage.getItem('agrimap_user') || '{}')
+    const user = JSON.parse(
+      localStorage.getItem('agrimap_user') || '{}'
+    )
+
     switch (user?.role) {
       case 'admin':
         return <AdminDashboard />
+
       case 'cooperative':
         return <CooperativeDashboard />
+
       default:
         return <FarmerDashboard />
     }
@@ -44,31 +50,100 @@ function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
+
+          {/* FIRST PAGE — LANDING */}
           <Route
             path="/"
+            element={<Landing />}
+          />
+
+          {/* ONBOARDING */}
+          <Route
+            path="/onboarding"
             element={
-              isOnboarded ? <Navigate to="/home" replace /> : <UserOnboarding />
+              isOnboarded
+                ? <Navigate to="/dashboard" replace />
+                : <UserOnboarding />
             }
           />
+
+          {/* PUBLIC PAGES */}
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsConditions />} />
 
-          <Route path="/farmer/register" element={<FarmerProfileSetup />} />
-          <Route path="/cooperatives" element={<Cooperatives />} />
-          <Route path="/cooperatives/new" element={<CooperativeRegister />} />
-          <Route path="/cooperatives/:id" element={<CooperativeDetails />} />
-          <Route path="/dashboard" element={renderDashboard()} />
-          <Route path="/fields" element={<Fields />} />
-          <Route path="/fields/new" element={<NewField />} />
-          <Route path="/fields/:id" element={<FieldDetails />} />
-          <Route path="/fields/:id/report" element={<FieldReport />} />
-          <Route path="/fields/:id/satellite" element={<SatelliteAnalysis />} />
-          <Route path="/heatmap" element={<HeatmapView />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* FARMER */}
+          <Route
+            path="/farmer/register"
+            element={<FarmerProfileSetup />}
+          />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* COOPERATIVES */}
+          <Route
+            path="/cooperatives"
+            element={<Cooperatives />}
+          />
+
+          <Route
+            path="/cooperatives/new"
+            element={<CooperativeRegister />}
+          />
+
+          <Route
+            path="/cooperatives/:id"
+            element={<CooperativeDetails />}
+          />
+
+          {/* DASHBOARD */}
+          <Route
+            path="/dashboard"
+            element={renderDashboard()}
+          />
+
+          {/* FARM */}
+          <Route
+            path="/fields"
+            element={<Fields />}
+          />
+
+          <Route
+            path="/fields/new"
+            element={<NewField />}
+          />
+
+          <Route
+            path="/fields/:id"
+            element={<FieldDetails />}
+          />
+
+          <Route
+            path="/fields/:id/report"
+            element={<FieldReport />}
+          />
+
+          <Route
+            path="/fields/:id/satellite"
+            element={<SatelliteAnalysis />}
+          />
+
+          <Route
+            path="/heatmap"
+            element={<HeatmapView />}
+          />
+
+          {/* SETTINGS */}
+          <Route
+            path="/settings"
+            element={<Settings />}
+          />
+
+          {/* UNKNOWN URL */}
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
+
         </Routes>
       </Layout>
     </BrowserRouter>
