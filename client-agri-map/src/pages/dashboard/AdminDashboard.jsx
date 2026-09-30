@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import { FaUsers, FaChartBar, FaCog, FaSearch } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import axios from 'axios'
 
 const AdminDashboard = () => {
-  const { user, token } = useAuth()
+  const { user } = useUser()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')

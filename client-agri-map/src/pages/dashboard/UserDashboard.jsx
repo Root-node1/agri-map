@@ -1,10 +1,10 @@
 import React from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import { FaUser, FaChartLine, FaMapMarkerAlt, FaLeaf } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
 const UserDashboard = () => {
-  const { user } = useAuth()
+  const { user } = useUser()
 
   const stats = [
     { icon: <FaUser />, label: 'Profile', value: 'Active' },

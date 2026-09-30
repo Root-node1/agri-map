@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
 
 const FarmerProfileSetup = () => {
   const navigate = useNavigate()
-  const { user, completeFarmerProfile } = useAuth()
   const [formData, setFormData] = useState({
-    phone: user?.phone || '',
-    location: user?.location || ''
+    phone: '',
+    location: ''
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,7 +15,7 @@ const FarmerProfileSetup = () => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
     setError('')
 
@@ -27,15 +25,10 @@ const FarmerProfileSetup = () => {
     }
 
     setLoading(true)
-    const result = await completeFarmerProfile(formData)
-    setLoading(false)
-
-    if (!result.success) {
-      setError(result.error)
-      return
-    }
-
-    navigate('/dashboard')
+    setTimeout(() => {
+      setLoading(false)
+      navigate('/dashboard')
+    }, 800)
   }
 
   return (

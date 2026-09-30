@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaUsers, FaHands, FaLeaf, FaWallet, FaPlus, FaChartLine } from 'react-icons/fa'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import PageHeader from '../../components/ui/PageHeader'
 import StatCard from '../../components/ui/StatCard'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 const CooperativeDashboard = () => {
-  const { user } = useAuth()
+  const { user } = useUser()
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
     members: 0,

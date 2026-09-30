@@ -6,7 +6,7 @@ import {
   FaTint, FaThermometerHalf, FaChartLine, FaEdit,
   FaTrash, FaDownload, FaShare
 } from 'react-icons/fa'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import FieldMap from '../../components/ui/FieldMap'
@@ -17,7 +17,7 @@ import { demoFields, demoSoilData, nutrientHeatmap, demoPredictions, demoCarbonD
 const FieldDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user } = useUser()
   const [field, setField] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')

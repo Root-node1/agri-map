@@ -1,15 +1,12 @@
 import React from 'react'
-import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom'
-import { useAuth } from './contexts/AuthContext'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useUser } from './contexts/UserContext'
 import Layout from './components/layout/Layout'
-import WelcomeLanding from './pages/public/WelcomeLanding'
+import UserOnboarding from './pages/public/UserOnboarding'
 import Home from './pages/public/Home'
 import About from './pages/public/About'
 import PrivacyPolicy from './pages/public/PrivacyPolicy'
 import TermsConditions from './pages/public/TermsConditions'
-import Login from './pages/auth/Login'
-import Signup from './pages/auth/Signup'
-import ForgotPassword from './pages/auth/ForgotPassword'
 
 import FarmerDashboard from './pages/dashboard/FarmerDashboard'
 import CooperativeDashboard from './pages/dashboard/CooperativeDashboard'
@@ -26,13 +23,13 @@ import Cooperatives from './pages/public/Cooperatives'
 import CooperativeDetails from './pages/public/CooperativeDetails'
 import CooperativeRegister from './pages/public/CooperativeRegister'
 import Settings from './pages/public/Settings'
-import ProtectedRoute from './components/auth/ProtectedRoute'
 import Logo from './components/common/Logo'
 
 function App() {
-  const { user, needsFarmerProfile } = useAuth()
+  const { isOnboarded } = useUser()
 
   const renderDashboard = () => {
+    const user = JSON.parse(localStorage.getItem('agrimap_user') || '{}')
     switch (user?.role) {
       case 'admin':
         return <AdminDashboard />
@@ -45,132 +42,35 @@ function App() {
 
   return (
     <BrowserRouter>
-    <Layout>
-      <Routes>
-        {/* Logged-out visitors land on the welcome tag before login/register.
-            Logged-in farmers who still need to complete profile are sent to the
-            farmer registration step before they can use the dashboard. */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              needsFarmerProfile ? <Navigate to="/farmer/register" replace /> : <Navigate to="/dashboard" replace />
-            ) : (
-              <WelcomeLanding />
-            )
-          }
-        />
-        <Route path="/home" element={<Home />} />
-        <Route path="/" element={<Logo/>}/>
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsConditions />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/signup" element={<Signup />} />
+      <Layout>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isOnboarded ? <Navigate to="/home" replace /> : <UserOnboarding />
+            }
+          />
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsConditions />} />
 
-        {/* Farmer profile (phone + location) is a separate, authenticated step
-            after account creation — POST /api/farmers/register/ needs a token,
-            so this can't reuse the public Signup component. */}
-        <Route
-          path="/farmer/register"
-          element={
-            <ProtectedRoute requiredRole="farmer">
-              <FarmerProfileSetup />
-            </ProtectedRoute>
-          }
-        />
+          <Route path="/farmer/register" element={<FarmerProfileSetup />} />
+          <Route path="/cooperatives" element={<Cooperatives />} />
+          <Route path="/cooperatives/new" element={<CooperativeRegister />} />
+          <Route path="/cooperatives/:id" element={<CooperativeDetails />} />
+          <Route path="/dashboard" element={renderDashboard()} />
+          <Route path="/fields" element={<Fields />} />
+          <Route path="/fields/new" element={<NewField />} />
+          <Route path="/fields/:id" element={<FieldDetails />} />
+          <Route path="/fields/:id/report" element={<FieldReport />} />
+          <Route path="/fields/:id/satellite" element={<SatelliteAnalysis />} />
+          <Route path="/heatmap" element={<HeatmapView />} />
+          <Route path="/settings" element={<Settings />} />
 
-        {/* /api/farmers/cooperatives/ is JWT-gated on the backend — these were
-            public before, which meant a logged-out visit would 401 silently. */}
-        <Route
-          path="/cooperatives"
-          element={
-            <ProtectedRoute>
-              <Cooperatives />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cooperatives/new"
-          element={
-            <ProtectedRoute>
-              <CooperativeRegister />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cooperatives/:id"
-          element={
-            <ProtectedRoute>
-              <CooperativeDetails />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              {needsFarmerProfile ? <Navigate to="/farmer/register" replace /> : renderDashboard()}
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fields"
-          element={
-            <ProtectedRoute>
-              <Fields />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fields/new"
-          element={
-            <ProtectedRoute>
-              <NewField />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fields/:id"
-          element={
-            <ProtectedRoute>
-              <FieldDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fields/:id/report"
-          element={
-            <ProtectedRoute>
-              <FieldReport />
-            </ProtectedRoute>
-          }
-        />
-        {/* SatelliteAnalysis was imported but had no route — wiring it in
-            under the field it analyzes, matching the Satellite tab flow. */}
-        <Route
-          path="/fields/:id/satellite"
-          element={
-            <ProtectedRoute>
-              <SatelliteAnalysis />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Layout>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   )
 }

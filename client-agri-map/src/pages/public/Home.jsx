@@ -11,7 +11,6 @@ import {
   FiShield,
   FiArrowRight as FiArrowRightLine,
 } from 'react-icons/fi'
-import { useAuth } from '../../contexts/AuthContext'
 import { useHeroReveal, useStaggerReveal } from '../../lib/motion'
 
 /* Feature list — vector icons only (no emoji-as-icons) with a per-feature
@@ -79,7 +78,6 @@ const ACCENT_STYLES = {
 }
 
 const Home = () => {
-  const { isAuthenticated } = useAuth()
   const hero = useHeroReveal()
   const featureReveal = useStaggerReveal({ step: 0.07 })
   const pathReveal = useStaggerReveal({ step: 0.08, delay: 0.08 })
@@ -123,31 +121,15 @@ const Home = () => {
             variants={hero.item}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            {isAuthenticated ? (
-              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  to="/dashboard"
-                  className="btn-primary text-base agrimap-focus"
-                >
-                  Go to Dashboard
-                  <FaArrowRight size={14} aria-hidden="true" />
-                </Link>
-              </motion.div>
-            ) : (
-              <>
-                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                  <Link to="/register" className="btn-primary text-base agrimap-focus">
-                    Get Started
-                    <FaArrowRight size={14} aria-hidden="true" />
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                  <Link to="/login" className="btn-secondary text-base agrimap-focus">
-                    Sign In
-                  </Link>
-                </motion.div>
-              </>
-            )}
+            <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                to="/dashboard"
+                className="btn-primary text-base agrimap-focus"
+              >
+                Go to Dashboard
+                <FaArrowRight size={14} aria-hidden="true" />
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* Trust signals sit directly under the primary CTA */}
@@ -287,31 +269,29 @@ const Home = () => {
         {/* ----------------------------------------------------------------
             Closing CTA
             ---------------------------------------------------------------- */}
-        {!isAuthenticated && (
-          <motion.section
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            className="frosted-panel text-center px-6 py-12 mt-6 border-emerald-500/20"
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          className="frosted-panel text-center px-6 py-12 mt-6 border-emerald-500/20"
+        >
+          <h2 className="text-2xl font-bold text-white mb-3">
+            Ready to map your first field?
+          </h2>
+          <p className="text-slate-400 max-w-lg mx-auto mb-7 text-sm sm:text-base">
+            Create an account in under a minute. No payment details required to start.
+          </p>
+          <motion.div
+            className="flex flex-wrap justify-center gap-4"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <h2 className="text-2xl font-bold text-white mb-3">
-              Ready to map your first field?
-            </h2>
-            <p className="text-slate-400 max-w-lg mx-auto mb-7 text-sm sm:text-base">
-              Create an account in under a minute. No payment details required to start.
-            </p>
-            <motion.div
-              className="flex flex-wrap justify-center gap-4"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link to="/register" className="btn-primary agrimap-focus">
-                Create free account
-                <FaArrowRight size={14} aria-hidden="true" />
-              </Link>
-            </motion.div>
-          </motion.section>
-        )}
+            <Link to="/register" className="btn-primary agrimap-focus">
+              Create free account
+              <FaArrowRight size={14} aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </motion.section>
       </div>
     </div>
   )

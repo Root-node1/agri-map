@@ -16,7 +16,7 @@ import {
   FiCalendar,
   FiArrowRight,
 } from 'react-icons/fi'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import PageHeader from '../../components/ui/PageHeader'
 import StatCard from '../../components/ui/StatCard'
 import FieldMap from '../../components/ui/FieldMap'
@@ -56,7 +56,7 @@ const QUICK_ACTIONS = [
 ]
 
 const FarmerDashboard = () => {
-  const { user } = useAuth()
+  const { user } = useUser()
   const { prefersReducedMotion, transition } = useMotionConfig()
   const [stats, setStats] = useState({ fields: 0, crops: 0, carbon: 0, balance: 0 })
   const [activities, setActivities] = useState(demoActivities)

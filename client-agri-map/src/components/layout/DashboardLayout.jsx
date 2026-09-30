@@ -6,7 +6,7 @@ import {
   Cog6ToothIcon, Bars3Icon, XMarkIcon, SunIcon, MoonIcon,
   ArrowRightOnRectangleIcon, ChartBarIcon,
 } from '@heroicons/react/24/outline'
-import { useAuth } from '../../contexts/AuthContext'
+import { useUser } from '../../contexts/UserContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import SkipLink from '../ui/SkipLink'
 import AccessibilityMenu from '../ui/AccessibilityMenu'
@@ -50,7 +50,7 @@ const navSections = [
 ]
 
 const Sidebar = ({ open, onClose }) => {
-  const { user, logout } = useAuth()
+  const { user, resetUser } = useUser()
   const { darkMode, toggleDarkMode } = useTheme()
   const navigate = useNavigate()
 
@@ -58,6 +58,11 @@ const Sidebar = ({ open, onClose }) => {
     `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none ${
       isActive ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-300 hover:bg-white/5 hover:text-white'
     }`
+
+  const handleReset = () => {
+    resetUser()
+    navigate('/')
+  }
 
   return (
     <>
@@ -100,11 +105,11 @@ const Sidebar = ({ open, onClose }) => {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-[#061b12]/95">
           <div className="flex items-center gap-3 mb-3 px-2">
             <div className="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-bold text-sm">
-              {(user?.firstName?.[0] || user?.name?.[0] || 'U').toUpperCase()}
+              {(user?.name?.[0] || 'U').toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.firstName || user?.name || 'User'}</p>
-              <p className="text-xs text-slate-400 truncate capitalize">{user?.role || 'farmer'}</p>
+              <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>
+              <p className="text-xs text-slate-400 truncate capitalize">{user?.role?.replace(/_/g, ' ') || 'Visitor'}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -116,12 +121,12 @@ const Sidebar = ({ open, onClose }) => {
               {darkMode ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
             </button>
             <button
-              onClick={() => { logout(); navigate('/login') }}
+              onClick={handleReset}
               className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-slate-300 text-sm hover:bg-rose-500/20 hover:text-rose-300 focus-visible:ring-2 focus-visible:ring-emerald-400"
-              aria-label="Sign out"
+              aria-label="Switch user"
             >
               <ArrowRightOnRectangleIcon className="w-4 h-4" />
-              Logout
+              Switch
             </button>
           </div>
         </div>

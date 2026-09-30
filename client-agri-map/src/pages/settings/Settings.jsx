@@ -1,19 +1,30 @@
-import React, { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import React, { useState, useEffect } from 'react'
 import PageHeader from '../../components/ui/PageHeader'
+import { useUser } from '../../contexts/UserContext'
 
 const Settings = () => {
-  const { user } = useAuth()
+  const { user } = useUser()
   const [tab, setTab] = useState('profile')
   const [profile, setProfile] = useState({
-    firstName: user?.firstName || user?.name?.split(' ')[0] || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
+    firstName: user?.name?.split(' ')[0] || '',
+    lastName: user?.name?.split(' ')[1] || '',
+    email: '',
+    phone: '',
   })
   const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, marketing: false })
   const [security, setSecurity] = useState({ twoFactor: false })
   const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    if (user?.name) {
+      const nameParts = user.name.split(' ')
+      setProfile(prev => ({
+        ...prev,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+      }))
+    }
+  }, [user])
 
   const tabs = [
     { id: 'profile', label: 'Profile' },
