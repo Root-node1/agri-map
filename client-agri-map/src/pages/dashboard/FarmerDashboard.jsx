@@ -22,7 +22,9 @@ import StatCard from '../../components/ui/StatCard'
 import FieldMap from '../../components/ui/FieldMap'
 import { StatGridSkeleton, PanelSkeleton } from '../../components/ui/Skeletons'
 import { ErrorState } from '../../components/ui/StateViews'
-import { fieldAPI, walletAPI, carbonAPI } from '../../services/api'
+import { fieldAPI, carbonAPI } from '../../services/api'
+import { walletAPI } from '../../services/nodeApi'
+
 import { demoFields, demoActivities } from '../../lib/demoData'
 import { useStaggerReveal, useMotionConfig } from '../../lib/motion'
 

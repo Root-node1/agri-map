@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
-import { walletAPI, paymentAPI } from '../../services/api'
+   import { walletAPI, paymentAPI } from '../../services/nodeApi'
 import { demoWallet, demoTransactions } from '../../lib/demoData'
 
 const WalletDashboard = () => {
