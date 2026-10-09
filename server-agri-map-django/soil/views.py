@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fields.models import Field
+from server_agri_map_django.caching import cached_get_view
+from server_agri_map_django.permissions import owned_or_shared_field_or_404
 from .models import SoilHealthRecord
 from .serializers import SoilHealthResponseSerializer
 
@@ -16,15 +17,18 @@ from .serializers import SoilHealthResponseSerializer
 )
 class SoilHealthView(APIView):
     serializer_class = serializers.Serializer
+    @cached_get_view()
     def get(self, request, field_id=None):
-        try:
-            field = Field.objects.get(pk=field_id)
-        except Field.DoesNotExist:
-            return Response({'error': 'Field not found'}, status=404)
+        field = owned_or_shared_field_or_404(request.user, field_id)
 
         record = SoilHealthRecord.objects.filter(field=field).first()
         if record is None:
-            return Response({'error': 'No soil data for this field'}, status=404)
+            return Response(
+                {'error': 'No soil data for this field',
+                 'message': 'No soil data for this field',
+                 'code': 'not_found', 'details': {}},
+                status=404,
+            )
 
         return Response({
             'field_id': field.id,

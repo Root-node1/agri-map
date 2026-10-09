@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
 from django.test import TestCase
 
 from .models import Field
@@ -114,8 +115,10 @@ class FieldModelTest(TestCase):
 
 class FieldAPITest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = make_user('fieldowner')
         self.user2 = make_user('other')
+        self.client.force_login(self.user)
 
     def _create(self, name='North Field', **extra):
         payload = {
@@ -126,14 +129,19 @@ class FieldAPITest(TestCase):
         payload.update(extra)
         return self.client.post('/api/fields/', payload, content_type='application/json')
 
-    def test_create_field_no_auth(self):
+    def test_create_field_authenticated(self):
         resp = self._create()
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Field.objects.count(), 1)
         field = Field.objects.first()
         self.assertIsNotNone(field.centroid_lat)
         self.assertIsNotNone(field.centroid_lng)
-        self.assertIsNotNone(field.user)
+        self.assertEqual(field.user, self.user)
+
+    def test_create_field_unauthenticated_rejected(self):
+        self.client.logout()
+        resp = self._create()
+        self.assertEqual(resp.status_code, 401)
 
     def test_create_field_missing_name(self):
         resp = self.client.post('/api/fields/', {
@@ -141,19 +149,18 @@ class FieldAPITest(TestCase):
         }, content_type='application/json')
         self.assertEqual(resp.status_code, 400)
 
-    def test_list_fields_shows_all_users(self):
+    def test_list_fields_isolated_per_user(self):
         Field.objects.create(user=self.user, name='Mine', geometry={'type': 'Point', 'coordinates': [0, 0]})
         Field.objects.create(user=self.user2, name='Theirs', geometry={'type': 'Point', 'coordinates': [1, 1]})
         resp = self.client.get('/api/fields/')
         self.assertEqual(resp.status_code, 200)
         names = {r['name'] for r in resp.json()['results']}
-        self.assertEqual(names, {'Mine', 'Theirs'})
+        self.assertEqual(names, {'Mine'})
 
-    def test_field_detail_any_owner(self):
+    def test_field_detail_other_owner_forbidden(self):
         field = Field.objects.create(user=self.user2, name='Theirs', geometry={'type': 'Point', 'coordinates': [1, 1]})
         resp = self.client.get(f'/api/fields/{field.id}/')
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json()['name'], 'Theirs')
+        self.assertEqual(resp.status_code, 404)
 
     def test_field_detail_missing(self):
         resp = self.client.get('/api/fields/9999/')
@@ -226,3 +233,19 @@ class FieldAPITest(TestCase):
             'geometry': {'type': 'Invalid', 'coordinates': []},
         }, content_type='application/json')
         self.assertEqual(resp.status_code, 400)
+
+    def test_legacy_aliases_accepted_and_returned(self):
+        resp = self.client.post('/api/fields/', {
+            'name': 'Legacy Field',
+            'geometry': {'type': 'Point', 'coordinates': [0, 0]},
+            'location': 'Kiambu',
+            'cropType': 'Maize',
+            'size': 3.5,
+        }, content_type='application/json')
+        self.assertEqual(resp.status_code, 201)
+        body = resp.json()
+        self.assertEqual(body['location'], 'Kiambu')
+        self.assertEqual(body['crop_type'], 'Maize')
+        self.assertEqual(body['cropType'], 'Maize')
+        self.assertAlmostEqual(body['area_ha'], 3.5)
+        self.assertAlmostEqual(body['size'], 3.5)

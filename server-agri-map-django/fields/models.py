@@ -7,13 +7,27 @@ User = get_user_model()
 VALID_GEOM_TYPES = {'Point', 'Polygon', 'MultiPolygon', 'LineString', 'MultiLineString', 'MultiPoint', 'GeometryCollection'}
 
 
+def _count_points(coords) -> int:
+    """Recursively count coordinate tuples in a GeoJSON coordinates array."""
+    if not isinstance(coords, (list, tuple)) or not coords:
+        return 0
+    if isinstance(coords[0], (int, float)):
+        return 1
+    return sum(_count_points(part) for part in coords)
+
+
 def validate_geojson(value):
+    from django.conf import settings
+
     if not isinstance(value, dict):
         raise ValidationError('Geometry must be a GeoJSON object.')
     if 'type' not in value or value['type'] not in VALID_GEOM_TYPES:
         raise ValidationError(f"Invalid GeoJSON type. Must be one of: {', '.join(sorted(VALID_GEOM_TYPES))}")
     if 'coordinates' not in value:
         raise ValidationError('GeoJSON object must contain coordinates.')
+    max_points = getattr(settings, 'FIELD_GEOMETRY_MAX_POINTS', 5000)
+    if _count_points(value['coordinates']) > max_points:
+        raise ValidationError(f'Geometry exceeds the {max_points} coordinate-point limit.')
 
 
 class Field(models.Model):
@@ -21,6 +35,8 @@ class Field(models.Model):
     name = models.CharField(max_length=255)
     geometry = models.JSONField(validators=[validate_geojson])
     area_ha = models.FloatField(null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True, default='')
+    crop_type = models.CharField(max_length=255, blank=True, default='')
     centroid_lat = models.FloatField(null=True, blank=True, editable=False)
     centroid_lng = models.FloatField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
