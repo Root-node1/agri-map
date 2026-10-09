@@ -23,7 +23,9 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_filters',
     'drf_spectacular',
     'whitenoise.runserver_nostatic',
 ]
@@ -52,6 +54,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'server_agri_map_django.observability.RequestIdMiddleware',
+    'server_agri_map_django.idempotency.IdempotencyMiddleware',
+    'server_agri_map_django.observability.AuditLogMiddleware',
 ]
 
 ROOT_URLCONF = 'server_agri_map_django.urls'
@@ -101,14 +106,67 @@ CORS_ALLOWED_ORIGINS = config(
     cast=Csv(),
 )
 
+REDIS_URL = config('REDIS_URL', default='')
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'agrimap-idempotency',
+        }
+    }
+
+if not DEBUG and CACHES['default']['BACKEND'].endswith('LocMemCache'):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('Refusing LocMemCache with DEBUG=False: set REDIS_URL.')
+
+# Fail-closed: only fall back to the shared open-access user when
+# explicitly enabled (legacy local dev). Production forces False.
+OPEN_ACCESS_FALLBACK = config('OPEN_ACCESS_FALLBACK', default=False, cast=bool)
+
+# P2: short TTL for per-user GET caches (seconds).
+VIEW_CACHE_SECONDS = config('VIEW_CACHE_SECONDS', default=60, cast=int)
+# P1: payload limits — reject oversized bodies before they hit views.
+DATA_UPLOAD_MAX_MEMORY_SIZE = config('DATA_UPLOAD_MAX_MEMORY_SIZE', default=2 * 1024 * 1024, cast=int)
+DATA_UPLOAD_MAX_NUMBER_OF_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_OF_FIELDS', default=1000, cast=int)
+# P1: max GeoJSON coordinate points per Field geometry.
+FIELD_GEOMETRY_MAX_POINTS = config('FIELD_GEOMETRY_MAX_POINTS', default=5000, cast=int)
+
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': config('THROTTLE_ANON', default='100/hour'),
+        'user': config('THROTTLE_USER', default='1000/hour'),
+        'satellite': config('THROTTLE_SATELLITE', default='30/hour'),
+        'ml': config('THROTTLE_ML', default='60/hour'),
+        'auth': config('THROTTLE_AUTH', default='20/hour'),
+    },
+    'EXCEPTION_HANDLER': 'server_agri_map_django.exceptions.consistent_exception_handler',
 }
 
 SPECTACULAR_SETTINGS = {
@@ -119,6 +177,15 @@ SPECTACULAR_SETTINGS = {
 }
 
 ML_ASSETS_DIR = BASE_DIR / 'ml' / 'model_assets'
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=config('JWT_ACCESS_MINUTES', default=60, cast=int)),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=config('JWT_REFRESH_DAYS', default=7, cast=int)),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 LOGGING = {
     'version': 1,
