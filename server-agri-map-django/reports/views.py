@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from analysis.models import CropPrediction, VegetationIndex
 from carbon.models import CarbonSequestration
-from fields.models import Field
+from server_agri_map_django.caching import cached_get_view
+from server_agri_map_django.permissions import owned_or_shared_field_or_404
 from soil.models import SoilHealthRecord
 
 from .models import FieldReport
@@ -20,11 +21,9 @@ from .serializers import FieldReportResponseSerializer
 )
 class FieldReportDetailView(APIView):
     serializer_class = serializers.Serializer
+    @cached_get_view()
     def get(self, request, field_id=None):
-        try:
-            field = Field.objects.get(pk=field_id)
-        except Field.DoesNotExist:
-            return Response({'error': 'Field not found'}, status=404)
+        field = owned_or_shared_field_or_404(request.user, field_id)
 
         report = FieldReport.objects.filter(field=field).first()
         if report is None:

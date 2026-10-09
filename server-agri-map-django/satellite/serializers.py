@@ -30,6 +30,7 @@ class FetchImageryResponseSerializer(serializers.Serializer):
     cloud_cover = serializers.FloatField()
     bands = _BandsSerializer()
     date_range = _DateRangeSerializer()
+    source = serializers.CharField()
 
 
 class ProcessImageryInputSerializer(serializers.Serializer):

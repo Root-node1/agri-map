@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 
 from analysis.models import CropPrediction
@@ -11,11 +12,13 @@ User = get_user_model()
 
 class ReportTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user('repuser', 'r@e.com', 'pass')
         self.field = Field.objects.create(
             user=self.user, name='Test Field',
             geometry={'type': 'Point', 'coordinates': [0, 0]},
         )
+        self.client.force_login(self.user)
 
     def test_report_generation_open(self):
         resp = self.client.get(f'/api/reports/field/{self.field.id}/')

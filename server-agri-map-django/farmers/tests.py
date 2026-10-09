@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 
 from .models import Cooperative, CooperativeMember, Farmer
@@ -11,24 +12,34 @@ def make_user(username):
 
 
 class FarmerTest(TestCase):
-    def test_farmer_register_open(self):
+    def test_farmer_register_authenticated(self):
+        user = make_user('newfarmer')
+        self.client.force_login(user)
         resp = self.client.post('/api/farmers/register/', {
             'phone': '+1234567890', 'location': 'Test Farm',
         }, content_type='application/json')
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Farmer.objects.count(), 1)
 
-    def test_farmer_me_open_auto_creates(self):
+    def test_farmer_me_auto_creates(self):
+        user = make_user('meuser')
+        self.client.force_login(user)
         resp = self.client.get('/api/farmers/me/')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(Farmer.objects.exists())
 
     def test_farmer_me_update(self):
+        user = make_user('updater')
+        self.client.force_login(user)
         self.client.get('/api/farmers/me/')
         resp = self.client.patch('/api/farmers/me/', {'phone': '+999', 'location': 'Updated'},
                                  content_type='application/json')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['phone'], '+999')
+
+    def test_farmer_me_unauthenticated_rejected(self):
+        resp = self.client.get('/api/farmers/me/')
+        self.assertEqual(resp.status_code, 401)
 
     def test_farmer_str(self):
         user = make_user('strfarmer')
@@ -38,10 +49,12 @@ class FarmerTest(TestCase):
 
 class CooperativeTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = make_user('coopowner')
         Farmer.objects.create(user=self.user)
+        self.client.force_login(self.user)
 
-    def test_create_cooperative_open(self):
+    def test_create_cooperative_authenticated(self):
         resp = self.client.post('/api/farmers/cooperatives/', {
             'name': 'Test Coop', 'description': 'A test', 'location': 'Here',
         }, content_type='application/json')
@@ -85,11 +98,13 @@ class CooperativeTest(TestCase):
 
 class CooperativeMemberTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.admin_user = make_user('admin')
         self.member_user = make_user('member')
         self.admin_farmer = Farmer.objects.create(user=self.admin_user)
         self.member_farmer = Farmer.objects.create(user=self.member_user)
         self.coop = Cooperative.objects.create(name='Test Coop', created_by=self.admin_user)
+        self.client.force_login(self.admin_user)
 
     def test_add_member_open(self):
         resp = self.client.post(
@@ -183,12 +198,13 @@ class CooperativeMemberTest(TestCase):
         member = CooperativeMember.objects.create(cooperative=self.coop, farmer=self.member_farmer)
         self.assertIn('Test Coop', str(member))
 
-    def test_anyone_can_manage_members(self):
+    def test_outsider_cannot_manage_members(self):
         outsider = make_user('outsider')
         Farmer.objects.create(user=outsider)
+        self.client.force_login(outsider)
         resp = self.client.post(
             f'/api/farmers/cooperatives/{self.coop.id}/members/',
             {'user_id': self.member_user.id},
             content_type='application/json',
         )
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 403)

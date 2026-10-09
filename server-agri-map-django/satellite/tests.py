@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 
 from fields.models import Field
@@ -8,11 +9,13 @@ User = get_user_model()
 
 class SatelliteTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user('satuser', 's@e.com', 'pass')
         self.field = Field.objects.create(
             user=self.user, name='Test Field',
             geometry={'type': 'Point', 'coordinates': [0, 0]},
         )
+        self.client.force_login(self.user)
 
     def test_fetch_imagery_open(self):
         resp = self.client.post('/api/satellite/fetch/', {

@@ -36,6 +36,23 @@ INPUT_FIELDS = [
     'moisture', 'lon', 'lat',
 ]
 
+# Single source of truth for valid input ranges, shared by the DRF
+# serializers (reject out-of-range) and _build_dataframe (clip direct
+# service calls). Keep both in sync by importing this dict.
+INPUT_RANGES = {
+    'nitrogen': (0, 300),
+    'phosphorus': (0, 300),
+    'potassium': (0, 300),
+    'temperature': (-10, 55),
+    'humidity': (0, 100),
+    'rainfall': (0, 5000),
+    'moisture': (0, 100),
+    'lon': (-180, 180),
+    'lat': (-90, 90),
+}
+
+MAX_CATEGORICAL_LENGTH = 100
+
 RECOMMENDATION_CLASSES = [
     'apple', 'banana', 'blackgram',
 ]

@@ -1,16 +1,23 @@
 from rest_framework import serializers
 
+from ml.schema import INPUT_RANGES, MAX_CATEGORICAL_LENGTH
+
+
+def _ranged_float(name, default):
+    lo, hi = INPUT_RANGES[name]
+    return serializers.FloatField(min_value=lo, max_value=hi, default=default)
+
 
 class CropTypeInputSerializer(serializers.Serializer):
-    nitrogen = serializers.FloatField(min_value=0, max_value=300, default=80)
-    phosphorus = serializers.FloatField(min_value=0, max_value=300, default=40)
-    potassium = serializers.FloatField(min_value=0, max_value=300, default=40)
-    temperature = serializers.FloatField(min_value=-10, max_value=55, default=25.0)
-    humidity = serializers.FloatField(min_value=0, max_value=100, default=70.0)
-    rainfall = serializers.FloatField(min_value=0, max_value=5000, default=200.0)
-    moisture = serializers.FloatField(min_value=0, max_value=100, default=40.0)
-    lon = serializers.FloatField(min_value=-180, max_value=180, default=3.1)
-    lat = serializers.FloatField(min_value=-90, max_value=90, default=43.1)
+    nitrogen = _ranged_float('nitrogen', 80)
+    phosphorus = _ranged_float('phosphorus', 40)
+    potassium = _ranged_float('potassium', 40)
+    temperature = _ranged_float('temperature', 25.0)
+    humidity = _ranged_float('humidity', 70.0)
+    rainfall = _ranged_float('rainfall', 200.0)
+    moisture = _ranged_float('moisture', 40.0)
+    lon = _ranged_float('lon', 3.1)
+    lat = _ranged_float('lat', 43.1)
 
 
 class _VegetationDataSerializer(serializers.Serializer):
@@ -21,6 +28,9 @@ class _VegetationDataSerializer(serializers.Serializer):
 
 class VegetationIndexResponseSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()
+    count = serializers.IntegerField()
+    limit = serializers.IntegerField()
+    offset = serializers.IntegerField()
     indices = _VegetationDataSerializer(many=True)
 
 
@@ -30,6 +40,8 @@ class CropTypeResponseSerializer(serializers.Serializer):
     confidence = serializers.FloatField()
     reliability_level = serializers.CharField()
     message = serializers.CharField()
+    source = serializers.CharField()
+    action_required = serializers.BooleanField()
 
 
 class BoundaryResponseSerializer(serializers.Serializer):
@@ -58,18 +70,18 @@ class DegradationResponseSerializer(serializers.Serializer):
 
 
 class MLInputSerializer(serializers.Serializer):
-    nitrogen = serializers.FloatField(min_value=0, max_value=300, default=80)
-    phosphorus = serializers.FloatField(min_value=0, max_value=300, default=40)
-    potassium = serializers.FloatField(min_value=0, max_value=300, default=40)
-    temperature = serializers.FloatField(min_value=-10, max_value=55, default=25.0)
-    humidity = serializers.FloatField(min_value=0, max_value=100, default=70.0)
-    rainfall = serializers.FloatField(min_value=0, max_value=5000, default=200.0)
-    moisture = serializers.FloatField(min_value=0, max_value=100, default=40.0)
-    lon = serializers.FloatField(min_value=-180, max_value=180, default=3.1)
-    lat = serializers.FloatField(min_value=-90, max_value=90, default=43.1)
-    soil_type = serializers.CharField(required=False, default='Unknown')
-    region = serializers.CharField(required=False, default='Unknown')
-    country = serializers.CharField(required=False, default='Unknown')
+    nitrogen = _ranged_float('nitrogen', 80)
+    phosphorus = _ranged_float('phosphorus', 40)
+    potassium = _ranged_float('potassium', 40)
+    temperature = _ranged_float('temperature', 25.0)
+    humidity = _ranged_float('humidity', 70.0)
+    rainfall = _ranged_float('rainfall', 200.0)
+    moisture = _ranged_float('moisture', 40.0)
+    lon = _ranged_float('lon', 3.1)
+    lat = _ranged_float('lat', 43.1)
+    soil_type = serializers.CharField(required=False, default='Unknown', max_length=MAX_CATEGORICAL_LENGTH)
+    region = serializers.CharField(required=False, default='Unknown', max_length=MAX_CATEGORICAL_LENGTH)
+    country = serializers.CharField(required=False, default='Unknown', max_length=MAX_CATEGORICAL_LENGTH)
 
 
 class MLResponseSerializer(serializers.Serializer):
@@ -78,3 +90,5 @@ class MLResponseSerializer(serializers.Serializer):
     confidence = serializers.FloatField()
     reliability_level = serializers.CharField()
     message = serializers.CharField()
+    source = serializers.CharField()
+    action_required = serializers.BooleanField()

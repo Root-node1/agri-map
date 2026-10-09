@@ -1,9 +1,11 @@
 python-decouple
 dj-database-url
+redis
 django>=4.2
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
+django-filter
 drf-spectacular
 gunicorn
 whitenoise

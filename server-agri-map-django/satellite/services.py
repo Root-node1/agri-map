@@ -1,4 +1,5 @@
 import logging
+import time
 from datetime import date
 
 from decouple import config
@@ -8,6 +9,23 @@ from analysis.models import VegetationIndex
 from .models import ProcessingJob, SatelliteImage
 
 logger = logging.getLogger(__name__)
+
+
+def _with_retries(label, fn, *, attempts=3, base_delay=0.5):
+    """P2: retry external calls with exponential backoff.
+
+    `_real_fetch` rebuilds all request state per call, so retries are safe.
+    """
+    last_exc = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001 — retried, then stub fallback
+            last_exc = exc
+            logger.warning('%s failed (attempt %d/%d): %s', label, attempt, attempts, exc)
+            if attempt < attempts:
+                time.sleep(base_delay * 2 ** (attempt - 1))
+    raise last_exc
 
 
 def compute_ndvi(bands):
@@ -55,7 +73,10 @@ def fetch_satellite_data(*, field, start_date, end_date):
         return _stub_fetch(field)
 
     try:
-        return _real_fetch(field, start_date, end_date)
+        return _with_retries(
+            f'Sentinel Hub fetch for field {field.id}',
+            lambda: _real_fetch(field, start_date, end_date),
+        )
     except Exception:
         logger.exception('Sentinel Hub fetch failed for field %s — falling back to stub', field.id)
         return _stub_fetch(field)
@@ -131,6 +152,7 @@ def _real_fetch(field, start_date, end_date):
         'cloud_cover': round(float(cloud_cover), 2),
         'bands': {'B02': round(b02, 4), 'B03': round(b03, 4), 'B04': round(b04, 4), 'B08': round(b08, 4)},
         'scene_id': scene_id,
+        'source': 'model',
     }
 
 
@@ -140,6 +162,7 @@ def _stub_fetch(field):
         'source_url': f'https://scihub.copernicus.eu/dhus/search?q=field_{field.id}',
         'cloud_cover': 12.5,
         'bands': {'B02': 0.15, 'B03': 0.22, 'B04': 0.31, 'B08': 0.68},
+        'source': 'stub',
     }
 
 

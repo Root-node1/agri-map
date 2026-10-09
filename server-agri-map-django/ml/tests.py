@@ -101,6 +101,20 @@ class MLServiceTest(TestCase):
         self.assertEqual(_get_reliability(0.60), 'Medium')
         self.assertEqual(_get_reliability(0.10), 'Low')
 
+    def test_stub_results_flagged_low_with_source(self):
+        from ml.services import _stub_result
+        for prediction, confidence in (('apple', 0.45), ('Maize', 0.40), ('Loamy', 0.35)):
+            result = _stub_result(prediction, confidence)
+            self.assertEqual(result['reliability_level'], 'Low')
+            self.assertEqual(result['source'], 'stub')
+
+    def test_build_dataframe_clips_direct_calls(self):
+        from ml.services import _build_dataframe
+        df = _build_dataframe(temperature=9999, humidity=-50, soil_type='x' * 500)
+        self.assertEqual(df.loc[0, 'temperature'], 55)
+        self.assertEqual(df.loc[0, 'humidity'], 0)
+        self.assertLessEqual(len(df.loc[0, 'soil_type']), 100)
+
 
 class OpenAccessHelperTest(TestCase):
     def test_get_default_user_stable(self):
@@ -110,6 +124,22 @@ class OpenAccessHelperTest(TestCase):
         self.assertEqual(u1.pk, u2.pk)
         self.assertEqual(u1.username, 'open-access')
 
-    def test_resolve_user_returns_default(self):
-        from server_agri_map_django.open_access import get_default_user, resolve_user
-        self.assertEqual(resolve_user(None).pk, get_default_user().pk)
+    def test_resolve_user_fail_closed_by_default(self):
+        from django.test import override_settings
+        from server_agri_map_django.open_access import resolve_user
+        # Fail-closed: no fallback user unless explicitly enabled.
+        self.assertIsNone(resolve_user(None))
+        with override_settings(OPEN_ACCESS_FALLBACK=True):
+            from server_agri_map_django.open_access import get_default_user
+            self.assertEqual(resolve_user(None).pk, get_default_user().pk)
+
+    def test_resolve_user_prefers_authenticated(self):
+        from django.contrib.auth import get_user_model
+        from server_agri_map_django.open_access import resolve_user
+        user = get_user_model().objects.create_user('realuser', 'r@e.com', 'pass')
+
+        class Req:
+            pass
+        req = Req()
+        req.user = user
+        self.assertEqual(resolve_user(req).pk, user.pk)
