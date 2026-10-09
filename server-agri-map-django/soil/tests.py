@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 
 from fields.models import Field
@@ -9,12 +10,14 @@ User = get_user_model()
 
 class SoilTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user('soiluser', 's@e.com', 'pass')
         self.field = Field.objects.create(
             user=self.user, name='Test Field',
             geometry={'type': 'Point', 'coordinates': [0, 0]},
         )
         SoilHealthRecord.objects.create(field=self.field, nitrogen_proxy=0.62, moisture_index=0.48, degradation_risk='moderate')
+        self.client.force_login(self.user)
 
     def test_soil_health_open(self):
         resp = self.client.get(f'/api/soil/{self.field.id}/')

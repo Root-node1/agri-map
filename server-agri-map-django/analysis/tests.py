@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 
 from analysis.models import (BoundaryDetection, CropPrediction,
@@ -10,6 +11,7 @@ User = get_user_model()
 
 class AnalysisTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user('analyst', 'a@e.com', 'pass')
         self.field = Field.objects.create(
             user=self.user, name='Test Field',
@@ -20,6 +22,7 @@ class AnalysisTest(TestCase):
         CropPrediction.objects.create(field=self.field, crop_type='Maize', confidence=0.92)
         BoundaryDetection.objects.create(field=self.field, boundary_geojson=self.field.geometry)
         LandDegradation.objects.create(field=self.field, severity='low', score=0.22)
+        self.client.force_login(self.user)
 
     def test_vegetation_index(self):
         resp = self.client.get(f'/api/analysis/vegetation/{self.field.id}/')
@@ -44,6 +47,16 @@ class AnalysisTest(TestCase):
         self.assertIn('confidence', resp.json())
         self.assertIn('reliability_level', resp.json())
 
+    def test_crop_type_get_compat(self):
+        resp = self.client.get(f'/api/analysis/crop-type/{self.field.id}/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('crop_type', resp.json())
+
+    def test_soil_alias_get_compat(self):
+        resp = self.client.get(f'/api/analysis/soil/{self.field.id}/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('prediction', resp.json())
+
     def test_crop_type_with_params(self):
         resp = self.client.post(f'/api/analysis/crop-type/{self.field.id}/', {
             'humidity': 75, 'rainfall': 120, 'temperature': 28,
@@ -60,6 +73,11 @@ class AnalysisTest(TestCase):
     def test_crop_type_invalid_params(self):
         resp = self.client.post(f'/api/analysis/crop-type/{self.field.id}/', {'humidity': -1},
                                 content_type='application/json')
+        self.assertEqual(resp.status_code, 400)
+
+    def test_soil_composition_rejects_oversized_categorical(self):
+        resp = self.client.post(f'/api/analysis/soil-composition/{self.field.id}/',
+                                {'soil_type': 'x' * 500}, content_type='application/json')
         self.assertEqual(resp.status_code, 400)
 
     def test_soil_composition(self):
@@ -81,6 +99,20 @@ class AnalysisTest(TestCase):
     def test_crop_area_missing_field(self):
         resp = self.client.post('/api/analysis/crop-area/9999/', {}, content_type='application/json')
         self.assertEqual(resp.status_code, 404)
+
+    def test_crop_area_get_compat(self):
+        resp = self.client.get(f'/api/analysis/crop-area/{self.field.id}/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('prediction', resp.json())
+
+    def test_missing_data_envelope(self):
+        empty = Field.objects.create(user=self.user, name='No Data', geometry={'type': 'Point', 'coordinates': [9, 9]})
+        resp = self.client.get(f'/api/analysis/degradation/{empty.id}/')
+        self.assertEqual(resp.status_code, 404)
+        body = resp.json()
+        self.assertIn('error', body)
+        self.assertIn('message', body)
+        self.assertEqual(body.get('code'), 'not_found')
 
     def test_boundaries(self):
         resp = self.client.get(f'/api/analysis/boundaries/{self.field.id}/')
@@ -132,9 +164,14 @@ class AnalysisTest(TestCase):
         resp = self.client.get('/api/analysis/degradation/9999/')
         self.assertEqual(resp.status_code, 404)
 
-    def test_any_field_visible_without_login(self):
+    def test_other_user_field_not_visible(self):
         other = User.objects.create_user('stranger', 's@e.com', 'pass')
         field = Field.objects.create(user=other, name='Stranger field',
                                      geometry={'type': 'Point', 'coordinates': [9, 9]})
         resp = self.client.get(f'/api/analysis/vegetation/{field.id}/')
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_vegetation_requires_login(self):
+        self.client.logout()
+        resp = self.client.get(f'/api/analysis/vegetation/{self.field.id}/')
+        self.assertEqual(resp.status_code, 401)

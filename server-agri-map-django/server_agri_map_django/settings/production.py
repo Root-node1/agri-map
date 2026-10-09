@@ -2,6 +2,9 @@ from .base import *
 
 DEBUG = False
 
+# P0: never fall back to the shared open-access user in production.
+OPEN_ACCESS_FALLBACK = False
+
 # Render terminates TLS at its proxy and forwards plain HTTP internally.
 # Without this, SECURE_SSL_REDIRECT would 301 Render's own health checks
 # and the deploy would never pass as healthy.

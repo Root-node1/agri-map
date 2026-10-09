@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 OPEN_ACCESS_USERNAME = 'open-access'
@@ -13,4 +14,11 @@ def get_default_user():
 
 
 def resolve_user(request):
-    return get_default_user()
+    """P0: prefer the authenticated user; fall back to the shared
+    open-access user only when OPEN_ACCESS_FALLBACK=True (dev/legacy)."""
+    user = getattr(request, 'user', None)
+    if user is not None and user.is_authenticated:
+        return user
+    if getattr(settings, 'OPEN_ACCESS_FALLBACK', False):
+        return get_default_user()
+    return user

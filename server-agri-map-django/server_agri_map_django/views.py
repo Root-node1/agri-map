@@ -27,3 +27,19 @@ def health(_request: Request) -> Response:
         'version': '1.0.0',
         'database': 'connected' if db_ok else 'unreachable',
     })
+
+
+@extend_schema(
+    summary='Readiness probe',
+    description='Returns 200 when the API can serve traffic (database reachable), else 503',
+    tags=['Health'],
+    responses={200: None},
+)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ready(_request: Request) -> Response:
+    try:
+        connection.ensure_connection()
+    except OperationalError:
+        return Response({'status': 'not-ready'}, status=503)
+    return Response({'status': 'ready'})

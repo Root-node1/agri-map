@@ -11,6 +11,8 @@ from .schema import (
     CONFIDENCE_THRESHOLDS,
     FEATURE_ORDER,
     INPUT_FIELDS,
+    INPUT_RANGES,
+    MAX_CATEGORICAL_LENGTH,
     NUMERICAL_DEFAULTS,
     NUMERICAL_FEATURES,
 )
@@ -70,16 +72,35 @@ def _get_reliability(confidence):
     return 'Low'
 
 
+def _log_prediction(label, *, prediction, confidence, reliability, source, extra=None):
+    # Stable alert token: aggregate on `reliability=Low` to detect model
+    # degradation. Lows log at warning so log-based alerting can fire.
+    log = logger.warning if reliability == 'Low' else logger.info
+    log('%s — prediction=%s confidence=%.4f reliability=%s source=%s%s',
+        label, prediction, confidence, reliability, source,
+        f' inputs={extra}' if extra is not None else '')
+
+
 def _build_dataframe(**kwargs):
     row = {}
     for col in NUMERICAL_FEATURES:
         val = kwargs.get(col)
         if val is None:
             val = NUMERICAL_DEFAULTS.get(col, 0.0)
-        row[col] = float(val)
+        try:
+            val = float(val)
+        except (TypeError, ValueError):
+            val = NUMERICAL_DEFAULTS.get(col, 0.0)
+        # Direct service callers bypass serializer validation: clip to the
+        # same documented ranges instead of feeding the model garbage.
+        bounds = INPUT_RANGES.get(col)
+        if bounds is not None:
+            val = max(bounds[0], min(bounds[1], val))
+        row[col] = val
     for col in CATEGORICAL_FEATURES:
         val = kwargs.get(col)
-        row[col] = val if val else 'Unknown'
+        val = str(val).strip()[:MAX_CATEGORICAL_LENGTH] if val else 'Unknown'
+        row[col] = val or 'Unknown'
     return pd.DataFrame([row], columns=FEATURE_ORDER)
 
 
@@ -90,6 +111,7 @@ def _stub_result(prediction, confidence):
         'confidence': confidence,
         'reliability_level': reliability,
         'message': CONFIDENCE_MESSAGES[reliability],
+        'source': 'stub',
     }
 
 
@@ -103,17 +125,19 @@ def predict_crop(*, field_id=None, user=None, **kwargs):
                 field = Field.objects.get(pk=field_id)
                 existing = CropPrediction.objects.filter(field=field).first()
                 if existing:
+                    reliability = _get_reliability(existing.confidence)
                     return {
                         'field_id': field.id,
                         'crop_type': existing.crop_type,
                         'confidence': existing.confidence,
                         'predicted_at': existing.predicted_at,
-                        'reliability_level': _get_reliability(existing.confidence),
-                        'message': CONFIDENCE_MESSAGES[_get_reliability(existing.confidence)],
+                        'reliability_level': reliability,
+                        'message': CONFIDENCE_MESSAGES[reliability],
+                        'source': 'cache',
                     }
             except Field.DoesNotExist:
                 pass
-        stub = _stub_result('apple', 0.85)
+        stub = _stub_result('apple', 0.45)
         logger.info('Recommendation model unavailable — returning stub')
         return stub
 
@@ -125,11 +149,9 @@ def predict_crop(*, field_id=None, user=None, **kwargs):
     crop_type = str(assets.rec_encoder.inverse_transform([best_idx])[0])
     reliability = _get_reliability(confidence)
 
-    logger.info(
-        'Prediction — crop=%s confidence=%.4f reliability=%s inputs=%s',
-        crop_type, confidence, reliability,
-        {k: kwargs.get(k) for k in INPUT_FIELDS},
-    )
+    _log_prediction('Prediction', prediction=crop_type, confidence=confidence,
+                    reliability=reliability, source='model',
+                    extra={k: kwargs.get(k) for k in INPUT_FIELDS})
 
     saved_field_id = None
     if field_id is not None:
@@ -148,13 +170,14 @@ def predict_crop(*, field_id=None, user=None, **kwargs):
         'confidence': confidence,
         'reliability_level': reliability,
         'message': CONFIDENCE_MESSAGES[reliability],
+        'source': 'model',
     }
 
 
 def predict_crop_area(*, field_id=None, user=None, **kwargs):
     assets = ModelAssets.load()
     if assets.area_model is None:
-        stub = _stub_result('Maize', 0.70)
+        stub = _stub_result('Maize', 0.40)
         logger.info('Crop area model unavailable — returning stub')
         return stub
 
@@ -166,10 +189,8 @@ def predict_crop_area(*, field_id=None, user=None, **kwargs):
     crop_type = str(assets.area_encoder.inverse_transform([best_idx])[0])
     reliability = _get_reliability(confidence)
 
-    logger.info(
-        'CropArea — crop=%s confidence=%.4f reliability=%s',
-        crop_type, confidence, reliability,
-    )
+    _log_prediction('CropArea', prediction=crop_type, confidence=confidence,
+                    reliability=reliability, source='model')
 
     saved_field_id = None
     if field_id is not None:
@@ -188,12 +209,13 @@ def predict_crop_area(*, field_id=None, user=None, **kwargs):
         'confidence': confidence,
         'reliability_level': reliability,
         'message': CONFIDENCE_MESSAGES[reliability],
+        'source': 'model',
     }
 
 
 def predict_soil(*, field_id=None, user=None, **kwargs):
     assets = ModelAssets.load()
-    stub = _stub_result('Loamy', 0.60)
+    stub = _stub_result('Loamy', 0.35)
     stub['note'] = 'Soil model not yet trained — returning estimate'
     logger.info('Soil model unavailable — returning stub')
     return stub
